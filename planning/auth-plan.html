@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNOFF 서비스기획 — 01. 회원가입/로그인</title>
+<style>
+  :root {
+    --bg: #0F0F1A;
+    --surface: #1A1A2E;
+    --surface-alt: #16213E;
+    --border: #2A2A4A;
+    --text: #E8E8F0;
+    --text-dim: #8888AA;
+    --accent: #7B68EE;
+    --accent-dim: rgba(123,104,238,0.15);
+    --green: #4ECDC4;
+    --green-dim: rgba(78,205,196,0.15);
+    --yellow: #FFD93D;
+    --yellow-dim: rgba(255,217,61,0.15);
+    --red: #FF6B6B;
+    --red-dim: rgba(255,107,107,0.15);
+    --blue: #4D96FF;
+    --blue-dim: rgba(77,150,255,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+
+  /* 네비게이션 */
+  .top-nav {
+    position: sticky; top:0; z-index:100;
+    background: rgba(15,15,26,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .top-nav .logo { font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: 1px; }
+  .top-nav .sep { color: var(--text-dim); }
+  .top-nav .title { font-size: 14px; color: var(--text-dim); }
+  .top-nav .status {
+    margin-left: auto;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--green-dim);
+    color: var(--green);
+  }
+
+  /* 사이드바 + 콘텐츠 레이아웃 */
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 260px; min-width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky; top: 45px;
+    height: calc(100vh - 45px);
+    overflow-y: auto;
+  }
+  .sidebar h3 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-dim); padding: 8px 24px; margin-top: 16px;
+  }
+  .sidebar h3:first-child { margin-top: 0; }
+  .sidebar a {
+    display: block; padding: 8px 24px; font-size: 13px;
+    color: var(--text-dim); text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .sidebar a:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .sidebar a.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-dim); }
+  .main { flex:1; padding: 40px 48px; max-width: 960px; }
+
+  /* 타이포 */
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  h1 small { font-size: 14px; color: var(--text-dim); font-weight: 400; }
+  h2 {
+    font-size: 20px; font-weight: 600; margin-top: 48px; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2 .badge {
+    font-size: 11px; padding: 2px 8px; border-radius: 4px;
+    font-weight: 500;
+  }
+  h2 .badge.fe { background: var(--blue-dim); color: var(--blue); }
+  h2 .badge.be { background: var(--green-dim); color: var(--green); }
+  h2 .badge.data { background: var(--yellow-dim); color: var(--yellow); }
+  h2 .badge.both { background: var(--accent-dim); color: var(--accent); }
+  h3 { font-size: 16px; font-weight: 600; margin-top: 28px; margin-bottom: 12px; color: var(--accent); }
+  p { margin-bottom: 12px; }
+
+  /* 메타 헤더 */
+  .meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    padding: 16px 20px; background: var(--surface);
+    border-radius: 8px; margin-bottom: 32px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .meta dt { color: var(--text-dim); margin-bottom: 2px; }
+  .meta dd { color: var(--text); font-weight: 500; }
+
+  /* 카드 */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .card.highlight { border-left: 3px solid var(--accent); }
+  .card.warn { border-left: 3px solid var(--yellow); }
+  .card.danger { border-left: 3px solid var(--red); }
+
+  /* 테이블 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  th {
+    text-align: left; padding: 10px 12px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-dim); font-weight: 600;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  td {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  /* 코드 */
+  pre {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+  }
+  :not(pre) > code {
+    background: var(--surface-alt);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* 플로우 다이어그램 */
+  .flow {
+    display: flex; flex-direction: column; gap: 4px;
+    margin: 16px 0;
+  }
+  .flow-step {
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .flow-num {
+    min-width: 28px; height: 28px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .flow-line {
+    width: 2px; height: 16px;
+    background: var(--border);
+    margin-left: 13px;
+  }
+  .flow-content {
+    padding: 4px 0;
+    font-size: 14px;
+  }
+  .flow-content small { display: block; color: var(--text-dim); font-size: 12px; }
+
+  /* 체크리스트 */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .checklist li::before {
+    content: ''; width: 16px; height: 16px; flex-shrink: 0;
+    border: 2px solid var(--border); border-radius: 3px;
+    margin-top: 3px;
+  }
+  .checklist li.done::before {
+    background: var(--green); border-color: var(--green);
+    content: ''; /* checked via CSS only */
+  }
+
+  /* 태그 */
+  .tag {
+    display: inline-block;
+    font-size: 11px; padding: 2px 8px;
+    border-radius: 4px; margin-right: 4px;
+    font-weight: 500;
+  }
+  .tag.required { background: var(--red-dim); color: var(--red); }
+  .tag.optional { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+  .tag.mvp { background: var(--green-dim); color: var(--green); }
+  .tag.phase2 { background: var(--yellow-dim); color: var(--yellow); }
+
+  /* 분기 박스 */
+  .branch {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin: 16px 0;
+  }
+  .branch > div {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .branch .yes { background: var(--green-dim); border-color: rgba(78,205,196,0.3); }
+  .branch .no { background: var(--red-dim); border-color: rgba(255,107,107,0.3); }
+  .branch h4 { font-size: 13px; margin-bottom: 8px; }
+
+  /* 반응형 */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 24px 16px; }
+    .branch { grid-template-columns: 1fr; }
+  }
+
+  /* 인쇄 */
+  @media print {
+    .sidebar, .top-nav { display: none; }
+    .main { max-width: 100%; padding: 20px; }
+    body { background: #fff; color: #111; }
+  }
+
+  /* 업데이트 로그 */
+  .update-log {
+    font-size: 12px; color: var(--text-dim);
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    margin-top: 8px;
+  }
+  .update-log strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- 상단 네비게이션 -->
+<nav class="top-nav">
+  <span class="logo">UNOFF</span>
+  <span class="sep">/</span>
+  <span class="title">서비스기획 &gt; 01. 회원가입/로그인</span>
+  <span class="status">v1.0 작업중</span>
+</nav>
+
+<div class="layout">
+
+<!-- 사이드바 (목차) -->
+<aside class="sidebar">
+  <h3>개요</h3>
+  <a href="#overview" class="active">기능 개요</a>
+  <a href="#user-flow">유저 플로우 요약</a>
+
+  <h3>프론트엔드</h3>
+  <a href="#login-screen">로그인 화면</a>
+  <a href="#social-login">소셜 로그인</a>
+  <a href="#email-signup">이메일 회원가입</a>
+  <a href="#email-login">이메일 로그인</a>
+  <a href="#pw-reset">비밀번호 찾기</a>
+  <a href="#error-ux">에러 UX</a>
+
+  <h3>백엔드</h3>
+  <a href="#auth-architecture">인증 아키텍처</a>
+  <a href="#db-schema">DB 스키마</a>
+  <a href="#rls-policy">RLS 정책</a>
+  <a href="#edge-functions">Edge Functions</a>
+  <a href="#session-mgmt">세션 관리</a>
+
+  <h3>데이터</h3>
+  <a href="#data-collection">수집 데이터</a>
+  <a href="#privacy">개인정보 처리</a>
+
+  <h3>엣지케이스</h3>
+  <a href="#edge-cases">엣지케이스 대응</a>
+
+  <h3>구현 체크리스트</h3>
+  <a href="#checklist">개발 체크리스트</a>
+
+  <h3>변경 이력</h3>
+  <a href="#changelog">업데이트 로그</a>
+</aside>
+
+<!-- 메인 콘텐츠 -->
+<main class="main">
+
+<!-- ================================ -->
+<!-- 기능 개요 -->
+<!-- ================================ -->
+<h1 id="overview">01. 회원가입 / 로그인 <small>Auth Flow</small></h1>
+
+<div class="meta">
+  <dl><dt>담당 기능</dt><dd>회원가입, 로그인, 비밀번호 찾기, 세션 관리</dd></dl>
+  <dl><dt>관련 화면</dt><dd>LoginScreen, SignUpScreen, EmailLoginScreen, OnboardingSurvey</dd></dl>
+  <dl><dt>백엔드</dt><dd>Supabase Auth + Edge Functions</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-16</dd></dl>
+  <dl><dt>상태</dt><dd><span class="tag mvp">MVP</span></dd></dl>
+</div>
+
+<div class="card highlight">
+  <strong>이 문서의 목적</strong><br>
+  회원가입/로그인 기능의 프론트엔드 화면 설계, 백엔드 인증 아키텍처, DB 스키마, 데이터 수집 정책을
+  <strong>한 곳에서</strong> 관리한다. 개발 시 이 문서 하나만 보면 된다.
+</div>
+
+
+<!-- ================================ -->
+<!-- 유저 플로우 요약 -->
+<!-- ================================ -->
+<h2 id="user-flow">유저 플로우 요약 <span class="badge both">FE + BE</span></h2>
+
+<div class="card">
+<pre><code>앱 실행
+  │
+  ├─ SecureStore에 refresh_token 있음?
+  │   ├─ YES → Supabase refreshSession()
+  │   │   ├─ 성공 → HomeScreen (자동 로그인)
+  │   │   └─ 실패 (만료) → LoginScreen
+  │   └─ NO → 최초 설치?
+  │       ├─ YES → 온보딩 슬라이드 → LoginScreen
+  │       └─ NO → LoginScreen
+  │
+LoginScreen
+  ├─ 소셜 로그인 (카카오/네이버/Apple)
+  │   └─ Edge Function → 기존 유저? → YES: HomeScreen
+  │                                  → NO: 자동 가입 → OnboardingSurvey
+  │
+  ├─ 이메일로 가입
+  │   └─ SignUpScreen → 이메일 인증 → OnboardingSurvey
+  │
+  └─ 이메일로 로그인
+      └─ EmailLoginScreen → HomeScreen</code></pre>
+</div>
+
+
+<!-- ================================ -->
+<!-- 로그인 화면 (프론트엔드) -->
+<!-- ================================ -->
+<h2 id="login-screen">로그인 화면 (LoginScreen) <span class="badge fe">프론트엔드</span></h2>
+
+<h3>화면 구성</h3>
+<table>
+  <tr><th>요소</th><th>설명</th><th>비고</th></tr>
+  <tr><td>UNOFF 로고</td><td>상단 중앙</td><td>밤하늘 무드 배경</td></tr>
+  <tr><td>슬로건</td><td>"다음 ON을 위해 지금은 OFF."</td><td></td></tr>
+  <tr><td>카카오로 시작</td><td>노란색 버튼, 최상단</td><td>한국 1순위</td></tr>
+  <tr><td>네이버로 시작</td><td>초록색 버튼</td><td></td></tr>
+  <tr><td>Apple로 시작</td><td>검정색 버튼</td><td>iOS 앱스토어 필수</td></tr>
+  <tr><td>이메일로 가입하기</td><td>텍스트 링크</td><td>소셜 불가 시 대체</td></tr>
+  <tr><td>이메일로 로그인</td><td>텍스트 링크</td><td></td></tr>
+  <tr><td>약관 안내</td><td>"가입하면 이용약관과 개인정보처리방침에 동의하는 것으로 간주합니다."</td><td>밑줄 링크</td></tr>
+</table>
+
+<h3>UX 규칙</h3>
+<ul>
+  <li>소셜 로그인 버튼 순서: 카카오 → 네이버 → Apple (사용률 순)</li>
+  <li>이메일 가입/로그인은 하단 텍스트 링크 — 소셜을 우선 유도</li>
+  <li>뒤로 가기(하드웨어/제스처): 앱 종료 확인 → "정말 나갈래?" 없이 바로 종료</li>
+</ul>
+
+
+<!-- ================================ -->
+<!-- 소셜 로그인 -->
+<!-- ================================ -->
+<h2 id="social-login">소셜 로그인 <span class="badge both">FE + BE</span></h2>
+
+<h3>지원 소셜 프로바이더</h3>
+<table>
+  <tr><th>제공자</th><th>SDK</th><th>수집 정보</th><th>Supabase 연동 방식</th></tr>
+  <tr>
+    <td><strong>카카오</strong></td>
+    <td><code>@react-native-seoul/kakao-login</code></td>
+    <td>이메일, 닉네임(선택), 프로필이미지(선택)</td>
+    <td>Edge Function으로 커스텀 OAuth</td>
+  </tr>
+  <tr>
+    <td><strong>네이버</strong></td>
+    <td><code>@react-native-seoul/naver-login</code></td>
+    <td>이메일, 이름, 프로필이미지</td>
+    <td>Edge Function으로 커스텀 OAuth</td>
+  </tr>
+  <tr>
+    <td><strong>Apple</strong></td>
+    <td><code>expo-apple-authentication</code></td>
+    <td>이메일(숨김 가능), 이름</td>
+    <td>Supabase Auth 기본 지원</td>
+  </tr>
+</table>
+
+<h3>소셜 로그인 상세 플로우 (카카오 기준)</h3>
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-content">유저가 "카카오로 시작" 버튼 탭<small>프론트엔드 — LoginScreen</small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-content">카카오 SDK가 인앱 브라우저로 카카오 로그인 화면 표시<small>프론트엔드 — 카카오 SDK</small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-content">유저가 카카오 계정으로 동의 → 카카오 액세스 토큰 반환<small>프론트엔드 — 카카오 SDK callback</small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-content">앱이 카카오 토큰을 Supabase Edge Function으로 전송<small>프론트엔드 → 백엔드 — <code>POST /functions/v1/auth-social</code></small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">5</div>
+    <div class="flow-content">
+      Edge Function이 카카오 API로 유저 정보 조회 (이메일, 닉네임)
+      <small>백엔드 — Edge Function <code>auth-social</code></small>
+    </div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">6</div>
+    <div class="flow-content">
+      Supabase Auth에서 해당 이메일로 유저 존재 확인
+      <small>백엔드 — <code>supabase.auth.admin.getUserByEmail()</code></small>
+    </div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">7</div>
+    <div class="flow-content">
+      <strong>분기:</strong> 기존 유저면 JWT 발급 / 신규면 자동 가입 + JWT 발급
+      <small>백엔드 — <code>supabase.auth.admin.createUser()</code> 또는 <code>generateLink()</code></small>
+    </div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">8</div>
+    <div class="flow-content">JWT를 앱으로 반환 → SecureStore에 저장<small>프론트엔드 — <code>expo-secure-store</code></small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">9</div>
+    <div class="flow-content">
+      신규 유저 → OnboardingSurvey / 기존 유저 → HomeScreen
+      <small>프론트엔드 — <code>onboarding_completed</code> 필드로 분기</small>
+    </div>
+  </div>
+</div>
+
+<div class="card warn">
+  <strong>네이버 로그인도 동일한 플로우</strong> — SDK와 토큰 검증 API 엔드포인트만 다름.<br>
+  <strong>Apple 로그인</strong>은 Supabase Auth가 기본 지원하므로 Edge Function 불필요. <code>supabase.auth.signInWithIdToken({ provider: 'apple', token })</code> 사용.
+</div>
+
+
+<!-- ================================ -->
+<!-- 이메일 회원가입 -->
+<!-- ================================ -->
+<h2 id="email-signup">이메일 회원가입 (SignUpScreen) <span class="badge fe">프론트엔드</span></h2>
+
+<h3>입력 필드 & 유효성 검사</h3>
+<table>
+  <tr><th>필드</th><th>규칙</th><th>에러 메시지</th><th>검증 시점</th></tr>
+  <tr>
+    <td>이메일</td>
+    <td>이메일 형식 + 중복 체크</td>
+    <td>"올바른 이메일 주소를 입력해줘" / "이미 가입된 이메일이야"</td>
+    <td>onBlur + 제출 시</td>
+  </tr>
+  <tr>
+    <td>비밀번호</td>
+    <td>8자 이상, 영문+숫자 포함</td>
+    <td>"8자 이상, 영문과 숫자를 섞어줘"</td>
+    <td>onChange (실시간)</td>
+  </tr>
+  <tr>
+    <td>비밀번호 확인</td>
+    <td>비밀번호와 일치</td>
+    <td>"비밀번호가 맞지 않아"</td>
+    <td>onChange</td>
+  </tr>
+  <tr>
+    <td>이용약관 <span class="tag required">필수</span></td>
+    <td>체크 필수</td>
+    <td>"이용약관에 동의해야 가입할 수 있어"</td>
+    <td>제출 시</td>
+  </tr>
+  <tr>
+    <td>개인정보처리방침 <span class="tag required">필수</span></td>
+    <td>체크 필수</td>
+    <td>"개인정보 처리방침에 동의해야 가입할 수 있어"</td>
+    <td>제출 시</td>
+  </tr>
+  <tr>
+    <td>마케팅 수신 <span class="tag optional">선택</span></td>
+    <td>체크 선택</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+</table>
+
+<h3>이메일 인증 플로우</h3>
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-content">"가입하기" 탭 → <code>supabase.auth.signUp({ email, password })</code><small>프론트엔드 → Supabase Auth</small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-content">Supabase가 인증 이메일 자동 발송<small>백엔드 — Supabase Auth 내장 기능</small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-content">
+      화면 전환: "이메일을 확인해줘" 안내 화면
+      <small>"인증 메일을 보냈어. 메일함을 확인해줘." + [메일앱 열기] 버튼 + "메일이 안 왔어?" 재발송 (60초 쿨다운)</small>
+    </div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-content">유저가 이메일 링크 클릭 → 딥링크 <code>unoff://auth/verify-email</code>로 앱 복귀<small>프론트엔드 — Expo Linking</small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">5</div>
+    <div class="flow-content">인증 완료 → OnboardingSurvey 시작<small>프론트엔드</small></div>
+  </div>
+</div>
+
+
+<!-- ================================ -->
+<!-- 이메일 로그인 -->
+<!-- ================================ -->
+<h2 id="email-login">이메일 로그인 (EmailLoginScreen) <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>필드</th><th>설명</th></tr>
+  <tr><td>이메일 입력</td><td>키보드 타입: email-address, autoComplete: email</td></tr>
+  <tr><td>비밀번호 입력</td><td>secureTextEntry + 눈 아이콘 토글</td></tr>
+  <tr><td>로그인 버튼</td><td><code>supabase.auth.signInWithPassword()</code></td></tr>
+  <tr><td>비밀번호 잊었어?</td><td>텍스트 링크 → 비밀번호 재설정 화면</td></tr>
+</table>
+
+
+<!-- ================================ -->
+<!-- 비밀번호 찾기 -->
+<!-- ================================ -->
+<h2 id="pw-reset">비밀번호 찾기 <span class="badge both">FE + BE</span></h2>
+
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-content">"비밀번호 잊었어?" 탭 → 이메일 입력 화면</div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-content"><code>supabase.auth.resetPasswordForEmail(email)</code> 호출</div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-content">"비밀번호 재설정 링크를 보냈어. 메일함을 확인해줘."</div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-content">이메일 링크 클릭 → 딥링크 <code>unoff://auth/reset-password</code> → 새 비밀번호 입력 화면</div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">5</div>
+    <div class="flow-content"><code>supabase.auth.updateUser({ password })</code> → LoginScreen 이동</div>
+  </div>
+</div>
+
+
+<!-- ================================ -->
+<!-- 에러 UX -->
+<!-- ================================ -->
+<h2 id="error-ux">에러 UX <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>상황</th><th>에러 메시지</th><th>대응</th></tr>
+  <tr><td>네트워크 없음</td><td>"인터넷 연결을 확인해줘"</td><td>재시도 버튼</td></tr>
+  <tr><td>카카오 로그인 취소</td><td>(아무 동작 없음, 원래 화면 유지)</td><td>—</td></tr>
+  <tr><td>이미 가입된 소셜 계정</td><td>자동 로그인 처리</td><td>—</td></tr>
+  <tr><td>다른 소셜로 가입한 이메일</td><td>"이 이메일은 [카카오]로 가입되어 있어. [카카오]로 로그인해줘"</td><td>해당 소셜 버튼 하이라이트</td></tr>
+  <tr><td>이메일 미인증</td><td>"아직 이메일 인증이 안 됐어. 메일함을 확인해줘"</td><td>재발송 버튼</td></tr>
+  <tr><td>비밀번호 틀림</td><td>"비밀번호가 맞지 않아. 다시 확인해줘"</td><td>비밀번호 찾기 링크</td></tr>
+  <tr><td>서버 오류</td><td>"잠깐 문제가 생겼어. 조금 뒤에 다시 시도해줘"</td><td>재시도 버튼</td></tr>
+  <tr><td>비밀번호 5회 연속 실패</td><td>"보안을 위해 5분 뒤에 다시 시도해줘"</td><td>비밀번호 찾기 유도</td></tr>
+</table>
+
+
+<!-- ================================ -->
+<!-- 인증 아키텍처 (백엔드) -->
+<!-- ================================ -->
+<h2 id="auth-architecture">인증 아키텍처 <span class="badge be">백엔드</span></h2>
+
+<div class="card highlight">
+  <strong>핵심 원칙</strong>
+  <ul>
+    <li>Supabase Auth를 메인 인증 시스템으로 사용</li>
+    <li>카카오/네이버는 Supabase Auth에서 직접 지원하지 않으므로 Edge Function으로 커스텀 OAuth 구현</li>
+    <li>Apple은 Supabase Auth 기본 지원 — Edge Function 불필요</li>
+    <li>모든 JWT 토큰은 Supabase Auth가 관리 (직접 생성 금지)</li>
+  </ul>
+</div>
+
+<h3>아키텍처 다이어그램</h3>
+<pre><code>┌─────────────┐     ┌──────────────────┐     ┌───────────────┐
+│  React Native │────▶│  Supabase Auth    │────▶│  PostgreSQL    │
+│  (Expo)       │     │                  │     │  (users 등)    │
+└──────┬────────┘     └──────────────────┘     └───────────────┘
+       │                       ▲
+       │  카카오/네이버 토큰      │  유저 생성/조회
+       ▼                       │
+┌──────────────┐    ┌─────────┴──────────┐
+│  카카오 API   │◀───│  Edge Function      │
+│  네이버 API   │    │  (auth-social)      │
+└──────────────┘    └────────────────────┘
+
+토큰 저장: expo-secure-store (SecureStore)
+  - access_token:  1시간 유효 (Supabase 기본)
+  - refresh_token: 30일 유효</code></pre>
+
+<h3>Edge Function 엔드포인트</h3>
+<table>
+  <tr><th>엔드포인트</th><th>메서드</th><th>용도</th></tr>
+  <tr>
+    <td><code>/functions/v1/auth-social</code></td>
+    <td>POST</td>
+    <td>소셜 로그인 (카카오/네이버) — 토큰 검증 + 유저 생성/로그인</td>
+  </tr>
+  <tr>
+    <td><code>/functions/v1/auth-withdraw</code></td>
+    <td>POST</td>
+    <td>회원 탈퇴 — soft delete + 데이터 익명화</td>
+  </tr>
+</table>
+
+
+<!-- ================================ -->
+<!-- DB 스키마 -->
+<!-- ================================ -->
+<h2 id="db-schema">DB 스키마 <span class="badge be">백엔드</span></h2>
+
+<h3>auth.users (Supabase Auth 내장)</h3>
+<div class="card">
+  Supabase Auth가 자동으로 관리하는 테이블. 직접 수정하지 않음.
+  <ul>
+    <li><code>id</code> — UUID, PK</li>
+    <li><code>email</code> — 이메일</li>
+    <li><code>encrypted_password</code> — 암호화된 비밀번호 (이메일 가입 시)</li>
+    <li><code>raw_app_meta_data</code> — provider 정보 등</li>
+    <li><code>created_at</code>, <code>updated_at</code></li>
+  </ul>
+</div>
+
+<h3>public.users (앱 프로필 테이블)</h3>
+<pre><code>CREATE TABLE public.users (
+  -- PK: Supabase Auth의 auth.users.id와 동일
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+
+  -- 기본 프로필
+  email TEXT UNIQUE NOT NULL,
+  nickname TEXT UNIQUE NOT NULL DEFAULT 'OFF 중인 누군가',
+  bio TEXT DEFAULT '' CHECK (char_length(bio) &lt;= 50),
+  birth_date DATE NOT NULL,
+
+  -- ON/OFF 상태
+  status TEXT NOT NULL DEFAULT 'off'
+    CHECK (status IN ('off', 'slow', 'on', 'pause')),
+
+  -- 온보딩 서베이 결과
+  gap_duration TEXT CHECK (gap_duration IN (
+    'under_3m', '3m_to_1y', 'over_1y', 'burnout', 'browsing', NULL
+  )),
+  gap_reason TEXT CHECK (gap_reason IN (
+    'job_search', 'resign', 'health', 'voluntary', 'hard_to_say', NULL
+  )),
+  interests TEXT[] DEFAULT '{}',
+
+  -- 배터리 시스템
+  battery_percent INTEGER NOT NULL DEFAULT 0
+    CHECK (battery_percent BETWEEN 0 AND 100),
+  battery_level INTEGER NOT NULL DEFAULT 1
+    CHECK (battery_level BETWEEN 1 AND 5),
+
+  -- 인증 관련
+  auth_provider TEXT NOT NULL DEFAULT 'email'
+    CHECK (auth_provider IN ('email', 'kakao', 'naver', 'apple')),
+  is_school_verified BOOLEAN DEFAULT FALSE,
+
+  -- 알림 설정
+  push_enabled BOOLEAN DEFAULT FALSE,
+  notification_settings JSONB DEFAULT '{
+    "comments": true,
+    "reactions": true,
+    "together": true,
+    "matching": true,
+    "battery": true,
+    "notice": true,
+    "quiet_start": "23:00",
+    "quiet_end": "08:00"
+  }',
+
+  -- 약관 동의
+  terms_agreed_at TIMESTAMPTZ,           -- 이용약관 동의 시각
+  privacy_agreed_at TIMESTAMPTZ,         -- 개인정보처리방침 동의 시각
+  marketing_agreed BOOLEAN DEFAULT FALSE, -- 마케팅 수신 동의
+  marketing_agreed_at TIMESTAMPTZ,       -- 마케팅 수신 동의 시각
+
+  -- 메타
+  onboarding_completed BOOLEAN DEFAULT FALSE,
+  last_active_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ DEFAULT NULL     -- soft delete
+);</code></pre>
+
+<div class="card warn">
+  <strong>기존 스키마 대비 추가 항목</strong>
+  <ul>
+    <li><code>terms_agreed_at</code> — 이용약관 동의 시각 (법적 증거용, 동의 철회 시 NULL)</li>
+    <li><code>privacy_agreed_at</code> — 개인정보처리방침 동의 시각</li>
+    <li><code>marketing_agreed</code> + <code>marketing_agreed_at</code> — 마케팅 수신 동의</li>
+    <li><code>id</code>가 <code>auth.users(id)</code>를 참조 — Supabase Auth와 1:1 연동</li>
+  </ul>
+</div>
+
+<h3>public.waitlist (연령 초과 대기)</h3>
+<pre><code>CREATE TABLE public.waitlist (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  birth_date DATE,
+  reason TEXT DEFAULT 'age_limit',  -- 대기 사유
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);</code></pre>
+
+
+<!-- ================================ -->
+<!-- RLS 정책 -->
+<!-- ================================ -->
+<h2 id="rls-policy">RLS 정책 (Row Level Security) <span class="badge be">백엔드</span></h2>
+
+<div class="card highlight">
+  <strong>원칙</strong>: 모든 테이블에 RLS 활성화. <code>anon</code> 키는 RLS로 보호되므로 클라이언트 노출 가능. <code>service_role</code> 키는 RLS를 우회하므로 서버(Edge Function)에서만 사용.
+</div>
+
+<h3>public.users 테이블 RLS</h3>
+<pre><code>-- RLS 활성화
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+-- 본인 프로필 읽기
+CREATE POLICY "users_select_own" ON public.users
+  FOR SELECT USING (auth.uid() = id);
+
+-- 다른 유저의 공개 프로필 읽기 (삭제되지 않은 유저만)
+CREATE POLICY "users_select_public" ON public.users
+  FOR SELECT USING (
+    deleted_at IS NULL
+    AND id NOT IN (
+      SELECT blocked_id FROM blocks WHERE blocker_id = auth.uid()
+    )
+  );
+
+-- 본인 프로필 수정
+CREATE POLICY "users_update_own" ON public.users
+  FOR UPDATE USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+-- 프로필 생성 (가입 시 Edge Function에서 service_role로 수행)
+-- 클라이언트에서 직접 INSERT 불가
+CREATE POLICY "users_insert_none" ON public.users
+  FOR INSERT WITH CHECK (false);
+
+-- 삭제 (탈퇴는 Edge Function에서 soft delete로 처리)
+CREATE POLICY "users_delete_none" ON public.users
+  FOR DELETE USING (false);</code></pre>
+
+<h3>public.waitlist 테이블 RLS</h3>
+<pre><code>ALTER TABLE public.waitlist ENABLE ROW LEVEL SECURITY;
+
+-- 대기 등록은 누구나 가능 (가입 전이므로 anon)
+CREATE POLICY "waitlist_insert_anon" ON public.waitlist
+  FOR INSERT WITH CHECK (true);
+
+-- 읽기/수정/삭제는 서버만 (service_role)
+CREATE POLICY "waitlist_select_none" ON public.waitlist
+  FOR SELECT USING (false);</code></pre>
+
+
+<!-- ================================ -->
+<!-- Edge Functions -->
+<!-- ================================ -->
+<h2 id="edge-functions">Edge Functions 상세 <span class="badge be">백엔드</span></h2>
+
+<h3>auth-social (소셜 로그인)</h3>
+<pre><code>// POST /functions/v1/auth-social
+// Body: { provider: 'kakao' | 'naver', token: string }
+
+async function handler(req) {
+  const { provider, token } = await req.json()
+
+  // 1. 소셜 API로 유저 정보 조회
+  let userInfo
+  if (provider === 'kakao') {
+    userInfo = await fetchKakaoUser(token)
+    // GET https://kapi.kakao.com/v2/user/me
+    // Headers: Authorization: Bearer {token}
+  } else if (provider === 'naver') {
+    userInfo = await fetchNaverUser(token)
+    // GET https://openapi.naver.com/v1/nid/me
+    // Headers: Authorization: Bearer {token}
+  }
+
+  const { email, name, profileImage } = userInfo
+
+  // 2. 기존 유저 확인
+  const { data: existingUser } = await supabaseAdmin
+    .auth.admin.getUserByEmail(email)
+
+  if (existingUser) {
+    // 2a. 다른 provider로 가입한 경우 → 에러
+    const existingProvider = existingUser.app_metadata?.provider
+    if (existingProvider && existingProvider !== provider) {
+      return error(409, {
+        message: `이 이메일은 ${existingProvider}로 가입되어 있어`,
+        existing_provider: existingProvider
+      })
+    }
+
+    // 2b. 같은 provider → 로그인 (JWT 발급)
+    const { data: session } = await supabaseAdmin
+      .auth.admin.generateLink({
+        type: 'magiclink', email
+      })
+    return ok({ session, is_new: false })
+  }
+
+  // 3. 신규 유저 → 자동 가입
+  const { data: newUser } = await supabaseAdmin
+    .auth.admin.createUser({
+      email,
+      email_confirm: true,  // 소셜은 이메일 인증 불필요
+      app_metadata: { provider }
+    })
+
+  // 4. public.users 프로필 생성
+  await supabaseAdmin.from('users').insert({
+    id: newUser.id,
+    email,
+    nickname: name || 'OFF 중인 누군가',
+    auth_provider: provider,
+    birth_date: '2000-01-01',  // 온보딩에서 입력받을 예정
+    terms_agreed_at: new Date().toISOString(),
+    privacy_agreed_at: new Date().toISOString(),
+  })
+
+  // 5. JWT 발급
+  const { data: session } = await supabaseAdmin
+    .auth.admin.generateLink({
+      type: 'magiclink', email
+    })
+
+  return ok({ session, is_new: true })
+}</code></pre>
+
+<div class="card danger">
+  <strong>보안 주의사항</strong>
+  <ul>
+    <li>Edge Function에서만 <code>SUPABASE_SERVICE_ROLE_KEY</code> 사용</li>
+    <li>소셜 토큰은 반드시 해당 소셜 API로 검증 (클라이언트가 보낸 토큰을 그대로 신뢰하지 않음)</li>
+    <li>Rate Limiting: IP당 분당 10회 제한 (brute force 방지)</li>
+  </ul>
+</div>
+
+
+<!-- ================================ -->
+<!-- 세션 관리 -->
+<!-- ================================ -->
+<h2 id="session-mgmt">세션 관리 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>값</th><th>설명</th></tr>
+  <tr><td>access_token 유효기간</td><td>1시간</td><td>Supabase Auth 기본값</td></tr>
+  <tr><td>refresh_token 유효기간</td><td>30일</td><td>자동 로그인 유지</td></tr>
+  <tr><td>토큰 저장소</td><td>expo-secure-store</td><td>iOS Keychain / Android Keystore</td></tr>
+  <tr><td>자동 갱신</td><td>access_token 만료 시 자동</td><td>Supabase JS Client가 내부 처리</td></tr>
+</table>
+
+<h3>앱 시작 시 세션 체크 로직</h3>
+<pre><code>// App.tsx 또는 AuthProvider
+const checkSession = async () => {
+  const { data: { session }, error } = await supabase.auth.getSession()
+
+  if (session) {
+    // access_token 유효 → 홈 이동
+    // 또는 refresh로 자동 갱신됨
+    navigateTo('Home')
+  } else {
+    // 세션 없음 → 로그인 화면
+    navigateTo('Login')
+  }
+}
+
+// 세션 변경 감지 (실시간)
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') navigateTo('Login')
+  if (event === 'TOKEN_REFRESHED') { /* 자동 처리 */ }
+})</code></pre>
+
+<h3>로그아웃</h3>
+<pre><code>const logout = async () => {
+  await supabase.auth.signOut()
+  await SecureStore.deleteItemAsync('supabase-session')
+  navigateTo('Login')
+}</code></pre>
+
+<h3>회원 탈퇴</h3>
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-content">유저가 탈퇴 요청 (MY → 설정 → 계정 관리 → 탈퇴)</div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-content">소셜 로그인 재인증 (본인 확인)<small>보안 — 토큰 탈취 시 무단 탈퇴 방지</small></div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-content">
+      Edge Function <code>auth-withdraw</code> 호출
+      <small>soft delete: <code>deleted_at = NOW()</code> + 닉네임 → "탈퇴한 사용자" + 이메일 해시화</small>
+    </div>
+  </div>
+  <div class="flow-line"></div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-content">30일 유예 후 완전 삭제 (pg_cron 스케줄)<small>유예 기간 내 재가입 문의 시 복구 가능</small></div>
+  </div>
+</div>
+
+
+<!-- ================================ -->
+<!-- 수집 데이터 -->
+<!-- ================================ -->
+<h2 id="data-collection">수집 데이터 <span class="badge data">데이터</span></h2>
+
+<h3>가입 시 수집 항목</h3>
+<table>
+  <tr><th>항목</th><th>수집 시점</th><th>필수 여부</th><th>용도</th><th>DB 컬럼</th></tr>
+  <tr><td>이메일</td><td>가입</td><td><span class="tag required">필수</span></td><td>계정 식별, 이메일 인증, 비밀번호 찾기</td><td>email</td></tr>
+  <tr><td>비밀번호</td><td>이메일 가입</td><td><span class="tag required">필수</span> (이메일만)</td><td>인증</td><td>auth.users.encrypted_password</td></tr>
+  <tr><td>생년월일</td><td>온보딩 Step 1</td><td><span class="tag required">필수</span></td><td>연령 제한 (만 20~35세)</td><td>birth_date</td></tr>
+  <tr><td>공백 상태</td><td>온보딩 Step 2</td><td><span class="tag optional">선택</span></td><td>커뮤니티 매칭, 피드 추천</td><td>gap_duration</td></tr>
+  <tr><td>공백 이유</td><td>온보딩 Step 3</td><td><span class="tag optional">선택</span></td><td>커뮤니티 매칭</td><td>gap_reason</td></tr>
+  <tr><td>관심 분야</td><td>온보딩 Step 4</td><td><span class="tag optional">선택</span></td><td>피드 추천, 같이해요 매칭</td><td>interests[]</td></tr>
+  <tr><td>닉네임</td><td>온보딩 Step 5</td><td><span class="tag optional">선택</span></td><td>커뮤니티 표시명</td><td>nickname</td></tr>
+  <tr><td>이용약관 동의</td><td>가입</td><td><span class="tag required">필수</span></td><td>법적 요건</td><td>terms_agreed_at</td></tr>
+  <tr><td>개인정보 동의</td><td>가입</td><td><span class="tag required">필수</span></td><td>법적 요건</td><td>privacy_agreed_at</td></tr>
+  <tr><td>마케팅 동의</td><td>가입</td><td><span class="tag optional">선택</span></td><td>프로모션 알림</td><td>marketing_agreed</td></tr>
+</table>
+
+
+<!-- ================================ -->
+<!-- 개인정보 처리 -->
+<!-- ================================ -->
+<h2 id="privacy">개인정보 처리 <span class="badge data">데이터</span></h2>
+
+<table>
+  <tr><th>항목</th><th>보관 기간</th><th>삭제 시점</th></tr>
+  <tr><td>이메일</td><td>회원 탈퇴 후 30일</td><td>유예 기간 종료 후 해시화 → 원문 삭제</td></tr>
+  <tr><td>비밀번호 (해시)</td><td>회원 탈퇴 시 즉시</td><td>auth.users 삭제 시 함께 삭제</td></tr>
+  <tr><td>생년월일</td><td>회원 탈퇴 후 30일</td><td>유예 기간 종료 후 삭제</td></tr>
+  <tr><td>닉네임</td><td>탈퇴 즉시</td><td>"탈퇴한 사용자"로 대체</td></tr>
+  <tr><td>소셜 토큰</td><td>인증 완료 즉시</td><td>서버 메모리에서 즉시 삭제 (DB 저장 안 함)</td></tr>
+  <tr><td>마케팅 동의 이력</td><td>동의 철회 후 6개월</td><td>법적 분쟁 대비 보관 후 삭제</td></tr>
+</table>
+
+<div class="card warn">
+  <strong>법적 요구사항</strong>
+  <ul>
+    <li>개인정보보호법 제21조 — 목적 달성 시 지체 없이 파기</li>
+    <li>정보통신망법 — 이용자 동의 철회 요청 시 5일 이내 처리</li>
+    <li>만 14세 미만은 법정대리인 동의 필요 — UNOFF는 만 20세 이상이므로 해당 없음</li>
+    <li>마케팅 수신 동의/철회 이력은 반드시 시각(timestamp)과 함께 기록</li>
+  </ul>
+</div>
+
+
+<!-- ================================ -->
+<!-- 엣지케이스 -->
+<!-- ================================ -->
+<h2 id="edge-cases">엣지케이스 대응 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>상황</th><th>대응</th><th>담당</th></tr>
+  <tr>
+    <td>카카오로 가입 → 같은 이메일로 네이버 로그인 시도</td>
+    <td>"이 이메일은 카카오로 가입되어 있어. 카카오로 로그인해줘" + 카카오 버튼 하이라이트</td>
+    <td>BE (Edge Function) + FE</td>
+  </tr>
+  <tr>
+    <td>Apple "이메일 숨기기" 선택 시</td>
+    <td>Apple이 제공하는 relay 이메일을 그대로 사용. 유저에게 안내: "Apple 이메일로 가입했어"</td>
+    <td>FE + BE</td>
+  </tr>
+  <tr>
+    <td>온보딩 중 앱 종료</td>
+    <td><code>onboarding_completed = false</code> → 다음 로그인 시 이어서 진행. 이전 입력값 유지.</td>
+    <td>FE</td>
+  </tr>
+  <tr>
+    <td>연령 범위 초과 (만 20~35세 밖)</td>
+    <td>가입 차단 + "곧 더 넓혀갈 거야" 안내 + 대기 리스트(waitlist) 등록 유도</td>
+    <td>FE + BE (waitlist 테이블)</td>
+  </tr>
+  <tr>
+    <td>탈퇴 후 같은 이메일로 재가입</td>
+    <td>30일 유예 기간 내: "아직 계정이 남아있어. 복구할래?" / 유예 종료 후: 새로 가입</td>
+    <td>BE (Edge Function)</td>
+  </tr>
+  <tr>
+    <td>닉네임 중복</td>
+    <td>실시간 중복 체크 → "이미 쓰고 있는 닉네임이야. 다른 걸 생각해봐"</td>
+    <td>FE (API 호출) + BE (unique constraint)</td>
+  </tr>
+  <tr>
+    <td>이메일 인증 링크 만료 (24시간)</td>
+    <td>"인증 링크가 만료됐어. 다시 보내줄게." + 재발송 버튼</td>
+    <td>FE</td>
+  </tr>
+  <tr>
+    <td>동시 다기기 로그인</td>
+    <td>허용 (Supabase 기본 동작). 로그아웃은 해당 기기만.</td>
+    <td>BE (Supabase Auth 기본)</td>
+  </tr>
+</table>
+
+
+<!-- ================================ -->
+<!-- 개발 체크리스트 -->
+<!-- ================================ -->
+<h2 id="checklist">개발 체크리스트 <span class="badge both">FE + BE</span></h2>
+
+<h3>백엔드 (Supabase)</h3>
+<ul class="checklist">
+  <li>Supabase Auth 이메일 인증 활성화</li>
+  <li>Supabase Auth 딥링크 URL 설정 (unoff://auth/*)</li>
+  <li>public.users 테이블 생성 + RLS 정책 적용</li>
+  <li>public.waitlist 테이블 생성 + RLS 정책 적용</li>
+  <li>Edge Function: auth-social (카카오/네이버) 배포</li>
+  <li>Edge Function: auth-withdraw (회원 탈퇴) 배포</li>
+  <li>카카오 개발자 콘솔 앱 등록 + Redirect URI 설정</li>
+  <li>네이버 개발자 콘솔 앱 등록 + Redirect URI 설정</li>
+  <li>Apple Developer 콘솔 Sign In with Apple 설정</li>
+  <li>인증 이메일 템플릿 커스텀 (UNOFF 브랜드)</li>
+  <li>비밀번호 재설정 이메일 템플릿 커스텀</li>
+  <li>Rate Limiting 설정 (IP당 분당 10회)</li>
+  <li>pg_cron: 탈퇴 유예 30일 후 완전 삭제 스케줄</li>
+</ul>
+
+<h3>프론트엔드 (React Native)</h3>
+<ul class="checklist">
+  <li>LoginScreen UI 구현</li>
+  <li>SignUpScreen UI + 유효성 검사</li>
+  <li>EmailLoginScreen UI</li>
+  <li>비밀번호 찾기 화면</li>
+  <li>이메일 인증 대기 화면</li>
+  <li>카카오 SDK 연동 (@react-native-seoul/kakao-login)</li>
+  <li>네이버 SDK 연동 (@react-native-seoul/naver-login)</li>
+  <li>Apple 인증 연동 (expo-apple-authentication)</li>
+  <li>SecureStore 토큰 저장/관리</li>
+  <li>AuthProvider (세션 체크 + 라우팅)</li>
+  <li>딥링크 핸들러 (이메일 인증, 비밀번호 재설정)</li>
+  <li>에러 메시지 처리 (전체 에러 케이스)</li>
+  <li>OnboardingSurvey 7단계 구현</li>
+  <li>온보딩 중 앱 종료 → 재진입 시 이어하기</li>
+  <li>비밀번호 5회 실패 잠금 UI</li>
+</ul>
+
+
+<!-- ================================ -->
+<!-- 변경 이력 -->
+<!-- ================================ -->
+<h2 id="changelog">변경 이력</h2>
+
+<div class="update-log">
+  <strong>v1.0 — 2026-03-16</strong><br>
+  초기 작성. 6_상세기획서_앱설계.md의 회원가입/로그인 관련 내용을 통합하고,<br>
+  DB 스키마(약관 동의 컬럼 추가), RLS 정책, Edge Function 상세, 개인정보 처리 정책을 신규 추가.
+</div>
+
+</main>
+</div>
+
+<script>
+// 사이드바 스크롤 연동
+const links = document.querySelectorAll('.sidebar a');
+const sections = [];
+links.forEach(link => {
+  const id = link.getAttribute('href')?.replace('#','');
+  if (id) {
+    const el = document.getElementById(id);
+    if (el) sections.push({ link, el });
+  }
+});
+
+window.addEventListener('scroll', () => {
+  let current = sections[0];
+  for (const s of sections) {
+    if (s.el.getBoundingClientRect().top <= 80) current = s;
+  }
+  links.forEach(l => l.classList.remove('active'));
+  if (current) current.link.classList.add('active');
+});
+
+// 사이드바 클릭 시 부드러운 스크롤
+links.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const id = link.getAttribute('href')?.replace('#','');
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+</body>
+</html>

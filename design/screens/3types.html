@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>unoff — In-App UI Design · 3 Types</title>
+
+  <!-- Pretendard 폰트 공식 CDN (브랜드 가이드 §4-1) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+
+  <style>
+    /* ─────────────────────────────────────────
+       디자인 토큰 — UNOFF 브랜드 컬러/서체/간격
+       ───────────────────────────────────────── */
+    :root {
+      /* 컬러 */
+      --cloud-100: #F7F5F0;
+      --cloud-300: #E2DDD4;
+      --cloud-400: #C8C1B4;
+      --cloud-500: #F0EDE5;
+      --white:     #FFFFFF;
+      --violet-900: #2E1F4E;
+      --violet-500: #5F4B8B;
+      --violet-400: #7E6BA6;
+      --violet-300: #A899C4;
+      --violet-100: #EAE5F4;
+      --scuba-500: #00B4C5;
+      --scuba-300: #4DCFDD;
+      --scuba-100: #E0F5F8;
+      --warning: #E8A443;
+      --error: #D4726A;
+
+      /* 그림자 */
+      --shadow-sm: 0 2px 8px rgba(46,31,78,0.06);
+      --shadow-md: 0 4px 16px rgba(46,31,78,0.09);
+
+      /* 모서리 */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+
+      /* 간격 (8px 기반) */
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-6: 24px;
+      --sp-8: 32px;
+      --sp-12: 48px;
+    }
+
+    /* ─────────────────────────────────────────
+       기본 리셋
+       ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+      background: #120E1C; /* 어두운 배경 — 밝은 화면이 돋보임 */
+      min-height: 100vh;
+      padding: 60px 40px 80px;
+    }
+
+    /* ─────────────────────────────────────────
+       페이지 타이틀
+       ───────────────────────────────────────── */
+    .page-title {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .page-title h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+
+    .page-title p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ─────────────────────────────────────────
+       3개 프레임 가로 배치 컨테이너
+       ───────────────────────────────────────── */
+    .frames-row {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    /* 각 타입 래퍼 (폰 + 라벨) */
+    .type-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .type-label {
+      text-align: center;
+    }
+
+    .type-label .type-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.2px;
+      display: block;
+    }
+
+    .type-label .type-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 400;
+      display: block;
+      margin-top: 3px;
+    }
+
+    /* ─────────────────────────────────────────
+       iPhone 프레임 (390×844, border-radius 54px)
+       ───────────────────────────────────────── */
+    .iphone {
+      width: 390px;
+      height: 844px;
+      border-radius: 54px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.12),
+        0 0 0 3px rgba(255,255,255,0.06),
+        0 40px 80px rgba(0,0,0,0.5),
+        0 20px 40px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+    }
+
+    /* 화면 전체 (스크롤 없는 고정 레이아웃) */
+    .screen {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ─────────────────────────────────────────
+       다이나믹 아일랜드 + 상태바
+       ───────────────────────────────────────── */
+    .status-bar {
+      width: 100%;
+      height: 56px; /* iOS Safe Area top */
+      display: flex;
+      align-items: flex-end;
+      padding: 0 24px 8px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* 다이나믹 아일랜드 */
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 37px;
+      background: #000000;
+      border-radius: 20px;
+      z-index: 20;
+    }
+
+    /* 상태바 좌측: 시각 */
+    .status-bar .status-time {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    /* 상태바 우측: 배터리/와이파이 아이콘 */
+    .status-bar .status-icons {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 배터리 아이콘 (inline SVG) */
+    .icon-battery, .icon-wifi, .icon-signal {
+      display: block;
+    }
+
+    /* ─────────────────────────────────────────
+       상단 헤더 (로고 + 검색)
+       ───────────────────────────────────────── */
+    .app-header {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      flex-shrink: 0;
+    }
+
+    .app-logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      color: var(--violet-500);
+      line-height: 1;
+    }
+
+    .app-logo span {
+      /* 로고 내 오로라 포인트 */
+      color: var(--scuba-500);
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+    }
+
+    /* ─────────────────────────────────────────
+       핫한 이야기 배너
+       ───────────────────────────────────────── */
+    .hot-banner {
+      margin: 0 16px 12px;
+      border-radius: var(--radius-md);
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .hot-banner-text {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hot-banner-arrow {
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+
+    /* ─────────────────────────────────────────
+       카테고리 필터 탭
+       ───────────────────────────────────────── */
+    .filter-tabs {
+      display: flex;
+      padding: 0 16px;
+      gap: 6px;
+      margin-bottom: 14px;
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+
+    .filter-tabs::-webkit-scrollbar { display: none; }
+
+    .tab-chip {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border: none;
+      flex-shrink: 0;
+    }
+
+    /* ─────────────────────────────────────────
+       게시글 피드 영역
+       ───────────────────────────────────────── */
+    .feed-area {
+      flex: 1;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    /* 게시글 카드 */
+    .post-card {
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    /* 아바타 (이니셜 기반) */
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-full);
+      background: var(--violet-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--violet-500);
+      flex-shrink: 0;
+    }
+
+    .card-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-nickname {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--violet-900);
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-time {
+      font-size: 11px;
+      color: var(--violet-300);
+      margin-top: 1px;
+      display: block;
+    }
+
+    /* 상태 뱃지 */
+    .status-badge {
+      height: 22px;
+      padding: 0 9px;
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-off {
+      background: var(--violet-100);
+      color: var(--violet-400);
+    }
+
+    .badge-charging {
+      background: var(--scuba-100);
+      color: var(--scuba-500);
+    }
+
+    .badge-burnout {
+      /* 번아웃 회복 — warm cloud 톤 */
+      background: #F2EFE8;
+      color: #9A8E7C;
+    }
+
+    /* 본문 미리보기 */
+    .card-body {
+      font-size: 14px;
+      color: var(--violet-900);
+      line-height: 1.6;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: keep-all;
+    }
+
+    /* 반응 카운트 */
+    .card-reactions {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .reaction-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--violet-400);
+    }
+
+    .reaction-emoji {
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    /* ─────────────────────────────────────────
+       글쓰기 FAB 버튼
+       ───────────────────────────────────────── */
+    .fab {
+      position: absolute;
+      bottom: 80px; /* 네비게이션 높이만큼 위 */
+      right: 20px;
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-full);
+      background: var(--scuba-500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,180,197,0.35);
+      cursor: pointer;
+      z-index: 50;
+    }
+
+    /* ─────────────────────────────────────────
+       하단 네비게이션 (4탭)
+       ───────────────────────────────────────── */
+    .bottom-nav {
+      height: 83px; /* 탭바 49px + 홈인디케이터 34px */
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .nav-tabs {
+      height: 49px;
+      display: flex;
+      border-top: 1px solid rgba(46,31,78,0.07);
+    }
+
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      position: relative;
+    }
+
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    /* 활성 탭 Scuba 도트 */
+    .nav-tab.active::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      width: 4px;
+      height: 4px;
+      border-radius: var(--radius-full);
+      background: var(--scuba-500);
+    }
+
+    /* 홈 인디케이터 */
+    .home-indicator {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .home-indicator-bar {
+      width: 134px;
+      height: 5px;
+      border-radius: var(--radius-full);
+    }
+
+    /* ─────────────────────────────────────────
+       구분선
+       ───────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      margin: 0 16px;
+    }
+
+    /* ═══════════════════════════════════════════
+       TYPE A — "따뜻한 구름"
+       배경: Cloud Dancer 100 (#F7F5F0)
+       카드: White + 부드러운 그림자
+       배너: Violet 100 배경
+       ═══════════════════════════════════════════ */
+    .screen-a {
+      background: var(--cloud-100);
+    }
+
+    .screen-a .status-bar { color: var(--violet-900); }
+
+    .screen-a .hot-banner {
+      background: var(--violet-100);
+    }
+
+    .screen-a .hot-banner-text { color: var(--violet-500); }
+
+    /* 탭 — 활성 */
+    .screen-a .tab-chip.active {
+      background: var(--violet-900);
+      color: var(--white);
+    }
+
+    /* 탭 — 비활성 */
+    .screen-a .tab-chip.inactive {
+      background: rgba(0,0,0,0.04);
+      color: var(--violet-400);
+    }
+
+    /* 카드 */
+    .screen-a .post-card {
+      background: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .screen-a .divider { background: rgba(46,31,78,0.06); }
+
+    /* 네비게이션 */
+    .screen-a .bottom-nav { background: var(--white); }
+    .screen-a .nav-tabs { border-color: rgba(46,31,78,0.07); }
+
+    .screen-a .nav-tab.active .nav-icon svg { color: var(--violet-900); }
+    .screen-a .nav-tab.active .nav-label { color: var(--violet-900); font-weight: 700; }
+    .screen-a .nav-tab.inactive .nav-label { color: var(--violet-300); }
+
+    .screen-a .home-indicator-bar { background: var(--violet-900); opacity: 0.15; }
+
+    /* FAB */
+    .screen-a .fab { background: var(--scuba-500); }
+
+    /* 아이콘 컬러 */
+    .screen-a .icon-search { color: var(--violet-500); }
+
+    /* ═══════════════════════════════════════════
+       TYPE B — "깨끗한 화이트"
+       배경: White
+       카드: White + Cloud 300 보더 1px
+       배너: Scuba 100 배경
+       ═══════════════════════════════════════════ */
+    .screen-b {
+      background: var(--white);
+    }
+
+    .screen-b .status-bar { color: var(--violet-900); }
+
+    .screen-b .hot-banner {
+      background: var(--scuba-100);
+      border: 1px solid rgba(0,180,197,0.15);
+    }
+
+    .screen-b .hot-banner-text { color: var(--scuba-500); }
+
+    /* 탭 */
+    .screen-b .tab-chip.active {
+      background: var(--scuba-500);
+      color: var(--white);
+    }
+
+    .screen-b .tab-chip.inactive {
+      background: transparent;
+      color: var(--violet-400);
+      border: 1px solid var(--cloud-300);
+    }
+
+    /* 카드 */
+    .screen-b .post-card {
+      background: var(--white);
+      border: 1px solid var(--cloud-300);
+    }
+
+    .screen-b .divider { background: var(--cloud-300); }
+
+    /* 네비게이션 */
+    .screen-b .bottom-nav { background: var(--white); }
+    .screen-b .nav-tabs { border-color: var(--cloud-300); }
+
+    .screen-b .nav-tab.active .nav-label { color: var(--violet-900); font-weight: 700; }
+    .screen-b .nav-tab.inactive .nav-label { color: var(--violet-300); }
+
+    .screen-b .home-indicator-bar { background: var(--violet-900); opacity: 0.12; }
+
+    .screen-b .icon-search { color: var(--scuba-500); }
+
+    /* ═══════════════════════════════════════════
+       TYPE C — "은은한 오로라"
+       배경: White
+       카드: White + 상단 Scuba→Violet 그라데이션 라인 2px
+       배너: Violet 900 다크
+       ═══════════════════════════════════════════ */
+    .screen-c {
+      background: var(--white);
+    }
+
+    .screen-c .status-bar { color: var(--violet-900); }
+
+    .screen-c .hot-banner {
+      background: var(--violet-900);
+    }
+
+    .screen-c .hot-banner-text { color: rgba(255,255,255,0.92); }
+
+    .screen-c .hot-banner-arrow { color: rgba(255,255,255,0.4); }
+
+    /* 탭 */
+    .screen-c .tab-chip.active {
+      background: linear-gradient(90deg, var(--scuba-500), var(--violet-500));
+      color: var(--white);
+    }
+
+    .screen-c .tab-chip.inactive {
+      background: rgba(46,31,78,0.04);
+      color: var(--violet-400);
+    }
+
+    /* 카드 — 상단에 오로라 그라데이션 라인 2px */
+    .screen-c .post-card {
+      background: var(--white);
+      box-shadow: var(--shadow-sm);
+      border-top: 2px solid transparent;
+      background-clip: padding-box;
+      position: relative;
+      overflow: visible;
+    }
+
+    /* 오로라 그라데이션 상단 라인 (::before로 구현) */
+    .screen-c .post-card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      background: linear-gradient(90deg, var(--scuba-500), var(--violet-500), var(--scuba-300));
+    }
+
+    .screen-c .divider { background: rgba(46,31,78,0.06); }
+
+    /* 네비게이션 */
+    .screen-c .bottom-nav { background: var(--white); }
+    .screen-c .nav-tabs { border-color: rgba(46,31,78,0.07); }
+
+    .screen-c .nav-tab.active .nav-label { color: var(--violet-900); font-weight: 700; }
+    .screen-c .nav-tab.inactive .nav-label { color: var(--violet-300); }
+
+    .screen-c .home-indicator-bar { background: var(--violet-900); opacity: 0.12; }
+
+    .screen-c .icon-search { color: var(--violet-500); }
+
+    /* ─────────────────────────────────────────
+       활성 탭 바닥 인디케이터 (Type C — 오로라)
+       ───────────────────────────────────────── */
+    .screen-c .nav-tab.active::after {
+      background: linear-gradient(90deg, var(--scuba-500), var(--violet-500));
+    }
+
+    /* ─────────────────────────────────────────
+       타입별 활성 탭 아이콘 컬러
+       ───────────────────────────────────────── */
+    .nav-tab.active .nav-icon svg { stroke: var(--violet-900); }
+    .nav-tab.inactive .nav-icon svg { stroke: var(--violet-300); }
+
+    /* ─────────────────────────────────────────
+       핫 배너 불꽃 아이콘
+       ───────────────────────────────────────── */
+    .fire-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: var(--radius-full);
+      background: var(--warning);
+      flex-shrink: 0;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.85); }
+    }
+
+    /* 빈 공간 패딩 (마지막 카드 하단 여백) */
+    .feed-bottom-pad {
+      height: 8px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ────────────────────────────────────────
+       페이지 타이틀
+       ──────────────────────────────────────── -->
+  <div class="page-title">
+    <h1>unoff &mdash; In-App UI Design</h1>
+    <p>홈 피드 화면 · 3 Types</p>
+  </div>
+
+  <!-- ────────────────────────────────────────
+       3개 iPhone 프레임 가로 배치
+       ──────────────────────────────────────── -->
+  <div class="frames-row">
+
+    <!-- ══════════════════════════════════════
+         TYPE A — 따뜻한 구름
+         ══════════════════════════════════════ -->
+    <div class="type-wrapper">
+      <div class="iphone">
+        <div class="screen screen-a">
+
+          <!-- 다이나믹 아일랜드 -->
+          <div class="dynamic-island"></div>
+
+          <!-- iOS 상태바 -->
+          <div class="status-bar">
+            <span class="status-time" style="color: var(--violet-900); font-size:14px; font-weight:600;">9:41</span>
+            <div class="status-icons">
+              <!-- 신호 아이콘 -->
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+                <rect x="0" y="7" width="3" height="5" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="4.5" y="5" width="3" height="7" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="9" y="3" width="3" height="9" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+              </svg>
+              <!-- 와이파이 아이콘 -->
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+                <path d="M8 9.5C8.83 9.5 9.5 10.17 9.5 11S8.83 12.5 8 12.5 6.5 11.83 6.5 11 7.17 9.5 8 9.5Z" fill="#2E1F4E" fill-opacity="0.85"/>
+                <path d="M8 6C9.78 6 11.37 6.72 12.53 7.87L13.95 6.45C12.44 4.94 10.33 4 8 4S3.56 4.94 2.05 6.45L3.47 7.87C4.63 6.72 6.22 6 8 6Z" fill="#2E1F4E" fill-opacity="0.7"/>
+                <path d="M8 2C10.89 2 13.48 3.14 15.35 5.01L16.77 3.59C14.54 1.36 11.43 0 8 0S1.46 1.36-.77 3.59L.65 5.01C2.52 3.14 5.11 2 8 2Z" fill="#2E1F4E" fill-opacity="0.5"/>
+              </svg>
+              <!-- 배터리 아이콘 -->
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+                <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#2E1F4E" stroke-opacity="0.35"/>
+                <rect x="2" y="2" width="16" height="8" rx="2" fill="#2E1F4E" fill-opacity="0.85"/>
+                <path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#2E1F4E" fill-opacity="0.4"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 앱 헤더 -->
+          <div class="app-header">
+            <div class="app-logo">un<span>o</span>ff</div>
+            <div class="header-actions">
+              <div class="icon-btn icon-search">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+                  <circle cx="9" cy="9" r="6"/><path d="M16 16l-3.5-3.5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 핫한 이야기 배너 -->
+          <div class="hot-banner">
+            <div class="fire-dot"></div>
+            <span class="hot-banner-text">지금 핫한 이야기 — 면접에서 공백기 어떻게 말해요? · 같아요 34</span>
+            <svg class="hot-banner-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M5 3l4 4-4 4"/>
+            </svg>
+          </div>
+
+          <!-- 카테고리 필터 탭 -->
+          <div class="filter-tabs">
+            <button class="tab-chip active">전체</button>
+            <button class="tab-chip inactive">오늘의 OFF</button>
+            <button class="tab-chip inactive">면접후기</button>
+            <button class="tab-chip inactive">고민창고</button>
+          </div>
+
+          <!-- 게시글 피드 -->
+          <div class="feed-area">
+
+            <!-- 카드 1 -->
+            <div class="post-card">
+              <div class="card-header">
+                <div class="avatar">오</div>
+                <div class="card-meta">
+                  <span class="card-nickname">OFF중인누군가</span>
+                  <span class="card-time">2시간 전</span>
+                </div>
+                <div class="status-badge badge-off">잠깐 쉬는 중</div>
+              </div>
+              <div class="card-body">오늘 자소서 한 줄 썼다. 그것만으로 오늘은 충분해.</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>42</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>12</span></div>
+              </div>
+            </div>
+
+            <!-- 카드 2 -->
+            <div class="post-card">
+              <div class="card-header">
+                <div class="avatar">충</div>
+                <div class="card-meta">
+                  <span class="card-nickname">충전중인고양이</span>
+                  <span class="card-time">5시간 전</span>
+                </div>
+                <div class="status-badge badge-charging">쉬고 있는 중</div>
+              </div>
+              <div class="card-body">면접에서 공백기 어떻게 말해요? 다들 어떻게 설명하세요...</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>34</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>21</span></div>
+              </div>
+            </div>
+
+            <!-- 카드 3 -->
+            <div class="post-card">
+              <div class="card-header">
+                <div class="avatar">밤</div>
+                <div class="card-meta">
+                  <span class="card-nickname">밤하늘산책자</span>
+                  <span class="card-time">어제</span>
+                </div>
+                <div class="status-badge badge-burnout">번아웃 회복 중</div>
+              </div>
+              <div class="card-body">요즘 아침에 눈 뜨면 또 뭘 해야 하나 싶은데, 여기 오면 좀 나아져.</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>28</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>8</span></div>
+              </div>
+            </div>
+
+            <div class="feed-bottom-pad"></div>
+          </div>
+
+          <!-- FAB 글쓰기 -->
+          <div class="fab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4v14M4 11h14"/>
+            </svg>
+          </div>
+
+          <!-- 하단 네비게이션 -->
+          <div class="bottom-nav">
+            <div class="nav-tabs">
+              <!-- 홈 (활성) -->
+              <div class="nav-tab active">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-900)">
+                    <path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/>
+                    <path d="M8 20v-8h6v8"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-900); font-weight:700;">홈</span>
+              </div>
+              <!-- 게시판 (비활성) -->
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <rect x="3" y="3" width="16" height="16" rx="2"/>
+                    <path d="M7 8h8M7 12h6M7 16h4"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">게시판</span>
+              </div>
+              <!-- 알림 (비활성) -->
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <path d="M4 16v-5a7 7 0 1 1 14 0v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/>
+                    <path d="M9 18a2 2 0 0 0 4 0"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">알림</span>
+              </div>
+              <!-- MY (비활성) -->
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <circle cx="11" cy="8" r="4"/>
+                    <path d="M3 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">MY</span>
+              </div>
+            </div>
+            <!-- 홈 인디케이터 -->
+            <div class="home-indicator">
+              <div class="home-indicator-bar"></div>
+            </div>
+          </div>
+
+        </div><!-- .screen-a -->
+      </div><!-- .iphone -->
+      <!-- 타입 라벨 -->
+      <div class="type-label">
+        <span class="type-name">Type A — 따뜻한 구름</span>
+        <span class="type-sub">Cloud Dancer 오프화이트 배경 · 따뜻하고 부드러운 톤</span>
+      </div>
+    </div><!-- .type-wrapper -->
+
+
+    <!-- ══════════════════════════════════════
+         TYPE B — 깨끗한 화이트
+         ══════════════════════════════════════ -->
+    <div class="type-wrapper">
+      <div class="iphone">
+        <div class="screen screen-b">
+
+          <!-- 다이나믹 아일랜드 -->
+          <div class="dynamic-island"></div>
+
+          <!-- iOS 상태바 -->
+          <div class="status-bar">
+            <span class="status-time" style="color: var(--violet-900); font-size:14px; font-weight:600;">9:41</span>
+            <div class="status-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+                <rect x="0" y="7" width="3" height="5" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="4.5" y="5" width="3" height="7" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="9" y="3" width="3" height="9" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+              </svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+                <path d="M8 9.5C8.83 9.5 9.5 10.17 9.5 11S8.83 12.5 8 12.5 6.5 11.83 6.5 11 7.17 9.5 8 9.5Z" fill="#2E1F4E" fill-opacity="0.85"/>
+                <path d="M8 6C9.78 6 11.37 6.72 12.53 7.87L13.95 6.45C12.44 4.94 10.33 4 8 4S3.56 4.94 2.05 6.45L3.47 7.87C4.63 6.72 6.22 6 8 6Z" fill="#2E1F4E" fill-opacity="0.7"/>
+                <path d="M8 2C10.89 2 13.48 3.14 15.35 5.01L16.77 3.59C14.54 1.36 11.43 0 8 0S1.46 1.36-.77 3.59L.65 5.01C2.52 3.14 5.11 2 8 2Z" fill="#2E1F4E" fill-opacity="0.5"/>
+              </svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+                <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#2E1F4E" stroke-opacity="0.35"/>
+                <rect x="2" y="2" width="16" height="8" rx="2" fill="#2E1F4E" fill-opacity="0.85"/>
+                <path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#2E1F4E" fill-opacity="0.4"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 앱 헤더 -->
+          <div class="app-header">
+            <div class="app-logo">un<span>o</span>ff</div>
+            <div class="header-actions">
+              <div class="icon-btn icon-search" style="color:var(--scuba-500)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+                  <circle cx="9" cy="9" r="6"/><path d="M16 16l-3.5-3.5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 핫한 이야기 배너 -->
+          <div class="hot-banner">
+            <div class="fire-dot"></div>
+            <span class="hot-banner-text">지금 핫한 이야기 — 면접에서 공백기 어떻게 말해요? · 같아요 34</span>
+            <svg class="hot-banner-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--scuba-500)" stroke-width="1.5" stroke-linecap="round">
+              <path d="M5 3l4 4-4 4"/>
+            </svg>
+          </div>
+
+          <!-- 카테고리 필터 탭 -->
+          <div class="filter-tabs">
+            <button class="tab-chip active">전체</button>
+            <button class="tab-chip inactive">오늘의 OFF</button>
+            <button class="tab-chip inactive">면접후기</button>
+            <button class="tab-chip inactive">고민창고</button>
+          </div>
+
+          <!-- 게시글 피드 -->
+          <div class="feed-area">
+
+            <!-- 카드 1 -->
+            <div class="post-card">
+              <div class="card-header">
+                <div class="avatar" style="background:var(--scuba-100); color:var(--scuba-500);">오</div>
+                <div class="card-meta">
+                  <span class="card-nickname">OFF중인누군가</span>
+                  <span class="card-time">2시간 전</span>
+                </div>
+                <div class="status-badge badge-off">잠깐 쉬는 중</div>
+              </div>
+              <div class="card-body">오늘 자소서 한 줄 썼다. 그것만으로 오늘은 충분해.</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>42</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>12</span></div>
+              </div>
+            </div>
+
+            <!-- 카드 2 -->
+            <div class="post-card">
+              <div class="card-header">
+                <div class="avatar" style="background:var(--scuba-100); color:var(--scuba-500);">충</div>
+                <div class="card-meta">
+                  <span class="card-nickname">충전중인고양이</span>
+                  <span class="card-time">5시간 전</span>
+                </div>
+                <div class="status-badge badge-charging">쉬고 있는 중</div>
+              </div>
+              <div class="card-body">면접에서 공백기 어떻게 말해요? 다들 어떻게 설명하세요...</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>34</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>21</span></div>
+              </div>
+            </div>
+
+            <!-- 카드 3 -->
+            <div class="post-card">
+              <div class="card-header">
+                <div class="avatar" style="background:var(--scuba-100); color:var(--scuba-500);">밤</div>
+                <div class="card-meta">
+                  <span class="card-nickname">밤하늘산책자</span>
+                  <span class="card-time">어제</span>
+                </div>
+                <div class="status-badge badge-burnout">번아웃 회복 중</div>
+              </div>
+              <div class="card-body">요즘 아침에 눈 뜨면 또 뭘 해야 하나 싶은데, 여기 오면 좀 나아져.</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>28</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>8</span></div>
+              </div>
+            </div>
+
+            <div class="feed-bottom-pad"></div>
+          </div>
+
+          <!-- FAB 글쓰기 -->
+          <div class="fab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4v14M4 11h14"/>
+            </svg>
+          </div>
+
+          <!-- 하단 네비게이션 -->
+          <div class="bottom-nav" style="border-top:1px solid var(--cloud-300);">
+            <div class="nav-tabs" style="border-color:var(--cloud-300);">
+              <div class="nav-tab active">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-900)">
+                    <path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/>
+                    <path d="M8 20v-8h6v8"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-900); font-weight:700;">홈</span>
+              </div>
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <rect x="3" y="3" width="16" height="16" rx="2"/>
+                    <path d="M7 8h8M7 12h6M7 16h4"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">게시판</span>
+              </div>
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <path d="M4 16v-5a7 7 0 1 1 14 0v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/>
+                    <path d="M9 18a2 2 0 0 0 4 0"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">알림</span>
+              </div>
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <circle cx="11" cy="8" r="4"/>
+                    <path d="M3 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">MY</span>
+              </div>
+            </div>
+            <div class="home-indicator">
+              <div class="home-indicator-bar" style="background:var(--violet-900); opacity:0.12;"></div>
+            </div>
+          </div>
+
+        </div><!-- .screen-b -->
+      </div><!-- .iphone -->
+      <div class="type-label">
+        <span class="type-name">Type B — 깨끗한 화이트</span>
+        <span class="type-sub">순수 화이트 배경 · 보더 구분 · 모던 미니멀</span>
+      </div>
+    </div><!-- .type-wrapper -->
+
+
+    <!-- ══════════════════════════════════════
+         TYPE C — 은은한 오로라
+         ══════════════════════════════════════ -->
+    <div class="type-wrapper">
+      <div class="iphone">
+        <div class="screen screen-c">
+
+          <!-- 다이나믹 아일랜드 -->
+          <div class="dynamic-island"></div>
+
+          <!-- iOS 상태바 -->
+          <div class="status-bar">
+            <span class="status-time" style="color: var(--violet-900); font-size:14px; font-weight:600;">9:41</span>
+            <div class="status-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+                <rect x="0" y="7" width="3" height="5" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="4.5" y="5" width="3" height="7" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="9" y="3" width="3" height="9" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+                <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#2E1F4E" fill-opacity="0.85"/>
+              </svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+                <path d="M8 9.5C8.83 9.5 9.5 10.17 9.5 11S8.83 12.5 8 12.5 6.5 11.83 6.5 11 7.17 9.5 8 9.5Z" fill="#2E1F4E" fill-opacity="0.85"/>
+                <path d="M8 6C9.78 6 11.37 6.72 12.53 7.87L13.95 6.45C12.44 4.94 10.33 4 8 4S3.56 4.94 2.05 6.45L3.47 7.87C4.63 6.72 6.22 6 8 6Z" fill="#2E1F4E" fill-opacity="0.7"/>
+                <path d="M8 2C10.89 2 13.48 3.14 15.35 5.01L16.77 3.59C14.54 1.36 11.43 0 8 0S1.46 1.36-.77 3.59L.65 5.01C2.52 3.14 5.11 2 8 2Z" fill="#2E1F4E" fill-opacity="0.5"/>
+              </svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+                <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#2E1F4E" stroke-opacity="0.35"/>
+                <rect x="2" y="2" width="16" height="8" rx="2" fill="#2E1F4E" fill-opacity="0.85"/>
+                <path d="M23 4v4a2 2 0 0 0 0-4Z" fill="#2E1F4E" fill-opacity="0.4"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 앱 헤더 -->
+          <div class="app-header">
+            <div class="app-logo">un<span>o</span>ff</div>
+            <div class="header-actions">
+              <div class="icon-btn" style="color:var(--violet-500)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+                  <circle cx="9" cy="9" r="6"/><path d="M16 16l-3.5-3.5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 핫한 이야기 배너 (다크 배경 — 온보딩 무드) -->
+          <div class="hot-banner" style="background:var(--violet-900); position:relative; overflow:hidden;">
+            <!-- 오로라 장식 글로우 -->
+            <div style="
+              position:absolute; top:-10px; right:-10px;
+              width:80px; height:80px;
+              background: radial-gradient(circle, rgba(0,180,197,0.3) 0%, transparent 70%);
+              pointer-events:none;
+            "></div>
+            <div class="fire-dot" style="background:var(--scuba-300);"></div>
+            <span class="hot-banner-text" style="color:rgba(255,255,255,0.92);">지금 핫한 이야기 — 면접에서 공백기 어떻게 말해요? · 같아요 34</span>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round">
+              <path d="M5 3l4 4-4 4"/>
+            </svg>
+          </div>
+
+          <!-- 카테고리 필터 탭 -->
+          <div class="filter-tabs">
+            <button class="tab-chip active">전체</button>
+            <button class="tab-chip inactive">오늘의 OFF</button>
+            <button class="tab-chip inactive">면접후기</button>
+            <button class="tab-chip inactive">고민창고</button>
+          </div>
+
+          <!-- 게시글 피드 -->
+          <div class="feed-area">
+
+            <!-- 카드 1 — Scuba→Violet 오로라 라인 -->
+            <div class="post-card" style="box-shadow: var(--shadow-sm); border-radius: var(--radius-lg); overflow:visible; position:relative; padding-top:18px;">
+              <!-- 오로라 그라데이션 라인 -->
+              <div style="
+                position:absolute; top:0; left:0; right:0; height:2px;
+                background: linear-gradient(90deg, #00B4C5, #7E6BA6, #4DCFDD);
+                border-radius: 16px 16px 0 0;
+              "></div>
+              <div class="card-header">
+                <div class="avatar" style="background:linear-gradient(135deg, var(--scuba-100), var(--violet-100)); color:var(--violet-500);">오</div>
+                <div class="card-meta">
+                  <span class="card-nickname">OFF중인누군가</span>
+                  <span class="card-time">2시간 전</span>
+                </div>
+                <div class="status-badge badge-off">잠깐 쉬는 중</div>
+              </div>
+              <div class="card-body">오늘 자소서 한 줄 썼다. 그것만으로 오늘은 충분해.</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>42</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>12</span></div>
+              </div>
+            </div>
+
+            <!-- 카드 2 -->
+            <div class="post-card" style="box-shadow: var(--shadow-sm); border-radius: var(--radius-lg); overflow:visible; position:relative; padding-top:18px;">
+              <div style="
+                position:absolute; top:0; left:0; right:0; height:2px;
+                background: linear-gradient(90deg, #7E6BA6, #00B4C5, #7E6BA6);
+                border-radius: 16px 16px 0 0;
+              "></div>
+              <div class="card-header">
+                <div class="avatar" style="background:linear-gradient(135deg, var(--scuba-100), var(--violet-100)); color:var(--violet-500);">충</div>
+                <div class="card-meta">
+                  <span class="card-nickname">충전중인고양이</span>
+                  <span class="card-time">5시간 전</span>
+                </div>
+                <div class="status-badge badge-charging">쉬고 있는 중</div>
+              </div>
+              <div class="card-body">면접에서 공백기 어떻게 말해요? 다들 어떻게 설명하세요...</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>34</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>21</span></div>
+              </div>
+            </div>
+
+            <!-- 카드 3 -->
+            <div class="post-card" style="box-shadow: var(--shadow-sm); border-radius: var(--radius-lg); overflow:visible; position:relative; padding-top:18px;">
+              <div style="
+                position:absolute; top:0; left:0; right:0; height:2px;
+                background: linear-gradient(90deg, #4DCFDD, #5F4B8B, #00B4C5);
+                border-radius: 16px 16px 0 0;
+              "></div>
+              <div class="card-header">
+                <div class="avatar" style="background:linear-gradient(135deg, var(--scuba-100), var(--violet-100)); color:var(--violet-500);">밤</div>
+                <div class="card-meta">
+                  <span class="card-nickname">밤하늘산책자</span>
+                  <span class="card-time">어제</span>
+                </div>
+                <div class="status-badge badge-burnout">번아웃 회복 중</div>
+              </div>
+              <div class="card-body">요즘 아침에 눈 뜨면 또 뭘 해야 하나 싶은데, 여기 오면 좀 나아져.</div>
+              <div class="card-reactions">
+                <div class="reaction-item"><span class="reaction-emoji">🤝</span><span>28</span></div>
+                <div class="reaction-item"><span class="reaction-emoji">💬</span><span>8</span></div>
+              </div>
+            </div>
+
+            <div class="feed-bottom-pad"></div>
+          </div>
+
+          <!-- FAB 글쓰기 (오로라 그라데이션) -->
+          <div class="fab" style="background: linear-gradient(135deg, var(--scuba-500), var(--violet-500)); box-shadow: 0 4px 16px rgba(95,75,139,0.35);">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4v14M4 11h14"/>
+            </svg>
+          </div>
+
+          <!-- 하단 네비게이션 -->
+          <div class="bottom-nav">
+            <!-- 상단에 오로라 라인 -->
+            <div style="height:1px; background:linear-gradient(90deg, transparent, rgba(0,180,197,0.3), rgba(95,75,139,0.3), transparent);"></div>
+            <div class="nav-tabs" style="border-top:none;">
+              <div class="nav-tab active" style="position:relative;">
+                <!-- 활성 탭 오로라 도트 -->
+                <div style="
+                  position:absolute; top:6px;
+                  width:4px; height:4px; border-radius:9999px;
+                  background: linear-gradient(90deg, var(--scuba-500), var(--violet-500));
+                "></div>
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-900)">
+                    <path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/>
+                    <path d="M8 20v-8h6v8"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-900); font-weight:700;">홈</span>
+              </div>
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <rect x="3" y="3" width="16" height="16" rx="2"/>
+                    <path d="M7 8h8M7 12h6M7 16h4"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">게시판</span>
+              </div>
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <path d="M4 16v-5a7 7 0 1 1 14 0v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/>
+                    <path d="M9 18a2 2 0 0 0 4 0"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">알림</span>
+              </div>
+              <div class="nav-tab inactive">
+                <div class="nav-icon">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--violet-300)">
+                    <circle cx="11" cy="8" r="4"/>
+                    <path d="M3 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                  </svg>
+                </div>
+                <span class="nav-label" style="color:var(--violet-300);">MY</span>
+              </div>
+            </div>
+            <div class="home-indicator">
+              <div class="home-indicator-bar" style="background:linear-gradient(90deg, var(--scuba-500), var(--violet-500)); opacity:0.25;"></div>
+            </div>
+          </div>
+
+        </div><!-- .screen-c -->
+      </div><!-- .iphone -->
+      <div class="type-label">
+        <span class="type-name">Type C — 은은한 오로라</span>
+        <span class="type-sub">화이트 배경 · 오로라 그라데이션 포인트 · 다크 배너</span>
+      </div>
+    </div><!-- .type-wrapper -->
+
+  </div><!-- .frames-row -->
+
+</body>
+</html>

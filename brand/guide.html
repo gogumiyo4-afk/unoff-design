@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNOFF Brand Guide v2.1</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+:root {
+  /* ─── 브랜드 컬러 (스와치/데모 전용 — UI에 직접 쓰지 말 것) ─── */
+  --violet900: #2E1F4E;
+  --violet700: #47366A;
+  --violet500: #5F4B8B;
+  --violet400: #7E6BA6;
+  --violet300: #A899C4;
+  --violet200: #D0C7E0;
+  --violet100: #EDE9F5;
+  --scuba600: #009BAA;
+  --scuba500: #00B4C5;
+  --scuba400: #33C5D3;
+  --scuba300: #7DDAE3;
+  --scuba200: #B3E9EF;
+  --scuba100: #E0F5F8;
+  --cloud500: #F0EDE5;
+  --cloud400: #E8E4DA;
+  --cloud300: #DDD8CC;
+  --cloud200: #C9C3B5;
+  --cloud100: #F7F5F0;
+  --warning: #E8A443;
+  --error: #D4726A;
+
+  /* ─── UI 컬러 (페이지 렌더링 — 다크 테마) ─── */
+  --bg: #0F0F1A;
+  --surface: #1A1A2E;
+  --surface-alt: #16213E;
+  --border: #2A2A4A;
+  --border-light: #2A2A4A;
+  --text: #E8E8F0;
+  --text-primary: #E8E8F0;
+  --text-secondary: #BBBBCC;
+  --text-tertiary: #8888AA;
+  --text-dim: #8888AA;
+  --text-muted: #666688;
+  --accent: #7B68EE;
+  --accent-dim: rgba(123,104,238,0.15);
+  --accent-light: rgba(123,104,238,0.08);
+  --green: #4ECDC4;
+  --green-dim: rgba(78,205,196,0.15);
+  --yellow: #FFD93D;
+  --yellow-dim: rgba(255,217,61,0.15);
+  --red: #FF6B6B;
+  --red-dim: rgba(255,107,107,0.15);
+  --blue: #4D96FF;
+  --blue-dim: rgba(77,150,255,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+/* ─── 상단 네비게이션 ─── */
+.top-nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(15,15,26,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 32px;
+  display: flex; align-items: center; gap: 16px;
+}
+.top-nav .hub-link {
+  font-size: 13px; font-weight: 500; color: var(--text-dim);
+  text-decoration: none;
+  display: flex; align-items: center; gap: 6px;
+  transition: color 0.2s;
+}
+.top-nav .hub-link:hover { color: var(--text); }
+.top-nav .nav-divider { color: var(--border); font-size: 16px; }
+.top-nav .logo { font-size: 15px; font-weight: 700; color: var(--accent); letter-spacing: 1px; }
+.top-nav .title { font-size: 14px; color: var(--text); font-weight: 500; }
+.top-nav .updated { margin-left: auto; font-size: 11px; color: var(--text-dim); }
+
+/* ─── 레이아웃 ─── */
+.layout { display: flex; min-height: calc(100vh - 45px); }
+
+/* ─── 사이드바 ─── */
+.sidebar {
+  width: 280px; min-width: 280px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  position: sticky; top: 45px;
+  height: calc(100vh - 45px);
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* 사이드바 그룹 (접이식) */
+.nav-group { margin-bottom: 4px; }
+.nav-group-title {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; cursor: pointer;
+  font-size: 12px; font-weight: 600; color: var(--text);
+  text-transform: uppercase; letter-spacing: 1px;
+  user-select: none; transition: background 0.2s;
+}
+.nav-group-title:hover { background: rgba(255,255,255,0.03); }
+.nav-group-title .arrow {
+  font-size: 10px; color: var(--text-dim);
+  transition: transform 0.2s;
+  width: 12px; text-align: center; margin-left: auto;
+}
+.nav-group.open .arrow { transform: rotate(90deg); }
+.nav-items { display: none; padding: 0 0 8px 0; }
+.nav-group.open .nav-items { display: block; }
+.nav-items a {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 20px 7px 32px;
+  font-size: 12px; color: var(--text-dim);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.nav-items a:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+.nav-items a.active { color: var(--accent); border-left-color: var(--accent); }
+.nav-items a .num {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 11px;
+  min-width: 20px;
+}
+.nav-items a.active .num { color: var(--accent); }
+
+/* ─── 메인 콘텐츠 ─── */
+.main { flex: 1; padding: 40px 48px; max-width: 960px; min-width: 0; }
+
+/* ─── 섹션 헤더 ─── */
+.section-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 20px 28px;
+  margin-bottom: 36px;
+  margin-top: 64px;
+}
+.section-header:first-child { margin-top: 0; }
+.section-header .sec-num {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.section-header .sec-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.section-header .sec-sub {
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+/* ─── 서브섹션 ─── */
+.subsection { margin-bottom: 40px; }
+.subsection-title {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+/* ─── 테이블 ─── */
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  font-size: 13px;
+}
+
+th {
+  background: var(--surface-alt);
+  color: var(--text-dim);
+  padding: 9px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--border);
+}
+
+td {
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text-secondary);
+}
+
+/* ── 콜아웃 ── */
+.callout {
+  background: var(--surface);
+  border-left: 4px solid var(--border);
+  border-radius: 0 8px 8px 0;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.callout strong { color: var(--text); }
+
+.callout-violet {
+  background: var(--accent-dim);
+  border-left-color: var(--accent);
+}
+
+.callout-warning {
+  background: var(--yellow-dim);
+  border-left-color: var(--yellow);
+}
+
+/* ── DO/DONT ── */
+.do-dont {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.do-box {
+  background: var(--green-dim);
+  border-radius: 8px;
+  padding: 18px;
+  border: 1px solid rgba(78,205,196,0.2);
+}
+
+.do-box .box-title {
+  color: var(--green);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.dont-box {
+  background: var(--red-dim);
+  border-radius: 8px;
+  padding: 18px;
+  border: 1px solid rgba(255,107,107,0.2);
+}
+
+.dont-box .box-title {
+  color: var(--red);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.do-box ul, .dont-box ul {
+  list-style: none;
+  padding: 0;
+}
+
+.do-box li, .dont-box li {
+  font-size: 13px;
+  padding: 4px 0;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.do-box li::before { content: "✓ "; color: var(--green); }
+.dont-box li::before { content: "✗ "; color: var(--red); }
+
+/* ── 코드 블록 ── */
+pre {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+  font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+code {
+  font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  background: var(--surface-alt);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text);
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* ── 컬러 스와치 ── */
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.swatch {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.swatch-color { height: 70px; }
+
+.swatch-info {
+  background: var(--surface);
+  padding: 10px 12px;
+}
+
+.swatch-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.swatch-hex { font-size: 11px; color: var(--text-muted); font-family: monospace; }
+.swatch-use { font-size: 11px; color: var(--text-dim); margin-top: 3px; line-height: 1.4; }
+
+/* ── 배터리 바 데모 ── */
+.battery-demo {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.battery-bar-wrap { margin-bottom: 16px; }
+
+.battery-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.battery-bar-bg {
+  background: var(--border);
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+}
+
+.battery-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease-out;
+}
+
+/* ── 버튼 데모 ── */
+.btn-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background: var(--scuba500);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  height: 52px;
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  height: 52px;
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+/* ── 상태 뱃지 ── */
+.badge-demo { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  height: 24px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ── 카드 데모 ── */
+.card-demo {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  max-width: 340px;
+}
+
+.card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+.card-author { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.card-body { font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 14px; }
+.card-actions { display: flex; gap: 16px; font-size: 13px; color: var(--text-dim); }
+
+/* ── 체크리스트 ── */
+.checklist { list-style: none; padding: 0; margin-bottom: 16px; }
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.check-box {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── 토큰 리스트 ── */
+.token-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.token-item {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid var(--border);
+}
+
+.token-name { font-size: 12px; color: var(--text-dim); font-family: monospace; font-weight: 600; }
+.token-value { font-size: 20px; font-weight: 700; color: var(--text); }
+.token-use { font-size: 12px; color: var(--text-muted); }
+
+/* ── 그라데이션 바 ── */
+.gradient-demo {
+  height: 56px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* ── 인라인 태그 ── */
+.tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-dim);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+.tag-scuba {
+  background: rgba(0,180,197,0.12);
+  color: var(--scuba400);
+  border-color: rgba(0,180,197,0.2);
+}
+
+/* ── 섹션 구분 ── */
+.sec-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 48px 0;
+}
+
+/* ── body 텍스트 ── */
+p { margin-bottom: 14px; font-size: 14px; line-height: 1.7; color: var(--text-secondary); }
+strong { color: var(--text); }
+em { font-style: normal; color: var(--text); font-weight: 600; }
+
+blockquote {
+  border-left: 4px solid var(--accent);
+  background: var(--accent-dim);
+  margin: 0 0 20px;
+  padding: 16px 20px;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ── 구분선 ── */
+.feature-divider {
+  margin: 64px 0 48px;
+  border: none;
+  border-top: 2px solid var(--accent);
+  opacity: 0.3;
+}
+
+/* ── @media ── */
+@media (max-width: 900px) {
+  .layout { flex-direction: column; }
+  .sidebar {
+    width: 100%; min-width: unset;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .main { padding: 24px 20px; }
+  .do-dont { grid-template-columns: 1fr; }
+  .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media print {
+  .top-nav, .sidebar { display: none !important; }
+  .main { padding: 20px; }
+  .section-header { background: #1A1A1A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- 상단 네비게이션 -->
+<nav class="top-nav">
+  <a class="hub-link" href="../../">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Hub
+  </a>
+  <span class="nav-divider">/</span>
+  <span class="logo">unoff</span>
+  <span class="title">Brand Guide v2.1</span>
+  <span class="updated">2026-03-18</span>
+</nav>
+
+<!-- 레이아웃 -->
+<div class="layout">
+
+<!-- 사이드바 -->
+<aside class="sidebar" id="sidebar">
+  <!-- Overview 그룹 -->
+  <div class="nav-group open" id="group-overview">
+    <div class="nav-group-title" onclick="toggleGroup('group-overview')">Overview <span class="arrow">▶</span></div>
+    <div class="nav-items">
+      <a href="#section-0" class="nav-link"><span class="num">00</span> Brand Overview</a>
+    </div>
+  </div>
+  <!-- Foundation 그룹 -->
+  <div class="nav-group open" id="group-foundation">
+    <div class="nav-group-title" onclick="toggleGroup('group-foundation')">Foundation <span class="arrow">▶</span></div>
+    <div class="nav-items">
+      <a href="#section-1" class="nav-link"><span class="num">01</span> Brand Foundation</a>
+      <a href="#section-2" class="nav-link"><span class="num">02</span> Logo</a>
+    </div>
+  </div>
+  <!-- Visual 그룹 -->
+  <div class="nav-group open" id="group-visual">
+    <div class="nav-group-title" onclick="toggleGroup('group-visual')">Visual <span class="arrow">▶</span></div>
+    <div class="nav-items">
+      <a href="#section-3" class="nav-link"><span class="num">03</span> Color System</a>
+      <a href="#section-4" class="nav-link"><span class="num">04</span> Typography</a>
+      <a href="#section-5" class="nav-link"><span class="num">05</span> Spacing &amp; Layout</a>
+      <a href="#section-6" class="nav-link"><span class="num">06</span> Corner Radius</a>
+      <a href="#section-7" class="nav-link"><span class="num">07</span> Iconography</a>
+      <a href="#section-8" class="nav-link"><span class="num">08</span> Imagery</a>
+    </div>
+  </div>
+  <!-- Components 그룹 -->
+  <div class="nav-group open" id="group-components">
+    <div class="nav-group-title" onclick="toggleGroup('group-components')">Components <span class="arrow">▶</span></div>
+    <div class="nav-items">
+      <a href="#section-9" class="nav-link"><span class="num">09</span> Components</a>
+      <a href="#section-10" class="nav-link"><span class="num">10</span> Motion</a>
+      <a href="#section-11" class="nav-link"><span class="num">11</span> UX Writing</a>
+      <a href="#section-12" class="nav-link"><span class="num">12</span> Brand Application</a>
+    </div>
+  </div>
+  <!-- Reference 그룹 -->
+  <div class="nav-group open" id="group-reference">
+    <div class="nav-group-title" onclick="toggleGroup('group-reference')">Reference <span class="arrow">▶</span></div>
+    <div class="nav-items">
+      <a href="#section-13" class="nav-link"><span class="num">13</span> 체크리스트</a>
+      <a href="#section-14" class="nav-link"><span class="num">14</span> Design Tokens</a>
+    </div>
+  </div>
+</aside>
+
+<!-- 메인 -->
+<main class="main" id="main-content">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 0: Brand Overview -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-0">
+<div class="section-header">
+  <div class="sec-num">Section 00</div>
+  <div class="sec-title">Brand Overview</div>
+  <div class="sec-sub">브랜드 개요 — 왜, 무엇을, 누구를 위해</div>
+</div>
+
+<!-- 0-1 WHY -->
+<div class="subsection">
+  <div class="subsection-title">0-1. WHY — 왜 UNOFF인가</div>
+  <div class="callout">
+    <strong>71.7만 명의 쉬는 청년(2025년, 역대 최대)을 위한 공간이 세상에 없다.</strong>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>지표</th><th>수치</th><th>의미</th><th>출처</th></tr></thead>
+      <tbody>
+        <tr><td>20~30대 쉬었음 인구</td><td><strong>71.7만 명</strong> (2025, 역대 최대)</td><td>시장 존재 확인</td><td style="font-size:12px;color:var(--text-muted)">통계청 경제활동인구조사 (2025)</td></tr>
+        <tr><td>비자발적 비율</td><td><strong>72%</strong> (51.6만 명)</td><td>구직실패·권고사직 — 선택이 아닌 구조적 문제</td><td style="font-size:12px;color:var(--text-muted)">통계청 경제활동인구 부가조사 (2024)</td></tr>
+        <tr><td>낙인 경험률</td><td><strong>83.5%</strong></td><td>"의욕 없다"는 시선 경험 → 정서적 안전망 수요</td><td style="font-size:12px;color:var(--text-muted)">한국고용정보원 청년층 경활 심층분석 (2024)</td></tr>
+        <tr><td>복귀 의지 급락 구간</td><td>1년 초과 시 90%→55%</td><td>조기 개입 필요성</td><td style="font-size:12px;color:var(--text-muted)">한국고용정보원 패널 추적조사 (2023)</td></tr>
+        <tr><td>청년 NEET 비율</td><td><strong>19.2%</strong> (OECD 평균 13.1%)</td><td>구조적 문제 심각성</td><td style="font-size:12px;color:var(--text-muted)">OECD Employment Outlook (2023)</td></tr>
+        <tr><td>전용 플랫폼</td><td><strong>0개</strong></td><td>블라인드·에브리타임·잡플래닛 어디에도 쉬는 청년 전용 공간 없음</td><td style="font-size:12px;color:var(--text-muted)">자체 경쟁사 분석 (2025.03)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 0-2 WHAT -->
+<div class="subsection">
+  <div class="subsection-title">0-2. WHAT — UNOFF란 무엇인가</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Brand Essence</strong></td><td>"꺼진 게 아니라, 충전 중이다."</td></tr>
+        <tr><td><strong>네이밍 오리진</strong></td><td><strong>Unofficial + Underdog's Offbeat</strong> — 두 가지 의미를 함축</td></tr>
+        <tr><td><strong>메인 슬로건</strong></td><td>"다음 ON을 위해 지금은 OFF."</td></tr>
+        <tr><td><strong>태그라인 (국문)</strong></td><td>"켜지기 전까지, 여기 있어."</td></tr>
+        <tr><td><strong>태그라인 (영문)</strong></td><td>"Beyond the Official."</td></tr>
+        <tr><td><strong>카테고리 정의</strong></td><td>20~35세 공백기 청년 전용 커뮤니티 앱</td></tr>
+        <tr><td><strong>포지셔닝</strong></td><td>OFF 상태를 정상화하는 유일한 디지털 공간</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 0-3 포지셔닝 -->
+<div class="subsection">
+  <div class="subsection-title">0-3. 포지셔닝 스테이트먼트</div>
+  <div class="callout callout-violet">
+    <p><strong>[타깃]</strong> 사회적 스위치가 OFF된 20~35세 청년 (자발적·비자발적 공백기)</p>
+    <p><strong>[브랜드]</strong> UNOFF는</p>
+    <p><strong>[카테고리]</strong> 쉬는 청년 전용 커뮤니티 앱으로서</p>
+    <p><strong>[핵심 차별점]</strong> 낙인 없이 OFF 상태를 공유하고, 서로의 속도를 인정하며 각자의 ON을 준비할 수 있게 해주는 유일한 공간이다.</p>
+    <p><strong>[이유]</strong> 왜냐하면 현존하는 모든 플랫폼은 '이미 활동 중인 사람'을 전제로 설계되어 있기 때문이다.</p>
+  </div>
+</div>
+
+<!-- 0-4 타깃 -->
+<div class="subsection">
+  <div class="subsection-title">0-4. 타깃 정의</div>
+  <div class="callout">
+    <strong>초기 집중: Type B 비자발적 공백층 (51.6만 명)</strong>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>유형</th><th>규모 추정</th><th>심리적 긴급성</th><th>서비스 필요도</th></tr></thead>
+      <tbody>
+        <tr><td>A. 자발적 휴식 (번아웃·갭이어)</td><td>~15만 명</td><td>중간</td><td>중간</td></tr>
+        <tr><td><strong>B. 비자발적 공백 (구직실패·권고사직)</strong></td><td><strong>~51만 명</strong></td><td><strong>높음</strong></td><td><strong>매우 높음</strong></td></tr>
+        <tr><td>C. 반복 전환 (이직준비·프리랜서)</td><td>~5만 명</td><td>낮음</td><td>중간</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>확장 순서</strong>: B타입(0~6개월) → A타입 번아웃(6~18개월) → C타입 반복전환(18개월~)</p>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 1: Brand Foundation -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-1">
+<div class="section-header">
+  <div class="sec-num">Section 01</div>
+  <div class="sec-title">Brand Foundation</div>
+  <div class="sec-sub">브랜드 기초 — Essence, Naming, Slogan, Values</div>
+</div>
+
+<!-- 1-1 Essence -->
+<div class="subsection">
+  <div class="subsection-title">1-1. Brand Essence</div>
+  <blockquote>"꺼진 게 아니라, 충전 중이다."</blockquote>
+  <p>OFF 상태는 실패가 아니라 다음 ON을 위한 준비 상태다. UNOFF는 그 '충전 중'을 혼자가 아니라 함께 버티는 공간이다.</p>
+</div>
+
+<!-- 1-2 Naming -->
+<div class="subsection">
+  <div class="subsection-title">1-2. Brand Naming — 두 가지 의미</div>
+  <blockquote><strong>UNOFF는 두 가지 의미를 하나의 단어에 함축한다.</strong></blockquote>
+
+  <div class="subsection-title" style="margin-top:24px;font-size:15px">네이밍의 이중 구조 (Storytelling)</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>층위</th><th>해석</th><th>인상</th></tr></thead>
+      <tbody>
+        <tr><td><strong>첫 번째 의미</strong></td><td><strong>Unofficial</strong> — 공식적으로 어딘가에 속해있지 않은 사람들</td><td>정체성, 소속의 재정의</td></tr>
+        <tr><td><strong>두 번째 의미</strong></td><td><strong>Underdog's Offbeat</strong> — 언더독이 자기만의 박자를 타는 것</td><td>서사적이고 당당함</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>처음엔 UNOFF라는 짧고 친근한 단어로 접근하지만, 그 안에 <strong>Unofficial</strong>(공식 소속이 아닌 사람들의 공간)과 <strong>Underdog's Offbeat</strong>(자기만의 박자로 걷는 언더독)이라는 두 겹의 의미가 있음을 알게 되었을 때 유저들이 느끼는 브랜드의 무게감이 커진다.</p>
+
+  <div class="callout">
+    <strong>활용:</strong> 앱 내 전면 노출 안 함. PR 인터뷰, 창업자 스토리, 브랜드 필름, About 페이지에서 공개<br>
+    <strong>주의 1:</strong> "unofficial = 비공식·불량" 뉘앙스로 읽히지 않도록 — 공백 상태를 낙인 없이 정상화하는 맥락에서 사용<br>
+    <strong>주의 2:</strong> "언더독 = 싸워서 이기는 사람" 뉘앙스 → 경쟁 서사로 해석되지 않도록, 앱 내에서는 리스펙트 톤 유지<br>
+    <strong>금지:</strong> "un + off = 꺼져 있는 상태"라는 해석은 사용하지 않음. UNOFF의 네이밍 의미는 위 두 가지뿐임
+  </div>
+
+  <div class="subsection-title" style="margin-top:24px;font-size:15px">Phase별 서사 활용</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Phase</th><th>대상</th><th>서사 방향</th></tr></thead>
+      <tbody>
+        <tr><td>Phase 1 (MVP)</td><td>비자발적 공백자</td><td>"너만 그런 거 아니야" (연대·안전) — <em>Unofficial</em> 강조</td></tr>
+        <tr><td>Phase 2</td><td>자발적 휴식자 확장</td><td>"Offbeat = 자기만의 라이프스타일" (독립·당당) — <em>Underdog's Offbeat</em> 강조</td></tr>
+        <tr><td>Phase 3</td><td>글로벌</td><td>"Beyond the Official" + "The rhythm of Underdogs" (두 서사 전면화)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 1-3 슬로건 -->
+<div class="subsection">
+  <div class="subsection-title">1-3. 슬로건 & 태그라인 시스템</div>
+
+  <div class="subsection-title" style="margin-top:0;font-size:15px;color:var(--text-dim)">메인 슬로건</div>
+  <blockquote>"다음 ON을 위해 지금은 OFF."</blockquote>
+  <p>현재 상황(OFF)을 인정하면서도 미래(ON)를 향한 의지를 동시에 표현. "쉬는 것 = 실패"라는 사회적 낙인을 완전히 뒤집는 재구성 메시지.</p>
+
+  <div class="subsection-title" style="margin-top:20px;font-size:15px;color:var(--text-dim)">태그라인</div>
+  <ul style="padding-left:20px;margin-bottom:16px;font-size:14px;line-height:2;color:var(--text-dim)">
+    <li><strong>국문:</strong> "켜지기 전까지, 여기 있어." — 시간성과 공간성을 동시에 표현, 정서적 울림</li>
+    <li><strong>영문:</strong> "Beyond the Official." — 글로벌 확장 시 사용</li>
+  </ul>
+
+  <div class="subsection-title" style="margin-top:20px;font-size:15px;color:var(--text-dim)">채널별 슬로건 배분</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>채널</th><th>사용 슬로건</th><th>감정 목표</th></tr></thead>
+      <tbody>
+        <tr><td>앱스토어 이름 아래</td><td>"쉬는 사람들의 공간"</td><td>명확한 첫인상</td></tr>
+        <tr><td>앱 온보딩 1화면</td><td>"꺼져도 괜찮아, 여기선."</td><td>안도감</td></tr>
+        <tr><td>메인 마케팅 캠페인</td><td>"다음 ON을 위해 지금은 OFF."</td><td>재구성·희망</td></tr>
+        <tr><td>SNS 커뮤니티 캠페인</td><td>"같은 배터리, 같이 충전."</td><td>연대감·바이럴</td></tr>
+        <tr><td>광고 영상 엔딩</td><td>"스위치 OFF, 연결은 ON."</td><td>임팩트·기억성</td></tr>
+        <tr><td>스플래시 스크린</td><td>"켜지기 전까지, 여기 있어."</td><td>정서적 울림</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 1-4 메시지 계층 -->
+<div class="subsection">
+  <div class="subsection-title">1-4. 메시지 계층 구조</div>
+  <pre>MAIN:  "쉬는 것도 삶이다. UNOFF가 함께 있다."
+SUB:   ① 71.7만 명이 함께  ② 취업 강요 없음  ③ 각자의 속도로
+PROOF: 시장 데이터 + 낙인 수치 + 경쟁 공백 사실 + 정부 협업</pre>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>계층</th><th>메시지</th><th>설득 목표</th><th>사용 채널</th></tr></thead>
+      <tbody>
+        <tr><td><strong>MAIN</strong></td><td>"쉬는 것도 삶이다. UNOFF가 함께 있다."</td><td>브랜드 존재 이유 각인</td><td>전 채널</td></tr>
+        <tr><td><strong>SUB 1</strong></td><td>"71.7만 명이 함께 쉬고 있다"</td><td>"나만이 아니다" — 낙인 해소</td><td>SNS, 온보딩</td></tr>
+        <tr><td><strong>SUB 2</strong></td><td>"취업 강요 없는 유일한 공간"</td><td>기존 플랫폼 대비 차별화</td><td>앱스토어, 광고</td></tr>
+        <tr><td><strong>SUB 3</strong></td><td>"각자의 속도로 다시 켜진다"</td><td>자기 효능감 복원</td><td>앱 내 UX, 푸시</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 1-5 핵심 가치 -->
+<div class="subsection">
+  <div class="subsection-title">1-5. 핵심 가치 (Brand Values)</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>가치</th><th>한 줄 정의</th><th>디자인 반영</th></tr></thead>
+      <tbody>
+        <tr><td><strong>정상화</strong></td><td>"쉬는 것도 삶이다"</td><td>OFF를 부정적으로 표현하지 않는 뉴트럴 톤의 컬러와 카피</td></tr>
+        <tr><td><strong>연결</strong></td><td>"비교 없이 연결된다"</td><td>랭킹·스펙 비교 없는 UI, 수평적 레이아웃</td></tr>
+        <tr><td><strong>주도적 전환</strong></td><td>"내 속도로 다시 켜진다"</td><td>배터리 충전 메타포, 강요 없는 CTA</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 1-6 퍼스널리티 -->
+<div class="subsection">
+  <div class="subsection-title">1-6. 브랜드 퍼스널리티</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>형용사</th><th>디자인 톤</th><th>반대말 (우리가 아닌 것)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>담담한</strong></td><td>과장 없는 레이아웃, 절제된 그래픽</td><td>자극적인, 현란한</td></tr>
+        <tr><td><strong>솔직한</strong></td><td>명확한 타이포그래피, 꾸미지 않은 아이콘</td><td>포장하는, 가식적인</td></tr>
+        <tr><td><strong>느린 (unhurried)</strong></td><td>넉넉한 여백, 느린 애니메이션</td><td>빡빡한, 빠른</td></tr>
+        <tr><td><strong>따뜻하되 거리감 있는</strong></td><td>Warm neutral 컬러, 둥근 모서리지만 과하지 않게</td><td>달라붙는, 냉담한</td></tr>
+        <tr><td><strong>회복 지향적</strong></td><td>OFF→ON 그라데이션, 상승하는 시각 흐름</td><td>체념적인, 조급한</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 1-7 보이스 -->
+<div class="subsection">
+  <div class="subsection-title">1-7. 브랜드 보이스 & 톤</div>
+  <div class="callout callout-violet">
+    <strong>톤 기조: 위로 → 리스펙트</strong><br>
+    "괜찮아"보다 "네 박자는 틀린 게 아니라 독특한 거야"<br><br>
+    "위로"는 약자에게 하는 것이라는 뉘앙스가 남는다. "리스펙트"는 대등한 관계에서 나온다.<br>
+    타깃 유저가 가장 싫어하는 것이 동정이므로, UNOFF의 톤은 리스펙트 기반이다.
+  </div>
+  <div class="callout">
+    <strong>"같이 쉬어본 친구가 옆에 앉아서 조용히 말하는 것처럼."</strong>
+  </div>
+
+  <div class="subsection-title" style="margin-top:20px;font-size:15px;color:var(--text-dim)">보이스 키워드 6가지</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>키워드</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td><strong>리스펙트</strong></td><td>동정이 아닌 존중. "괜찮아"보다 "네 박자가 맞아"</td></tr>
+        <tr><td><strong>담담함</strong></td><td>호들갑 없이 있는 그대로</td></tr>
+        <tr><td><strong>옆에 있음</strong></td><td>해결해주는 게 아니라 함께 있어줌</td></tr>
+        <tr><td><strong>비교 없음</strong></td><td>타인 성과와 비교 유발 금지</td></tr>
+        <tr><td><strong>현실 인정</strong></td><td>힘든 것 힘들다고 말함</td></tr>
+        <tr><td><strong>가능성 열기</strong></td><td>강요 없이 선택지 제시</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-title" style="margin-top:20px;font-size:15px;color:var(--text-dim)">DO / DON'T</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>상황</th><th>DO</th><th>DON'T</th></tr></thead>
+      <tbody>
+        <tr><td>상태 묘사</td><td>"지금 OFF 중이야" / "네 박자로 가는 중이야"</td><td>"지금 백수야" / "쉬고 있어요" (비굴한 뉘앙스)</td></tr>
+        <tr><td>격려</td><td>"네 속도가 맞는 거야" / "배터리 조금씩 오르고 있어"</td><td>"화이팅! 넌 할 수 있어!" / "괜찮아, 다 잘 될 거야"</td></tr>
+        <tr><td>취업 언급</td><td>"언제든 준비되면 알려줘"</td><td>"빨리 취업해야죠!" / "이제 일할 때 됐잖아요"</td></tr>
+        <tr><td>실패 경험</td><td>"그건 네 리듬이야. 흔한 일이야"</td><td>"그건 너의 부족함 때문이야"</td></tr>
+        <tr><td>공백 상태</td><td>"네가 쉬기로 한 게 아니라도, 지금 이 시간은 네 거야"</td><td>"힘내! 금방 취업할 수 있을 거야!"</td></tr>
+        <tr><td>앱 기능 소개</td><td>"면접 후기 쌓여 있어. 언제든 봐"</td><td>"취업 성공 사례를 보며 동기부여하세요!"</td></tr>
+        <tr><td>푸시 알림</td><td>"새 글이 올라왔어. 와볼래?"</td><td>"오늘 이력서 1개 써봐요!"</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 1-8 메타포 -->
+<div class="subsection">
+  <div class="subsection-title">1-8. OFF→ON 메타포 시스템</div>
+  <pre>OFF 상태 (현재)          전환 구간               ON 상태 (미래)
+────────────────────────────────────────────────────────────
+스위치 꺼짐              충전 중                  스위치 켜짐
+배터리 방전              배터리 충전 중            배터리 완충
+화면 꺼짐                절전 모드                화면 켜짐</pre>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>브랜드 영역</th><th>적용 방식</th><th>구체적 표현</th></tr></thead>
+      <tbody>
+        <tr><td><strong>앱 UI/UX</strong></td><td>온보딩 화면</td><td>"지금 OFF 상태야? 여기 있어도 돼"</td></tr>
+        <tr><td><strong>상태 표시</strong></td><td>ON/OFF 토글</td><td>프로필에 현재 상태(OFF/충전 중/ON 전환) 표시</td></tr>
+        <tr><td><strong>게이미피케이션</strong></td><td>배터리 충전바</td><td>활동(게시글·댓글·커넥션)마다 배터리% 증가</td></tr>
+        <tr><td><strong>푸시 메시지</strong></td><td>재방문 유도</td><td>"배터리가 조금 올라갔어요" / "슬슬 켜질 타이밍인가요?"</td></tr>
+        <tr><td><strong>성취 시스템</strong></td><td>ON 전환 기념</td><td>취업·복귀 신고 시 "SWITCH ON" 배지 + 축하 피드</td></tr>
+        <tr><td><strong>리부트 패키지</strong></td><td>전환 지원</td><td>"ON 모드 전환 준비됐을 때 쓸 수 있는 배터리 팩"</td></tr>
+        <tr><td><strong>브랜드 컬러</strong></td><td>상태별 색상</td><td>OFF: 중성 그레이 (담담한 회색) → ON: Scuba Blue (활기 있는 틸)</td></tr>
+        <tr><td><strong>카피라이팅</strong></td><td>모든 UX 문구</td><td>OFF 단어를 부정이 아닌 자연스러운 상태로 사용</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>메타포 활용 원칙</strong><br>
+    • OFF는 약점이 아니라 <strong>현재 상태</strong>로만 표현 (예: "OFF 중이에요" = 중립적)<br>
+    • ON 전환은 <strong>축하하되 강요하지 않는다</strong> (취업 성공 공유 = 자율)<br>
+    • 배터리 충전 속도는 <strong>개인마다 다르다</strong>는 것을 시스템이 보여줌
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 2: Logo -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-2">
+<div class="section-header">
+  <div class="sec-num">Section 02</div>
+  <div class="sec-title">Logo</div>
+  <div class="sec-sub">로고 — Wordmark, 규격, 컬러 변형, 사용 규정</div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">2-1. Primary Logo — Wordmark</div>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:20px">
+    <div style="background:#F0EDE5;border-radius:12px;padding:28px 44px;display:flex;align-items:center;justify-content:center;min-width:180px">
+      <img src="../reference/logo.png" style="height:40px;display:block" alt="unoff logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <span style="display:none;font-size:36px;font-weight:700;color:#1A1A1A;letter-spacing:4px">unoff</span>
+    </div>
+    <div style="background:#2E1F4E;border-radius:12px;padding:28px 44px;display:flex;align-items:center;justify-content:center;min-width:180px">
+      <img src="../reference/logo.png" style="height:40px;display:block;filter:brightness(10)" alt="unoff logo dark" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <span style="display:none;font-size:36px;font-weight:700;color:#F0EDE5;letter-spacing:4px">unoff</span>
+    </div>
+  </div>
+  <ul style="padding-left:20px;font-size:14px;line-height:2.2;color:var(--text-dim)">
+    <li><strong>표기</strong>: 항상 소문자 — <code>unoff</code></li>
+    <li><strong>서체 스타일</strong>: 둥근 지오메트릭 산세리프, Bold — 'o'는 완전한 원형, 'f'의 상단 커브가 특징적</li>
+    <li><strong>구어 발음</strong>: "언오프" (온보딩에서 "어떻게 읽나요? un-off, 언오프" 안내)</li>
+    <li><strong>의미 구조</strong>: ① Unofficial = "공식적으로 소속되어 있지 않은" ② Underdog's Offbeat = "언더독의 엇박자"</li>
+    <li><strong>소문자 이유</strong>: 대문자의 권위적 느낌을 피하고, 캐주얼하고 친근한 톤 유지. "쉬어도 괜찮아"라는 메시지와 소문자의 부드러움이 정합</li>
+  </ul>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">2-2. 로고 규격</div>
+  <div class="token-grid">
+    <div class="token-item"><span class="token-name">자간</span><span class="token-value" style="font-size:16px">Optical Kerning</span><span class="token-use">글자 간 시각적 균형</span></div>
+    <div class="token-item"><span class="token-name">최소 사이즈 (디지털)</span><span class="token-value">72px</span><span class="token-use">이하 사용 금지</span></div>
+    <div class="token-item"><span class="token-name">최소 사이즈 (인쇄)</span><span class="token-value">20mm</span><span class="token-use">이하 사용 금지</span></div>
+    <div class="token-item"><span class="token-name">원본 파일</span><span class="token-value" style="font-size:13px">logo.png</span><span class="token-use">디자인/reference/</span></div>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">2-3. 로고 컬러 변형</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>변형</th><th>로고 색상</th><th>배경</th><th>사용 맥락</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Default</strong></td><td>Black <code>#1A1A1A</code></td><td>Cloud Dancer <code>#F0EDE5</code></td><td>메인 사용 (인앱 기본)</td></tr>
+        <tr><td><strong>Dark</strong></td><td>Cloud Dancer <code>#F0EDE5</code></td><td>Ultra Violet <code>#5F4B8B</code></td><td>다크 배경</td></tr>
+        <tr><td><strong>Mono Black</strong></td><td>Black <code>#1A1A1A</code></td><td>White</td><td>인쇄, 단색</td></tr>
+        <tr><td><strong>Mono White</strong></td><td>White <code>#FFFFFF</code></td><td>어두운 배경</td><td>사진 위 오버레이</td></tr>
+        <tr><td><strong>Scuba</strong></td><td>Scuba Blue <code>#00B4C5</code></td><td>Cloud Dancer <code>#F0EDE5</code></td><td>SNS 포인트 사용</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">2-4. 로고 사용 규정</div>
+  <div class="callout callout-violet">
+    <strong>Clear Space (보호 영역)</strong><br>
+    로고 높이의 0.5배를 상하좌우 여백으로 확보. 최소 여백 내에 다른 텍스트·이미지·로고 배치 금지
+  </div>
+  <div class="callout" style="background:var(--red-dim);border-left-color:var(--red)">
+    <strong>금지 사항</strong><br>
+    • 로고 색상 브랜드 팔레트 외 색상 사용 금지<br>
+    • 로고 비율 변형(늘리기/줄이기) 금지<br>
+    • 로고 위에 그림자·외곽선·그라데이션 추가 금지<br>
+    • 복잡한 배경 위에 로고 배치 금지<br>
+    • 로고를 기울이거나 회전 금지<br>
+    • <strong>대문자 "UNOFF" 표기 금지</strong> — 항상 소문자 <code>unoff</code>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 3: Color System -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-3">
+<div class="section-header">
+  <div class="sec-num">Section 03</div>
+  <div class="sec-title">Color System</div>
+  <div class="sec-sub">컬러 시스템 — PANTONE 기반 3색 체계</div>
+</div>
+
+<div class="callout">
+  UNOFF의 컬러는 PANTONE 기반 3색 체계로, <strong>차분함(Cloud Dancer) + 신선함(Scuba Blue) + 밤하늘(Ultra Violet)</strong>의 조화를 이룬다.<br>
+  OFF 상태는 중성 그레이로, 충전 중은 Scuba Blue의 활기로, Cloud Dancer는 안식처의 따뜻한 배경으로 기능한다.<br>
+  <strong>Ultra Violet은 온보딩·스플래시 밤하늘 그라데이션 전용 — 인앱 단독 사용 금지.</strong>
+</div>
+
+<!-- Cloud Dancer -->
+<div class="subsection">
+  <div class="subsection-title">3-1A. Cloud Dancer — 안식의 색</div>
+  <div class="callout" style="margin-bottom:16px">
+    PANTONE 11-4201 | 따뜻한 오프화이트. 쉬어도 괜찮은 안전한 공간을 상징
+  </div>
+  <div class="swatch-grid">
+    <div class="swatch"><div class="swatch-color" style="background:#F7F5F0"></div><div class="swatch-info"><div class="swatch-name">Cloud Dancer 100</div><div class="swatch-hex">#F7F5F0</div><div class="swatch-use">가장 연한 배경</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#F0EDE5"></div><div class="swatch-info"><div class="swatch-name">Cloud Dancer 500</div><div class="swatch-hex">#F0EDE5</div><div class="swatch-use">메인 배경, 카드</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#E8E4DA"></div><div class="swatch-info"><div class="swatch-name">Cloud Dancer 400</div><div class="swatch-hex">#E8E4DA</div><div class="swatch-use">인풋 배경, 구분</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#DDD8CC"></div><div class="swatch-info"><div class="swatch-name">Cloud Dancer 300</div><div class="swatch-hex">#DDD8CC</div><div class="swatch-use">구분선, 비활성</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#C9C3B5"></div><div class="swatch-info"><div class="swatch-name">Cloud Dancer 200</div><div class="swatch-hex">#C9C3B5</div><div class="swatch-use">플레이스홀더</div></div></div>
+  </div>
+</div>
+
+<!-- Scuba Blue -->
+<div class="subsection">
+  <div class="subsection-title">3-1B. Scuba Blue — 충전의 색</div>
+  <div class="callout" style="margin-bottom:16px">
+    PANTONE 16-4725 | 신선한 시안/틸. 충전 중인 에너지, 회복의 활력을 상징
+  </div>
+  <div class="swatch-grid">
+    <div class="swatch"><div class="swatch-color" style="background:#E0F5F8"></div><div class="swatch-info"><div class="swatch-name">Scuba 100</div><div class="swatch-hex">#E0F5F8</div><div class="swatch-use">연한 틸 배경</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#B3E9EF"></div><div class="swatch-info"><div class="swatch-name">Scuba 200</div><div class="swatch-hex">#B3E9EF</div><div class="swatch-use">연한 강조 배경</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#7DDAE3"></div><div class="swatch-info"><div class="swatch-name">Scuba 300</div><div class="swatch-hex">#7DDAE3</div><div class="swatch-use">알림 뱃지</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#33C5D3"></div><div class="swatch-info"><div class="swatch-name">Scuba 400</div><div class="swatch-hex">#33C5D3</div><div class="swatch-use">호버/프레스</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#00B4C5"></div><div class="swatch-info"><div class="swatch-name">Scuba 500</div><div class="swatch-hex">#00B4C5</div><div class="swatch-use">CTA, 충전바, 링크</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#009BAA"></div><div class="swatch-info"><div class="swatch-name">Scuba 600</div><div class="swatch-hex">#009BAA</div><div class="swatch-use">다크 버전, 호버</div></div></div>
+  </div>
+</div>
+
+<!-- Ultra Violet -->
+<div class="subsection">
+  <div class="subsection-title">3-1C. Ultra Violet — 밤하늘 그라데이션 전용</div>
+  <div class="callout callout-violet" style="margin-bottom:16px">
+    PANTONE 18-3838 | 깊은 보라. 내면의 깊이, 성찰, 밤하늘의 어둠을 상징.<br>
+    <strong style="color:#FF6B6B">⚠ 단독 사용 금지 — 온보딩·스플래시 밤하늘 그라데이션 내에서만 사용 가능 (인앱 단독 적용 불가)</strong>
+  </div>
+  <div class="swatch-grid">
+    <div class="swatch"><div class="swatch-color" style="background:#EDE9F5"></div><div class="swatch-info"><div class="swatch-name">Violet 100</div><div class="swatch-hex">#EDE9F5</div><div class="swatch-use">레퍼런스 전용</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#D0C7E0"></div><div class="swatch-info"><div class="swatch-name">Violet 200</div><div class="swatch-hex">#D0C7E0</div><div class="swatch-use">레퍼런스 전용</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#A899C4"></div><div class="swatch-info"><div class="swatch-name">Violet 300</div><div class="swatch-hex">#A899C4</div><div class="swatch-use">레퍼런스 전용</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#7E6BA6"></div><div class="swatch-info"><div class="swatch-name">Violet 400</div><div class="swatch-hex">#7E6BA6</div><div class="swatch-use">레퍼런스 전용</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#5F4B8B"></div><div class="swatch-info"><div class="swatch-name">Violet 500</div><div class="swatch-hex">#5F4B8B</div><div class="swatch-use">그라데이션 혼합 전용</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#47366A"></div><div class="swatch-info"><div class="swatch-name">Violet 700</div><div class="swatch-hex">#47366A</div><div class="swatch-use">그라데이션 혼합 전용</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#2E1F4E"></div><div class="swatch-info"><div class="swatch-name">Violet 900</div><div class="swatch-hex">#2E1F4E</div><div class="swatch-use">밤하늘 배경 전용 (그라데이션/스플래시)</div></div></div>
+  </div>
+</div>
+
+<!-- 3-2 그라데이션 -->
+<div class="subsection">
+  <div class="subsection-title">3-2. 브랜드 그라데이션</div>
+  <div style="margin-bottom:16px">
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:6px">Twilight — 온보딩 배경, 히어로 섹션</p>
+    <div class="gradient-demo" style="background:linear-gradient(to right, #5F4B8B, #00B4C5)"></div>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:6px;margin-top:16px">Dawn — 스플래시 스크린, 프리미엄 카드</p>
+    <div class="gradient-demo" style="background:linear-gradient(to bottom, #47366A, #009BAA)"></div>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:6px;margin-top:16px">Glow — 배터리 충전 하이라이트</p>
+    <div class="gradient-demo" style="background:radial-gradient(circle, #7DDAE3, #E0F5F8)"></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>이름</th><th>방향</th><th>시작 → 끝</th><th>사용처</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Twilight</strong></td><td>좌→우</td><td>Violet 500 → Scuba 500</td><td>온보딩 배경, 히어로 섹션, 앱 아이콘</td></tr>
+        <tr><td><strong>Dawn</strong></td><td>상→하</td><td>Violet 700 → Scuba 600</td><td>스플래시 스크린, 프리미엄 카드</td></tr>
+        <tr><td><strong>Glow</strong></td><td>중앙→외곽</td><td>Scuba 300 → Scuba 100</td><td>배터리 충전 하이라이트, 알림</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 3-3 Neutral -->
+<div class="subsection">
+  <div class="subsection-title">3-3. Neutral Colors</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>색상명</th><th>HEX</th><th>RGB</th><th>사용처</th></tr></thead>
+      <tbody>
+        <tr><td>White</td><td><code>#FFFFFF</code></td><td>255, 255, 255</td><td>카드 배경</td></tr>
+        <tr><td>Cloud Dancer 100</td><td><code>#F7F5F0</code></td><td>247, 245, 240</td><td>페이지 기본 배경</td></tr>
+        <tr><td>Cloud Dancer 400</td><td><code>#E8E4DA</code></td><td>232, 228, 218</td><td>구분 영역</td></tr>
+        <tr><td>Cloud Dancer 200</td><td><code>#C9C3B5</code></td><td>201, 195, 181</td><td>비활성 텍스트</td></tr>
+        <tr><td>Dark Text</td><td><code>#1A1A1A</code></td><td>26, 26, 26</td><td>주요 텍스트 (Black) — 인앱 기본 텍스트</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 3-4 Semantic -->
+<div class="subsection">
+  <div class="subsection-title">3-4. Semantic Colors</div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+    <div style="background:#E0F5F8;border-radius:8px;padding:14px 20px;flex:1;min-width:120px">
+      <div style="font-size:12px;font-weight:700;color:#009BAA;margin-bottom:4px">SUCCESS</div>
+      <div style="font-size:20px;font-weight:700;color:#00B4C5">#00B4C5</div>
+      <div style="font-size:12px;color:#666688">ON 전환, 완료</div>
+    </div>
+    <div style="background:#FEF6EA;border-radius:8px;padding:14px 20px;flex:1;min-width:120px">
+      <div style="font-size:12px;font-weight:700;color:#C8862A;margin-bottom:4px">WARNING</div>
+      <div style="font-size:20px;font-weight:700;color:#E8A443">#E8A443</div>
+      <div style="font-size:12px;color:#666688">주의, 중요 알림</div>
+    </div>
+    <div style="background:#FEF1F0;border-radius:8px;padding:14px 20px;flex:1;min-width:120px">
+      <div style="font-size:12px;font-weight:700;color:#B05050;margin-bottom:4px">ERROR</div>
+      <div style="font-size:20px;font-weight:700;color:#D4726A">#D4726A</div>
+      <div style="font-size:12px;color:#666688">오류, 삭제</div>
+    </div>
+    <div style="background:#F0F0F5;border-radius:8px;padding:14px 20px;flex:1;min-width:120px">
+      <div style="font-size:12px;font-weight:700;color:#555577;margin-bottom:4px">INFO</div>
+      <div style="font-size:20px;font-weight:700;color:#8888AA">#8888AA</div>
+      <div style="font-size:12px;color:#8888AA">정보, 안내</div>
+    </div>
+  </div>
+</div>
+
+<!-- 3-5 OFF→ON -->
+<div class="subsection">
+  <div class="subsection-title">3-5. OFF→ON 상태별 컬러 매핑</div>
+  <pre>OFF 상태 (고요함)                 충전 중                      ON 상태 (활성)
+───────────────────────────────────────────────────────────────────────
+중성 그레이 + Cloud 배경       →  그레이→Scuba 그라데이션    →  Scuba Blue 500 + Cloud 배경
+조용하고 담담한 그레이         →  그레이에서 틸로 전환       →  신선하고 활기 있는 틸</pre>
+  <div class="badge-demo">
+    <span class="badge" style="background:#F2F2F2;color:#aaa">OFF</span>
+    <span class="badge" style="background:#E0F5F8;color:#00B4C5">충전 중</span>
+    <span class="badge" style="background:#E0F5F8;color:#009BAA">ON</span>
+    <span class="badge" style="background:#E8E4DA;color:#C9C3B5">잠깐 멈춤</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>상태</th><th>텍스트색</th><th>배경색</th></tr></thead>
+      <tbody>
+        <tr><td>OFF</td><td>Gray <code>#aaaaaa</code></td><td>Light Gray <code>#F2F2F2</code></td></tr>
+        <tr><td>SLOW (충전 중)</td><td>Scuba 500 <code>#00B4C5</code></td><td>Scuba 100 <code>#E0F5F8</code></td></tr>
+        <tr><td>ON</td><td>Scuba 600 <code>#009BAA</code></td><td>Scuba 100 <code>#E0F5F8</code> + 배지</td></tr>
+        <tr><td>PAUSE (잠깐 멈춤)</td><td>Cloud 200 <code>#C9C3B5</code></td><td>Cloud 400 <code>#E8E4DA</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout callout-warning">
+    <strong>인앱 컬러 원칙 (v2.1 업데이트)</strong><br>
+    인앱 화면(로그인 이후)에서는 <strong>Violet 계열 사용 금지</strong>. 블랙(#1A1A1A) / 그레이(#555~#999) / 화이트 중심으로 구성한다.<br>
+    강조 포인트가 필요할 때만 Scuba Blue를 사용한다.<br>
+    <strong>예외:</strong> 온보딩·스플래시(다크 배경 화면)에서는 Violet 유지.
+  </div>
+</div>
+
+<!-- 3-6 다크모드 -->
+<div class="subsection">
+  <div class="subsection-title">3-6. 다크 모드</div>
+  <div class="callout">
+    UNOFF는 <strong>라이트 모드 우선</strong> 설계하되, 온보딩·스플래시는 밤하늘 다크 배경을 사용한다.<br>
+    인앱 다크 모드는 추후 지원 예정. 온보딩의 Violet 배경 색상은 밤하늘 그라데이션 일부이며 단독 UI 컬러가 아니다.
+  </div>
+  <div style="background:#2E1F4E;border-radius:12px;padding:24px;margin-bottom:16px">
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div style="width:60px;height:60px;border-radius:8px;background:#2E1F4E;border:1px solid rgba(255,255,255,0.15);margin:0 auto 8px"></div>
+        <div style="font-size:11px;color:#A899C4">배경 #2E1F4E<br>(밤하늘/그라데이션 전용)</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:60px;height:60px;border-radius:8px;background:#3A2B5C;margin:0 auto 8px"></div>
+        <div style="font-size:11px;color:#A899C4">카드 #3A2B5C</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:60px;height:60px;border-radius:8px;background:#F0EDE5;margin:0 auto 8px"></div>
+        <div style="font-size:11px;color:#A899C4">텍스트 #F0EDE5</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:60px;height:60px;border-radius:8px;background:#33C5D3;margin:0 auto 8px"></div>
+        <div style="font-size:11px;color:#A899C4">액센트 #33C5D3</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 4: Typography -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-4">
+<div class="section-header">
+  <div class="sec-num">Section 04</div>
+  <div class="sec-title">Typography</div>
+  <div class="sec-sub">타이포그래피 — Pretendard 기반 타입 시스템</div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">4-1. 서체 선정</div>
+  <div class="callout callout-violet">
+    <strong>Primary: Pretendard</strong> — 한국어 + 영문 동시 지원, 가독성 우수, 깔끔하고 현대적
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>용도</th><th>Weight</th><th>사용처</th></tr></thead>
+      <tbody>
+        <tr><td>Heading</td><td><strong>Bold (700)</strong></td><td>제목, 강조 텍스트, CTA 버튼</td></tr>
+        <tr><td>Subheading</td><td><strong>SemiBold (600)</strong></td><td>소제목, 탭 타이틀, 카드 제목</td></tr>
+        <tr><td>Body</td><td><strong>Regular (400)</strong></td><td>본문, 설명, 게시글</td></tr>
+        <tr><td>Caption</td><td><strong>Regular (400)</strong></td><td>캡션, 날짜, 부가 정보</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>웹폰트:</strong><br>
+    <code>@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');</code>
+  </div>
+
+  <div class="callout callout-violet" style="margin-top:16px">
+    <strong>Secondary: Inter</strong> — 영문 전용 콘텐츠(앱스토어 해외, 글로벌 마케팅)에서 사용
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">4-2. 타입 스케일 (Mobile)</div>
+
+  <!-- 타입 스케일 시각 데모 -->
+  <div style="background:var(--white);border-radius:12px;padding:28px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <div style="font-size:28px;font-weight:700;color:#1A1A1A;margin-bottom:8px">H1 — 28px / Bold (메인 타이틀)</div>
+    <div style="font-size:24px;font-weight:700;color:#1A1A1A;margin-bottom:8px">H2 — 24px / Bold (섹션 타이틀)</div>
+    <div style="font-size:20px;font-weight:600;color:#1A1A1A;margin-bottom:8px">H3 — 20px / SemiBold (카드 타이틀)</div>
+    <div style="font-size:17px;font-weight:600;color:#1A1A1A;margin-bottom:8px">H4 — 17px / SemiBold (리스트 아이템)</div>
+    <div style="font-size:16px;font-weight:400;color:#555555;margin-bottom:8px">Body L — 16px / Regular (본문 메인)</div>
+    <div style="font-size:15px;font-weight:400;color:#555555;margin-bottom:8px">Body M — 15px / Regular (본문 보조)</div>
+    <div style="font-size:14px;font-weight:400;color:#555555;margin-bottom:8px">Body S — 14px / Regular (부가 설명)</div>
+    <div style="font-size:12px;font-weight:400;color:#999999;margin-bottom:8px">Caption — 12px / Regular (캡션, 날짜)</div>
+    <div style="font-size:11px;font-weight:600;color:#999999;letter-spacing:0.5px;text-transform:uppercase">OVERLINE — 11px / SemiBold (라벨, 태그)</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Level</th><th>Size</th><th>Line Height</th><th>Weight</th><th>용도</th></tr></thead>
+      <tbody>
+        <tr><td><strong>H1</strong></td><td>28px</td><td>36px (1.29)</td><td>Bold</td><td>메인 화면 타이틀</td></tr>
+        <tr><td><strong>H2</strong></td><td>24px</td><td>32px (1.33)</td><td>Bold</td><td>섹션 타이틀</td></tr>
+        <tr><td><strong>H3</strong></td><td>20px</td><td>28px (1.4)</td><td>SemiBold</td><td>카드 타이틀, 서브섹션</td></tr>
+        <tr><td><strong>H4</strong></td><td>17px</td><td>24px (1.41)</td><td>SemiBold</td><td>리스트 아이템 타이틀</td></tr>
+        <tr><td><strong>Body L</strong></td><td>16px</td><td>24px (1.5)</td><td>Regular</td><td>본문 (메인)</td></tr>
+        <tr><td><strong>Body M</strong></td><td>15px</td><td>22px (1.47)</td><td>Regular</td><td>본문 (보조)</td></tr>
+        <tr><td><strong>Body S</strong></td><td>14px</td><td>20px (1.43)</td><td>Regular</td><td>부가 설명</td></tr>
+        <tr><td><strong>Caption</strong></td><td>12px</td><td>16px (1.33)</td><td>Regular</td><td>캡션, 날짜, 메타 정보</td></tr>
+        <tr><td><strong>Overline</strong></td><td>11px</td><td>16px (1.45)</td><td>SemiBold</td><td>라벨, 카테고리 태그</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">4-3. 타이포그래피 원칙</div>
+  <ul style="padding-left:0;list-style:none;margin-bottom:0">
+    <li style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-dim)"><strong style="color:var(--scuba600)">1. 여유로운 줄간격</strong> — Line Height 최소 1.4배. "느린" 퍼스널리티 반영</li>
+    <li style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-dim)"><strong style="color:var(--scuba600)">2. 충분한 단락 간격</strong> — 단락 사이 최소 16px. 답답하지 않게</li>
+    <li style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-dim)"><strong style="color:var(--scuba600)">3. 왼쪽 정렬 기본</strong> — 양쪽 정렬 사용 금지 (한글 특성상 어색한 공백 발생)</li>
+    <li style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-dim)"><strong style="color:var(--scuba600)">4. 한 줄 최대 18자 (모바일)</strong> — 가독성을 위해 줄 길이 제한</li>
+    <li style="padding:10px 0;font-size:14px;color:var(--text-dim)"><strong style="color:var(--scuba600)">5. 강조는 Weight로</strong> — 밑줄·이탤릭 대신 SemiBold/Bold 사용</li>
+  </ul>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 5: Spacing & Layout -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-5">
+<div class="section-header">
+  <div class="sec-num">Section 05</div>
+  <div class="sec-title">Spacing & Layout</div>
+  <div class="sec-sub">간격 & 레이아웃 — 8px 기반 스페이싱 시스템</div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">5-1. Spacing Scale (8px 기반)</div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-family:monospace;color:var(--scuba600);min-width:90px">space-2xs</span>
+      <div style="background:var(--scuba500);height:16px;width:4px;border-radius:2px"></div>
+      <span style="font-size:13px;color:var(--text-dim)">4px — 아이콘과 텍스트 사이</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-family:monospace;color:var(--scuba600);min-width:90px">space-xs</span>
+      <div style="background:var(--scuba500);height:16px;width:8px;border-radius:2px"></div>
+      <span style="font-size:13px;color:var(--text-dim)">8px — 인라인 요소 간격</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-family:monospace;color:var(--scuba600);min-width:90px">space-sm</span>
+      <div style="background:var(--scuba500);height:16px;width:12px;border-radius:2px"></div>
+      <span style="font-size:13px;color:var(--text-dim)">12px — 관련 요소 간격</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-family:monospace;color:var(--scuba600);min-width:90px">space-md</span>
+      <div style="background:var(--scuba500);height:16px;width:16px;border-radius:2px"></div>
+      <span style="font-size:13px;color:var(--text-dim)">16px — 기본 요소 간격, 카드 내부 패딩</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-family:monospace;color:var(--scuba600);min-width:90px">space-lg</span>
+      <div style="background:var(--scuba500);height:16px;width:24px;border-radius:2px"></div>
+      <span style="font-size:13px;color:var(--text-dim)">24px — 섹션 내 그룹 간격</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-family:monospace;color:var(--scuba600);min-width:90px">space-xl</span>
+      <div style="background:var(--scuba500);height:16px;width:32px;border-radius:2px"></div>
+      <span style="font-size:13px;color:var(--text-dim)">32px — 섹션 간 간격</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-family:monospace;color:var(--scuba600);min-width:90px">space-2xl</span>
+      <div style="background:var(--scuba500);height:16px;width:48px;border-radius:2px"></div>
+      <span style="font-size:13px;color:var(--text-dim)">48px — 대형 섹션 구분</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-family:monospace;color:var(--scuba600);min-width:90px">space-3xl</span>
+      <div style="background:var(--scuba500);height:16px;width:64px;border-radius:2px"></div>
+      <span style="font-size:13px;color:var(--text-dim)">64px — 페이지 상단/하단 여백</span>
+    </div>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">5-2. 레이아웃 원칙</div>
+  <ol style="padding-left:20px;font-size:14px;line-height:2.4;color:var(--text-dim)">
+    <li><strong>넉넉한 여백</strong>: 콘텐츠보다 여백이 넉넉해야 한다 — "숨 쉴 공간"이 UNOFF의 핵심 감성</li>
+    <li><strong>화면 좌우 패딩</strong>: 최소 20px (iOS 기본 16px보다 넉넉하게)</li>
+    <li><strong>카드 간격</strong>: 12px 이상 — 콘텐츠가 빡빡하지 않게</li>
+    <li><strong>스크롤 유도 안 함</strong>: 무한 스크롤보다 섹션 단위 구성 — 중독이 아닌 건강한 사용</li>
+    <li><strong>단일 컬럼</strong>: 모바일에서 2단 레이아웃 지양 — 심플하게</li>
+  </ol>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">5-3. Grid System</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>환경</th><th>Columns</th><th>Margin</th><th>Gutter</th></tr></thead>
+      <tbody>
+        <tr><td>모바일</td><td>4 columns</td><td>20px</td><td>8px</td></tr>
+        <tr><td>태블릿</td><td>8 columns</td><td>32px</td><td>12px</td></tr>
+        <tr><td>웹 (관리자)</td><td>12 columns</td><td>64px</td><td>24px</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 6: Corner Radius -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-6">
+<div class="section-header">
+  <div class="sec-num">Section 06</div>
+  <div class="sec-title">Corner Radius</div>
+  <div class="sec-sub">모서리 반경 — 부드럽지만 과하지 않게</div>
+</div>
+
+<div class="subsection">
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+    <div style="text-align:center">
+      <div style="width:80px;height:80px;background:var(--scuba100);border:2px solid var(--scuba300);border-radius:8px;margin:0 auto 8px"></div>
+      <div style="font-size:12px;font-family:monospace;color:var(--scuba600)">radius-sm</div>
+      <div style="font-size:11px;color:var(--text-dim)">8px</div>
+    </div>
+    <div style="text-align:center">
+      <div style="width:80px;height:80px;background:var(--scuba100);border:2px solid var(--scuba300);border-radius:12px;margin:0 auto 8px"></div>
+      <div style="font-size:12px;font-family:monospace;color:var(--scuba600)">radius-md</div>
+      <div style="font-size:11px;color:var(--text-dim)">12px</div>
+    </div>
+    <div style="text-align:center">
+      <div style="width:80px;height:80px;background:var(--scuba100);border:2px solid var(--scuba300);border-radius:16px;margin:0 auto 8px"></div>
+      <div style="font-size:12px;font-family:monospace;color:var(--scuba600)">radius-lg</div>
+      <div style="font-size:11px;color:var(--text-dim)">16px</div>
+    </div>
+    <div style="text-align:center">
+      <div style="width:80px;height:80px;background:var(--scuba100);border:2px solid var(--scuba300);border-radius:24px;margin:0 auto 8px"></div>
+      <div style="font-size:12px;font-family:monospace;color:var(--scuba600)">radius-xl</div>
+      <div style="font-size:11px;color:var(--text-dim)">24px</div>
+    </div>
+    <div style="text-align:center">
+      <div style="width:80px;height:80px;background:var(--scuba100);border:2px solid var(--scuba300);border-radius:9999px;margin:0 auto 8px"></div>
+      <div style="font-size:12px;font-family:monospace;color:var(--scuba600)">radius-full</div>
+      <div style="font-size:11px;color:var(--text-dim)">9999px</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Token</th><th>Value</th><th>용도</th></tr></thead>
+      <tbody>
+        <tr><td><code>radius-sm</code></td><td>8px</td><td>작은 버튼, 태그, 인풋</td></tr>
+        <tr><td><code>radius-md</code></td><td>12px</td><td>카드, 모달</td></tr>
+        <tr><td><code>radius-lg</code></td><td>16px</td><td>바텀시트, 큰 카드</td></tr>
+        <tr><td><code>radius-xl</code></td><td>24px</td><td>프로필 이미지, 특수 카드</td></tr>
+        <tr><td><code>radius-full</code></td><td>9999px</td><td>원형 아바타, 알약형 태그</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout callout-warning">
+    <strong>원칙:</strong> 부드럽지만 과하지 않게. 8~16px 범위를 주로 사용.<br>
+    과도한 둥근 모서리는 "아기같은/귀여운" 인상을 줄 수 있으므로 UNOFF에는 부적합.
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 7: Iconography -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-7">
+<div class="section-header">
+  <div class="sec-num">Section 07</div>
+  <div class="sec-title">Iconography</div>
+  <div class="sec-sub">아이콘 — Outlined 선형, Phosphor/Lucide 기반</div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">7-1. 아이콘 스타일</div>
+  <div class="token-grid">
+    <div class="token-item"><span class="token-name">스타일</span><span class="token-value" style="font-size:14px">Outlined</span><span class="token-use">선형 — 깔끔하고 담담한 느낌</span></div>
+    <div class="token-item"><span class="token-name">선 두께</span><span class="token-value" style="font-size:14px">1.5px~2px</span><span class="token-use">일관 유지</span></div>
+    <div class="token-item"><span class="token-name">모서리</span><span class="token-value" style="font-size:14px">Round</span><span class="token-use">Round Cap, Round Join</span></div>
+    <div class="token-item"><span class="token-name">기본 크기</span><span class="token-value" style="font-size:14px">24×24px</span><span class="token-use">소형: 20px / 대형: 32px</span></div>
+    <div class="token-item"><span class="token-name">기본 색상</span><span class="token-value" style="font-size:14px;color:#1A1A1A">Black #1A1A1A</span><span class="token-use">비활성: Gray #999</span></div>
+    <div class="token-item"><span class="token-name">라이브러리</span><span class="token-value" style="font-size:13px">Phosphor / Lucide</span><span class="token-use">권장 아이콘 세트</span></div>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">7-2. 커스텀 아이콘 (UNOFF 고유)</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>아이콘</th><th>의미</th><th>사용처</th></tr></thead>
+      <tbody>
+        <tr><td>배터리</td><td>충전 레벨 (OFF→ON 진행도)</td><td>프로필, 게이미피케이션</td></tr>
+        <tr><td>전원 스위치</td><td>ON/OFF 전환</td><td>상태 변경, CTA</td></tr>
+        <tr><td>충전기/번개</td><td>충전 중 (활동 참여)</td><td>알림, 뱃지</td></tr>
+        <tr><td>SWITCH ON 배지</td><td>ON 전환 성공</td><td>축하 카드, 공유</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">7-3. 아이콘 사용 원칙</div>
+  <div class="callout">
+    • 아이콘 단독 사용 지양 — 반드시 텍스트 라벨과 함께<br>
+    • 아이콘에 색상 남용 금지 — Black/Gray 단색 기본, 강조 시에만 Scuba 사용<br>
+    • 복잡한 일러스트 대신 심플한 선형 아이콘 선호
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 8: Imagery & Illustration -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-8">
+<div class="section-header">
+  <div class="sec-num">Section 08</div>
+  <div class="sec-title">Imagery & Illustration</div>
+  <div class="sec-sub">이미지 & 일러스트 — 밤하늘의 별과 오로라 무드</div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">8-1. 사진 스타일</div>
+  <div class="do-dont">
+    <div class="do-box">
+      <div class="box-title">DO</div>
+      <ul>
+        <li>따뜻하지만 과장 없는 자연광</li>
+        <li>혼자 있는 청년, 카페, 방 안, 공원 벤치</li>
+        <li>무표정~잔잔한 미소, 생각에 잠긴 표정</li>
+        <li>여백 많은 구도, 비대칭 구도</li>
+        <li>채도 낮은 Warm desaturated 색감</li>
+        <li>자연 요소 (하늘, 나무, 물) 적극 활용</li>
+        <li>다양한 인종·성별·체형 포함</li>
+      </ul>
+    </div>
+    <div class="dont-box">
+      <div class="box-title">DON'T</div>
+      <ul>
+        <li>단체 사진 (비교 유발)</li>
+        <li>정장/사무실 (취업 압박)</li>
+        <li>과도한 보정</li>
+        <li>과장된 웃음</li>
+        <li>성과·성공 이미지</li>
+        <li>디지털 기기를 들고 있는 이미지 (주의)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">8-2. 일러스트 스타일</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>항목</th><th>가이드라인</th></tr></thead>
+      <tbody>
+        <tr><td><strong>스타일</strong></td><td>Flat + 약간의 텍스처 — 미니멀하되 따뜻함 유지</td></tr>
+        <tr><td><strong>선</strong></td><td>Soft outline (1.5px~2px), 약간 불균일한 손그림 느낌</td></tr>
+        <tr><td><strong>색상</strong></td><td>브랜드 컬러 팔레트 내에서만 사용</td></tr>
+        <tr><td><strong>캐릭터</strong></td><td>단순한 도형 기반 (눈코입 최소화) — 특정 외모/성별 고정 피함</td></tr>
+        <tr><td><strong>오브젝트</strong></td><td>배터리, 스위치, 충전기, 구름, 베개 등 "쉼" 관련 소품</td></tr>
+        <tr><td><strong>분위기</strong></td><td>고요하고 평화로운 — 역동적이거나 긴장감 있는 장면 금지</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">8-3. 비주얼 무드: 밤하늘의 별과 오로라</div>
+  <!-- 밤하늘 무드 데모 -->
+  <div style="background:linear-gradient(135deg,#2E1F4E 0%,#47366A 40%,#1a2a4e 70%,#0d3a4a 100%);border-radius:16px;padding:40px 32px;margin-bottom:20px;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(0,180,197,0.25) 0%,transparent 50%),radial-gradient(ellipse at 20% 80%,rgba(125,218,227,0.1) 0%,transparent 40%)"></div>
+    <div style="position:relative;z-index:1">
+      <div style="font-size:18px;font-weight:700;color:#F0EDE5;margin-bottom:8px">"깊은 밤하늘 아래, 별빛과 오로라가 조용히 빛나는 공간."</div>
+      <div style="font-size:13px;color:#A899C4">UNOFF 비주얼 무드 — Ultra Violet(밤하늘) + Scuba Blue(오로라)</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>브랜드 컬러</th><th>무드 역할</th><th>시각 표현</th></tr></thead>
+      <tbody>
+        <tr><td>Violet 900 <code>#2E1F4E</code></td><td>깊은 밤하늘</td><td>배경, 캐릭터 배경, 스플래시</td></tr>
+        <tr><td>Violet 700 <code>#47366A</code></td><td>밤하늘 중간톤</td><td>그라데이션 중간, 구름 그림자</td></tr>
+        <tr><td>Violet 500 <code>#5F4B8B</code></td><td>별빛이 닿은 밤하늘</td><td>주요 UI, 로고</td></tr>
+        <tr><td>Violet 300 <code>#A899C4</code></td><td>희미한 별빛</td><td>비활성 요소, OFF 상태</td></tr>
+        <tr><td>Scuba 500 <code>#00B4C5</code></td><td>오로라 핵심</td><td>CTA, ON 상태, 충전 완료</td></tr>
+        <tr><td>Scuba 300 <code>#7DDAE3</code></td><td>오로라 확산</td><td>오로라 곡선, 충전 중간</td></tr>
+        <tr><td>Cloud Dancer <code>#F0EDE5</code></td><td>달빛에 비친 구름</td><td>배경, 카드</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-title" style="margin-top:24px;font-size:15px;color:var(--text-dim)">밤하늘/오로라 표현 요소</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>요소</th><th>설명</th><th>적용 방법</th></tr></thead>
+      <tbody>
+        <tr><td><strong>별 (Stars)</strong></td><td>작은 원형 점(2~4px), opacity 0.2~0.6</td><td>밤하늘 배경 위에 흩뿌림, twinkle 애니메이션</td></tr>
+        <tr><td><strong>오로라 (Aurora)</strong></td><td>Scuba 계열 그라데이션 곡선, blur 처리</td><td>배경 레이어에 얇은 곡선, 느리게 흐르는 애니메이션</td></tr>
+        <tr><td><strong>구름 (Clouds)</strong></td><td>Cloud Dancer 색상, opacity 0.15~0.25</td><td>밤하늘 배경 장식, 느린 부유</td></tr>
+        <tr><td><strong>달 (Moon)</strong></td><td>초승달 형태, Scuba 200~300</td><td>잠깐 멈춤/OFF 상태 아이콘에 사용</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection-title" style="margin-top:24px;font-size:15px;color:var(--text-dim)">달 게이지 레벨과 밤하늘의 변화 (10단계)</div>
+  <pre>Level 1~2  (0-20%)   — 그믐달, 깜깜한 밤하늘, 별 거의 없음 → Gray #aaa
+Level 3~4  (21-40%)  — 초승달, 별이 보이기 시작 → Gray → Scuba 300
+Level 5~6  (41-60%)  — 상현달, 별이 많아지고 오로라 시작 → Scuba 300~400
+Level 7~8  (61-80%)  — 볼록달, 오로라 선명 → Scuba 400~500
+Level 9~10 (81-100%) — 보름달, 환한 오로라 + 빛나는 별 → Scuba 500</pre>
+
+  <!-- 달 게이지 레벨 시각화 -->
+  <div class="battery-demo">
+    <div class="battery-bar-wrap">
+      <div class="battery-label"><span>&#127761; Lv.1 그믐달 — 방금 꺼짐</span><span>5%</span></div>
+      <div class="battery-bar-bg"><div class="battery-bar-fill" style="width:5%;background:#aaa"></div></div>
+    </div>
+    <div class="battery-bar-wrap">
+      <div class="battery-label"><span>&#127762; Lv.3 초승달 — 슬슬 밝아져</span><span>25%</span></div>
+      <div class="battery-bar-bg"><div class="battery-bar-fill" style="width:25%;background:linear-gradient(to right,#aaa,#7DDAE3)"></div></div>
+    </div>
+    <div class="battery-bar-wrap">
+      <div class="battery-label"><span>&#127764; Lv.5 상현달 — 절반 충전</span><span>45%</span></div>
+      <div class="battery-bar-bg"><div class="battery-bar-fill" style="width:45%;background:#7DDAE3"></div></div>
+    </div>
+    <div class="battery-bar-wrap">
+      <div class="battery-label"><span>&#127765; Lv.8 볼록달 — 환하게 빛나는 중</span><span>75%</span></div>
+      <div class="battery-bar-bg"><div class="battery-bar-fill" style="width:75%;background:#33C5D3"></div></div>
+    </div>
+    <div class="battery-bar-wrap" style="margin-bottom:0">
+      <div class="battery-label"><span>&#127765; Lv.10 보름달 — 풀 충전</span><span>95%</span></div>
+      <div class="battery-bar-bg"><div class="battery-bar-fill" style="width:95%;background:#00B4C5"></div></div>
+    </div>
+  </div>
+
+  <div class="callout" style="background:var(--red-dim);border-left-color:var(--red)">
+    <strong>무드 금지 사항</strong><br>
+    • 낮 풍경이나 해돋이 이미지 사용 금지 — 밤하늘 일관성 유지<br>
+    • 화려한 네온 효과 금지 — 오로라는 자연스럽고 부드럽게<br>
+    • 별이 과도하게 많거나 밝은 것 금지 — "고요한 밤하늘"의 절제감 유지<br>
+    • 밤하늘이라도 어둡거나 우울한 느낌 금지 — 별과 오로라로 따뜻함 표현
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 9: Components -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-9">
+<div class="section-header">
+  <div class="sec-num">Section 09</div>
+  <div class="sec-title">Component Style</div>
+  <div class="sec-sub">컴포넌트 스타일 — Button, Card, Input, Navigation, Battery</div>
+</div>
+
+<!-- 9-1 Button -->
+<div class="subsection">
+  <div class="subsection-title">9-1. Button (버튼)</div>
+
+  <div class="btn-demo">
+    <button class="btn-primary">시작하기</button>
+    <button class="btn-secondary">나중에</button>
+    <button class="btn-text">더 알아볼게</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="background:var(--white);border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(46,31,78,0.06)">
+      <div style="font-size:12px;font-weight:700;color:var(--scuba600);margin-bottom:10px">PRIMARY</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:2">배경: Scuba 500<br>텍스트: White<br>Weight: SemiBold 16px<br>모서리: 12px<br>높이: 52px</div>
+    </div>
+    <div style="background:var(--white);border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+      <div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:10px">SECONDARY</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:2">배경: 투명<br>테두리: Gray #DDDDDD 1.5px<br>텍스트: Black #1A1A1A<br>모서리: 12px</div>
+    </div>
+    <div style="background:var(--white);border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+      <div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:10px">TEXT</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:2">배경: 없음<br>텍스트: Gray #888888<br>Regular 14px<br>밑줄: 없음</div>
+    </div>
+  </div>
+
+  <div class="callout callout-violet">
+    <strong>CTA 카피 원칙</strong><br>
+    "지금 시작하기" 대신 "여기 있어도 돼" — 강요 없는 초대<br>
+    "가입하기" 대신 "들어와 볼래?" — 부드러운 톤<br>
+    "더 알아보기" 대신 "궁금하면 봐" — 캐주얼하지만 거리감 유지
+  </div>
+</div>
+
+<!-- 9-2 Card -->
+<div class="subsection">
+  <div class="subsection-title">9-2. Card (카드)</div>
+  <div class="card-demo">
+    <div class="card-meta">
+      <span class="badge" style="background:#EDE9F5;color:#A899C4">OFF</span>
+      <span style="margin-left:8px">3개월 째</span>
+    </div>
+    <div class="card-author">익명의 충전기</div>
+    <div class="card-body">면접에서 공백기 어떻게 설명해요? 저만 어려운 건가...</div>
+    <div class="card-actions">
+      <span>&#9825; 같아요 42</span>
+      <span>&#128172; 댓글 12</span>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>배경</td><td>White <code>#FFFFFF</code></td></tr>
+        <tr><td>테두리</td><td>없음 (그림자로 구분)</td></tr>
+        <tr><td>그림자</td><td><code>0 2px 8px rgba(46, 31, 78, 0.06)</code></td></tr>
+        <tr><td>모서리</td><td>12px</td></tr>
+        <tr><td>내부 패딩</td><td>16px</td></tr>
+        <tr><td>카드 간 간격</td><td>12px</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 9-3 Input -->
+<div class="subsection">
+  <div class="subsection-title">9-3. Input (입력 필드)</div>
+  <div style="background:var(--white);border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:0 2px 8px rgba(46,31,78,0.06)">
+    <input type="text" placeholder="여기에 마음 편히 적어봐" style="width:100%;background:#E8E4DA;border:none;border-radius:8px;height:48px;padding:0 16px;font-size:15px;color:#1A1A1A;font-family:inherit;outline:none;border-bottom:2px solid transparent;transition:border-color 0.2s">
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>배경</td><td>Cloud Dancer 400 <code>#E8E4DA</code></td></tr>
+        <tr><td>텍스트</td><td>Black <code>#1A1A1A</code></td></tr>
+        <tr><td>플레이스홀더</td><td>Cloud Dancer 200 <code>#C9C3B5</code></td></tr>
+        <tr><td>모서리</td><td>8px</td></tr>
+        <tr><td>높이</td><td>48px</td></tr>
+        <tr><td>포커스</td><td>Scuba 500 하단 보더 2px</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 9-4 Bottom Navigation -->
+<div class="subsection">
+  <div class="subsection-title">9-4. Bottom Navigation</div>
+  <div style="background:white;border-radius:12px;padding:0 8px;box-shadow:0 -1px 4px rgba(46,31,78,0.04),0 2px 8px rgba(46,31,78,0.06);display:flex;justify-content:space-around;align-items:center;height:64px;max-width:360px;margin-bottom:16px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px">
+      <span style="font-size:20px;color:#1A1A1A">&#127968;</span>
+      <span style="font-size:10px;color:#1A1A1A;font-weight:600">홈</span>
+      <div style="width:4px;height:4px;border-radius:50%;background:#00B4C5"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px">
+      <span style="font-size:20px;color:#999">&#128203;</span>
+      <span style="font-size:10px;color:#999">게시판</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px">
+      <span style="font-size:20px;color:#999">&#128269;</span>
+      <span style="font-size:10px;color:#999">검색</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px">
+      <span style="font-size:20px;color:#999">&#128100;</span>
+      <span style="font-size:10px;color:#999">MY</span>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>배경</td><td>White (상단 그림자: <code>0 -1px 4px rgba(46,31,78,0.04)</code>)</td></tr>
+        <tr><td>탭 구성</td><td><strong>4탭</strong>: 홈 / 게시판 / 검색 / MY</td></tr>
+        <tr><td>비활성 아이콘</td><td>Gray <code>#999999</code></td></tr>
+        <tr><td>활성 아이콘</td><td>Black <code>#1A1A1A</code></td></tr>
+        <tr><td>활성 도트</td><td>Scuba 500 4px 아래 도트</td></tr>
+        <tr><td>높이</td><td>83px (iOS Safe Area 포함)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 9-5 Battery Bar (달 게이지) -->
+<div class="subsection">
+  <div class="subsection-title">9-5. 달 게이지 충전 바 (게이미피케이션)</div>
+  <div class="callout">
+    <strong>달(Moon) 메타포</strong>: 배터리 대신 <strong>달의 차오름</strong>으로 충전 상태를 표현한다.<br>
+    그믐달(Level 1) → 보름달(Level 10)로 진행. 밤하늘 무드와 자연스럽게 연결된다.
+  </div>
+  <div class="battery-demo">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:12px">달 게이지 32% 예시:</div>
+    <div class="battery-bar-wrap" style="margin-bottom:8px">
+      <div class="battery-label"><span>그믐달</span><span>32%</span><span>보름달</span></div>
+      <div class="battery-bar-bg"><div class="battery-bar-fill" style="width:32%;background:linear-gradient(to right,#aaa,var(--scuba500))"></div></div>
+    </div>
+  </div>
+  <div class="table-wrap" style="margin-top:16px">
+    <table>
+      <thead><tr><th>레벨</th><th>게이지</th><th>달 형태</th><th>명칭</th><th>컬러</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>0~10%</td><td>그믐달</td><td>방금 꺼짐</td><td>Gray <code>#aaa</code></td></tr>
+        <tr><td>2</td><td>11~20%</td><td>초승달</td><td>충전 시작</td><td>Gray → Scuba 300</td></tr>
+        <tr><td>3</td><td>21~30%</td><td>초승달+</td><td>슬슬 밝아져</td><td>Scuba 300</td></tr>
+        <tr><td>4</td><td>31~40%</td><td>상현달 전</td><td>조금씩 차오름</td><td>Scuba 300</td></tr>
+        <tr><td>5</td><td>41~50%</td><td>상현달</td><td>절반 충전</td><td>Scuba 400</td></tr>
+        <tr><td>6</td><td>51~60%</td><td>상현달+</td><td>반 넘었어</td><td>Scuba 400</td></tr>
+        <tr><td>7</td><td>61~70%</td><td>볼록달</td><td>거의 다 됐어</td><td>Scuba 400 → 500</td></tr>
+        <tr><td>8</td><td>71~80%</td><td>볼록달+</td><td>환하게 빛나는 중</td><td>Scuba 500</td></tr>
+        <tr><td>9</td><td>81~90%</td><td>거의 보름달</td><td>곧 보름달</td><td>Scuba 500</td></tr>
+        <tr><td>10</td><td>91~100%</td><td>보름달</td><td>풀 충전</td><td>Scuba 500 (Glow)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <strong>빈 영역:</strong> Cloud Dancer 300 (<code>#DDD8CC</code>)<br>
+    <strong>채워진 영역:</strong> Gray #aaa → Scuba 500 그라데이션 (충전 진행에 따라 전환)<br>
+    <strong>애니메이션:</strong> 숫자 변경 시 0.5초 ease-out (급격한 변화 금지 — "느린" 퍼스널리티)
+  </div>
+</div>
+
+<!-- 9-6 Profile Status Badge -->
+<div class="subsection">
+  <div class="subsection-title">9-6. Profile Status Badge</div>
+  <div class="badge-demo" style="margin-bottom:20px">
+    <span class="badge" style="background:#F2F2F2;color:#aaa">OFF</span>
+    <span class="badge" style="background:#E0F5F8;color:#00B4C5">충전 중</span>
+    <span class="badge" style="background:#E0F5F8;color:#009BAA">ON</span>
+    <span class="badge" style="background:#E8E4DA;color:#C9C3B5">잠깐 멈춤</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>상태</th><th>텍스트</th><th>배경색</th><th>텍스트색</th></tr></thead>
+      <tbody>
+        <tr><td>OFF</td><td>"OFF"</td><td>Light Gray <code>#F2F2F2</code></td><td>Gray <code>#aaaaaa</code></td></tr>
+        <tr><td>SLOW</td><td>"충전 중"</td><td>Scuba 100 <code>#E0F5F8</code></td><td>Scuba 500 <code>#00B4C5</code></td></tr>
+        <tr><td>ON</td><td>"ON"</td><td>Scuba 100 <code>#E0F5F8</code> + 배지</td><td>Scuba 600 <code>#009BAA</code></td></tr>
+        <tr><td>PAUSE</td><td>"잠깐 멈춤"</td><td>Cloud 400 <code>#E8E4DA</code></td><td>Cloud 200 <code>#C9C3B5</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:13px;color:var(--text-dim)">모양: 알약형 (radius-full) | 높이: 22px | 패딩: 좌우 10px | 서체: Overline (11px, SemiBold)</p>
+</div>
+
+<!-- 9-7 달 프로필 아바타 -->
+<div class="subsection">
+  <div class="subsection-title">9-7. 달 프로필 아바타</div>
+  <div class="callout">
+    <strong>유저 아바타 = 달의 차오름 단계</strong><br>
+    기존 이모지/캐릭터 기반 프로필을 폐기하고, 달 게이지 레벨에 연동되는 달 아이콘을 아바타로 사용한다.<br>
+    그믐달(Level 1) ~ 보름달(Level 10)까지 10단계로 변화한다.
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+    <div style="text-align:center">
+      <div style="width:48px;height:48px;border-radius:50%;background:#2E1F4E;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:24px">&#127761;</div>
+      <div style="font-size:10px;color:var(--text-dim)">Lv.1 그믐달</div>
+    </div>
+    <div style="text-align:center">
+      <div style="width:48px;height:48px;border-radius:50%;background:#2E1F4E;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:24px">&#127762;</div>
+      <div style="font-size:10px;color:var(--text-dim)">Lv.3 초승달</div>
+    </div>
+    <div style="text-align:center">
+      <div style="width:48px;height:48px;border-radius:50%;background:#2E1F4E;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:24px">&#127764;</div>
+      <div style="font-size:10px;color:var(--text-dim)">Lv.5 상현달</div>
+    </div>
+    <div style="text-align:center">
+      <div style="width:48px;height:48px;border-radius:50%;background:#2E1F4E;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:24px">&#127765;</div>
+      <div style="font-size:10px;color:var(--text-dim)">Lv.8 볼록달</div>
+    </div>
+    <div style="text-align:center">
+      <div style="width:48px;height:48px;border-radius:50%;background:#2E1F4E;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:24px">&#127765;</div>
+      <div style="font-size:10px;color:var(--text-dim)">Lv.10 보름달</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>크기</td><td>피드 카드: 36px / 프로필 헤더: 72px / 댓글: 28px</td></tr>
+        <tr><td>배경</td><td>투명 (달 아이콘 자체가 프로필)</td></tr>
+        <tr><td>형태</td><td>원형 (radius-full)</td></tr>
+        <tr><td>연동</td><td>달 게이지 레벨과 자동 연동 — 레벨 변경 시 아바타도 변경</td></tr>
+        <tr><td>닉네임</td><td>변경 불가 (운영팀 별도 요청 시에만 가능)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 9-8 홈 카테고리 바로가기 -->
+<div class="subsection">
+  <div class="subsection-title">9-8. 홈 카테고리 바로가기 (6종)</div>
+  <div class="callout">
+    홈 피드 상단에 6개 카테고리 바로가기 아이콘 그리드(3x2)를 배치한다.<br>
+    각 카테고리는 고유한 배경색과 아이콘으로 구분된다.
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>카테고리</th><th>아이콘 배경</th><th>아이콘 색상</th><th>성격</th></tr></thead>
+      <tbody>
+        <tr><td><strong>참견해줘</strong></td><td><code>#FFF3E0</code> (연한 주황)</td><td><code>#F57C00</code></td><td>익명 Q&A — "말은 좀 하고 살자"</td></tr>
+        <tr><td><strong>면접창고</strong></td><td><code>#E8EAF6</code> (연한 네이비)</td><td><code>#3F51B5</code></td><td>면접 후기 + BLACKLIST 투표</td></tr>
+        <tr><td><strong>같이하자</strong></td><td><code>#F5F0FF</code> (연한 보라)</td><td><code>#333333</code></td><td>스터디·챌린지 모집</td></tr>
+        <tr><td><strong>자유게시판</strong></td><td><code>#F2F2F2</code> (연한 회색)</td><td><code>#333333</code></td><td>자유 주제 게시판</td></tr>
+        <tr><td><strong>공구하자</strong></td><td><code>#F0FBF5</code> (연한 초록)</td><td><code>#34A853</code></td><td>공동구매·나눔</td></tr>
+        <tr><td><strong>만들어줘</strong></td><td><code>#FFF5F5</code> (연한 빨강)</td><td><code>#E85555</code></td><td>신규 카테고리 건의</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="token-grid">
+    <div class="token-item"><span class="token-name">카드 사이즈</span><span class="token-value" style="font-size:14px">3x2 그리드</span><span class="token-use">gap: 10px</span></div>
+    <div class="token-item"><span class="token-name">아이콘 배경</span><span class="token-value" style="font-size:14px">40x40px</span><span class="token-use">radius: 12px</span></div>
+    <div class="token-item"><span class="token-name">카드 모서리</span><span class="token-value" style="font-size:14px">14px</span><span class="token-use">카드 shadow: card-shadow</span></div>
+    <div class="token-item"><span class="token-name">라벨 서체</span><span class="token-value" style="font-size:14px">12px SemiBold</span><span class="token-use">color: #1A1A1A</span></div>
+  </div>
+</div>
+
+<!-- 9-9 BLACKLIST 뱃지 -->
+<div class="subsection">
+  <div class="subsection-title">9-9. BLACKLIST 뱃지 (면접창고)</div>
+  <div class="callout" style="background:#1A1A1A;border-left-color:#1A1A1A;color:white">
+    <strong style="color:white">면접창고에서 투표 50표 이상을 받은 회사</strong>에 BLACKLIST 뱃지가 부여된다.<br>
+    검정 배경 + 흰 텍스트의 프리미엄 블랙카드 느낌으로, 진지한 경고를 담되 UNOFF 톤(담담한)을 유지한다.
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+    <span style="padding:5px 12px;border-radius:8px;background:#1A1A1A;font-size:12px;font-weight:700;color:#fff;letter-spacing:0.5px">BLACKLIST</span>
+    <span style="padding:2px 7px;border-radius:4px;background:#1A1A1A;font-size:9px;font-weight:700;color:#fff;letter-spacing:0.5px">BLACKLIST</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>큰 뱃지 (상세 페이지)</th><th>작은 뱃지 (리스트)</th></tr></thead>
+      <tbody>
+        <tr><td>배경</td><td><code>#1A1A1A</code></td><td><code>#1A1A1A</code></td></tr>
+        <tr><td>텍스트</td><td><code>#FFFFFF</code> 12px Bold</td><td><code>#FFFFFF</code> 9px Bold</td></tr>
+        <tr><td>모서리</td><td>8px</td><td>4px</td></tr>
+        <tr><td>자간</td><td>0.5px</td><td>0.5px</td></tr>
+        <tr><td>부여 조건</td><td colspan="2">면접창고 투표 50표 이상 → 자동 부여, 상단 고정 노출</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 10: Motion & Animation -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-10">
+<div class="section-header">
+  <div class="sec-num">Section 10</div>
+  <div class="sec-title">Motion & Animation</div>
+  <div class="sec-sub">모션 & 애니메이션 — 느리고, 부드럽고, 조용하게</div>
+</div>
+
+<div class="subsection">
+  <blockquote>"느리고, 부드럽고, 조용하게."<br><small style="font-size:13px;color:var(--text-dim)">UNOFF의 모션은 사용자를 재촉하지 않는다. 조급한 피드백 대신 여유로운 트랜지션을 사용한다.</small></blockquote>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">10-2. 모션 토큰</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Token</th><th>Duration</th><th>Easing</th><th>용도</th></tr></thead>
+      <tbody>
+        <tr><td><code>motion-quick</code></td><td>150ms</td><td>ease-out</td><td>버튼 프레스, 토글</td></tr>
+        <tr><td><code>motion-normal</code></td><td>300ms</td><td>ease-in-out</td><td>화면 전환, 카드 등장</td></tr>
+        <tr><td><code>motion-slow</code></td><td>500ms</td><td>ease-out</td><td>배터리 충전 애니메이션, 온보딩</td></tr>
+        <tr><td><code>motion-gentle</code></td><td>800ms</td><td>cubic-bezier(0.25, 0.1, 0.25, 1)</td><td>스플래시, 첫 로딩</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">10-3. 구체적 적용</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>요소</th><th>모션</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>화면 전환</td><td>Fade + 미세한 위로 이동 (8px)</td><td>급격한 슬라이드 대신 부드러운 등장</td></tr>
+        <tr><td>배터리 충전</td><td>숫자 카운팅 (0.5초)</td><td>점진적 증가, 급격한 점프 없음</td></tr>
+        <tr><td>카드 등장</td><td>Fade in + scale(0.97→1.0)</td><td>미세한 확대로 자연스러운 등장</td></tr>
+        <tr><td>버튼 프레스</td><td>scale(0.97) + opacity(0.9)</td><td>가벼운 눌림 피드백</td></tr>
+        <tr><td>스켈레톤</td><td>Shimmer (좌→우, 1.5초 주기)</td><td>로딩 중 부드러운 흐름</td></tr>
+        <tr><td>토스트 알림</td><td>하단에서 위로 슬라이드 (300ms)</td><td>3초 후 자동 사라짐</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">10-4. 모션 금지 사항</div>
+  <div class="callout" style="background:var(--red-dim);border-left-color:var(--red)">
+    • 바운스 애니메이션 금지 — 활기차고 신나는 느낌은 UNOFF에 부적합<br>
+    • 화려한 파티클 효과 금지 — 축하 시에도 절제된 모션 (예: 작은 반짝임 정도)<br>
+    • 진동·햅틱 피드백 최소화 — 긴급한 느낌을 주지 않음<br>
+    • 자동 재생 동영상 금지 — 사용자가 선택해서 플레이
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 11: UX Writing -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-11">
+<div class="section-header">
+  <div class="sec-num">Section 11</div>
+  <div class="sec-title">Tone of Voice — UX Writing</div>
+  <div class="sec-sub">UX 문구 가이드 — 중립적, 리스펙트, 강요 없는 초대</div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">11-1. 핵심 원칙</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>원칙</th><th>설명</th><th>예시</th></tr></thead>
+      <tbody>
+        <tr><td><strong>중립적 상태 묘사</strong></td><td>OFF를 부정적으로 표현하지 않음</td><td>"OFF 중이에요" (O) / "비활성 상태입니다" (X)</td></tr>
+        <tr><td><strong>강요 없는 초대</strong></td><td>행동을 유도하되 압박하지 않음</td><td>"와볼래?" (O) / "지금 확인하세요!" (X)</td></tr>
+        <tr><td><strong>짧고 담담하게</strong></td><td>과장·느낌표·이모지 최소화</td><td>"새 글이 있어." (O) / "새 글이 올라왔어요! 🎉" (X)</td></tr>
+        <tr><td><strong>비교 차단</strong></td><td>타인의 성과를 언급하지 않음</td><td>"네 페이스가 중요해" (O) / "다른 사람은 벌써..." (X)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">11-2. 상황별 UX 문구</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>상황</th><th>문구</th></tr></thead>
+      <tbody>
+        <tr><td><strong>로그인 화면</strong></td><td>"다시 올 때도 편하게 들어와." + "3초면 끝나. 부담 없이."</td></tr>
+        <tr><td><strong>온보딩 첫 화면</strong></td><td>"지금 어떤 상태든 괜찮아. 여기선 모두 OFF 중이야."</td></tr>
+        <tr><td><strong>회원가입 완료</strong></td><td>"그믐달에서 시작해도 돼. 여기선 그게 기본값이야."</td></tr>
+        <tr><td><strong>빈 피드</strong></td><td>"아직 조용해. 네가 첫 이야기를 시작해볼래?"</td></tr>
+        <tr><td><strong>오래 접속 안 함</strong></td><td>"잘 쉬고 있지? 와도 되고, 아직 안 와도 돼."</td></tr>
+        <tr><td><strong>글 작성 유도</strong></td><td>"여기에 마음 편히 적어봐."</td></tr>
+        <tr><td><strong>반응 버튼</strong></td><td>하트 아이콘 + 숫자 (같아요 — 동일 경험 공감)</td></tr>
+        <tr><td><strong>참견해줘 반응</strong></td><td>"BEST 참견" + "참견 N개" + "같아요 N"</td></tr>
+        <tr><td><strong>ON 전환 축하</strong></td><td>"ON 됐어? 축하해."</td></tr>
+        <tr><td><strong>에러 발생</strong></td><td>"앗, 뭔가 안 됐어. 다시 해볼까?"</td></tr>
+        <tr><td><strong>리부트 패키지</strong></td><td>"준비됐을 때만 봐. 지금 당장 쓸 필요 없어."</td></tr>
+        <tr><td><strong>푸시 알림</strong></td><td>"새 글이 올라왔어. 와볼래?"</td></tr>
+        <tr><td><strong>앱 업데이트</strong></td><td>"좀 더 편해졌어. 업데이트하면 볼 수 있어."</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">11-3. 금지 표현</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>금지</th><th>이유</th><th>대안</th></tr></thead>
+      <tbody>
+        <tr><td>"백수", "무직", "실업"</td><td>낙인 강화</td><td>"OFF 중", "쉬는 중"</td></tr>
+        <tr><td>"빨리", "지금 당장", "서두르세요"</td><td>조급함 유발</td><td>"언제든", "준비되면"</td></tr>
+        <tr><td>"성공", "합격", "스펙"</td><td>비교·성과 중심</td><td>"ON 전환", "다음 단계"</td></tr>
+        <tr><td>"화이팅!", "넌 할 수 있어!"</td><td>과잉 응원 (무책임)</td><td>"여기 있어. 같이 가자."</td></tr>
+        <tr><td>"부럽다" 류 반응</td><td>비교 유발</td><td>"같아요", "나도 그랬어"</td></tr>
+        <tr><td>느낌표 2개 이상 (!!)</td><td>과장된 톤</td><td>마침표 또는 느낌표 1개</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 12: Brand Application -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-12">
+<div class="section-header">
+  <div class="sec-num">Section 12</div>
+  <div class="sec-title">Brand Application</div>
+  <div class="sec-sub">브랜드 적용 예시 — 앱 아이콘, 스플래시, 앱스토어, SNS, 명함</div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">12-1. 앱 아이콘</div>
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px">
+    <div style="text-align:center">
+      <div style="width:96px;height:96px;border-radius:22px;background:#2E1F4E;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;box-shadow:0 4px 16px rgba(46,31,78,0.3)">
+        <div style="font-size:40px">&#128267;</div>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim)">앱 아이콘 예시</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>형태</td><td>둥근 모서리 사각형 (iOS 표준)</td></tr>
+        <tr><td>배경</td><td>Violet 900 (<code>#2E1F4E</code>)</td></tr>
+        <tr><td>심볼</td><td>배터리 아이콘 (Scuba 500, 20~30% 충전 상태)</td></tr>
+        <tr><td>스타일</td><td>미니멀, 단순한 선형 아이콘</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">12-2. 스플래시 스크린</div>
+  <div style="background:#2E1F4E;border-radius:16px;padding:48px 24px;text-align:center;max-width:220px;margin-bottom:16px;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 70%,rgba(0,180,197,0.2) 0%,transparent 60%)"></div>
+    <div style="position:relative;z-index:1">
+      <div style="font-size:32px;font-weight:700;color:#F0EDE5;letter-spacing:4px;margin-bottom:8px">unoff</div>
+      <div style="font-size:12px;color:#A899C4;line-height:1.6">켜지기 전까지,<br>여기 있어.</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>배경</td><td>Violet 900 (<code>#2E1F4E</code>)</td></tr>
+        <tr><td>로고</td><td>UNOFF 워드마크 (White, 중앙 배치)</td></tr>
+        <tr><td>서브텍스트</td><td>"켜지기 전까지, 여기 있어." (Violet 300, Caption)</td></tr>
+        <tr><td>애니메이션</td><td>로고 페이드인 (800ms) → 서브텍스트 페이드인 (500ms, 200ms 딜레이)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">12-3. 앱스토어 스크린샷</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>순서</th><th>화면</th><th>카피</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>온보딩</td><td>"지금 쉬고 있어도 괜찮아."</td></tr>
+        <tr><td>2</td><td>커뮤니티 피드</td><td>"71.7만 명이 함께 쉬고 있어."</td></tr>
+        <tr><td>3</td><td>배터리 게이미피케이션</td><td>"네 속도로 충전해."</td></tr>
+        <tr><td>4</td><td>면접 후기</td><td>"공백기? 여기선 흔한 이야기야."</td></tr>
+        <tr><td>5</td><td>ON 전환 배지</td><td>"언제든 켜질 수 있어."</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">12-4. SNS 카드뉴스 템플릿</div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+    <div style="width:160px;height:160px;background:#F7F5F0;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+      <div style="font-size:18px;font-weight:700;color:#1A1A1A;margin-bottom:8px">71.7만 명이 함께 쉬고 있어.</div>
+      <div style="font-size:11px;color:#999999">unoff</div>
+    </div>
+    <div style="width:160px;height:160px;background:#E0F5F8;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+      <div style="font-size:18px;font-weight:700;color:#1A1A1A;margin-bottom:8px">네 속도로 충전해.</div>
+      <div style="font-size:11px;color:#00B4C5">unoff</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>비율</td><td>1:1 (인스타그램) 또는 4:5 (리치 포맷)</td></tr>
+        <tr><td>배경</td><td>Cloud Dancer 100 또는 Scuba 100</td></tr>
+        <tr><td>텍스트</td><td>Black #1A1A1A, H2 (24px Bold)</td></tr>
+        <tr><td>로고 위치</td><td>우측 하단 (워드마크 소형)</td></tr>
+        <tr><td>여백</td><td>사방 40px 이상</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">12-5. 명함</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+    <div style="background:#2E1F4E;border-radius:8px;padding:24px 32px;min-width:200px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:#F0EDE5;letter-spacing:3px;margin-bottom:8px">unoff</div>
+      <div style="font-size:11px;color:#A899C4">"켜지기 전까지, 여기 있어."</div>
+    </div>
+    <div style="background:#F0EDE5;border-radius:8px;padding:24px 32px;min-width:200px">
+      <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:6px">홍길동</div>
+      <div style="font-size:11px;color:#555555;margin-bottom:4px">Co-Founder</div>
+      <div style="font-size:11px;color:#999999">hello@unoff.app</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>속성</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>전면</td><td>UNOFF 로고 (중앙) + 태그라인 (하단)</td></tr>
+        <tr><td>후면</td><td>이름, 직함, 연락처</td></tr>
+        <tr><td>용지</td><td>무광 코팅 (차분한 질감)</td></tr>
+        <tr><td>컬러 옵션 A</td><td>밤하늘 배경 (#2E1F4E) + White 텍스트 (브랜드 야간 무드)</td></tr>
+        <tr><td>컬러 옵션 B</td><td>Cloud Dancer 배경 + Black (#1A1A1A) 텍스트 (기본)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 13: 체크리스트 -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-13">
+<div class="section-header">
+  <div class="sec-num">Section 13</div>
+  <div class="sec-title">브랜드 사용 체크리스트</div>
+  <div class="sec-sub">작업 전 필수 확인 항목</div>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">디자인 작업 전 확인</div>
+  <ul class="checklist">
+    <li><span class="check-box"></span>컬러가 브랜드 팔레트 내에 있는가?</li>
+    <li><span class="check-box"></span><strong>인앱 화면에서 Violet 계열을 사용하지 않았는가?</strong> (블랙/그레이 사용)</li>
+    <li><span class="check-box"></span>서체가 Pretendard 또는 Inter인가?</li>
+    <li><span class="check-box"></span>여백이 충분한가? (넉넉한 > 빡빡한)</li>
+    <li><span class="check-box"></span>모서리 반경이 8~16px 범위인가?</li>
+    <li><span class="check-box"></span>아이콘이 선형(outlined) 스타일인가?</li>
+    <li><span class="check-box"></span>CTA 문구가 강요 없는 초대형인가?</li>
+    <li><span class="check-box"></span>하단 탭이 4개(홈/게시판/검색/MY)인가?</li>
+  </ul>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">카피라이팅 작업 전 확인</div>
+  <ul class="checklist">
+    <li><span class="check-box"></span>"백수", "무직", "실업" 단어를 사용하지 않았는가?</li>
+    <li><span class="check-box"></span>느낌표를 2개 이상 연속 사용하지 않았는가?</li>
+    <li><span class="check-box"></span>"빨리", "서두르세요" 등 조급한 표현이 없는가?</li>
+    <li><span class="check-box"></span>타인과의 비교를 유발하는 표현이 없는가?</li>
+    <li><span class="check-box"></span>톤이 "옆에 앉아서 조용히 말하는 친구"와 같은가?</li>
+  </ul>
+</div>
+
+<div class="subsection">
+  <div class="subsection-title">이미지 사용 전 확인</div>
+  <ul class="checklist">
+    <li><span class="check-box"></span>과장된 표정의 사진이 아닌가?</li>
+    <li><span class="check-box"></span>성과·성공을 과시하는 이미지가 아닌가?</li>
+    <li><span class="check-box"></span>채도가 낮고 따뜻한 톤인가?</li>
+    <li><span class="check-box"></span>여백이 충분한 구도인가?</li>
+  </ul>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 14: Design Tokens -->
+<!-- ═══════════════════════════════════════ -->
+<section id="section-14">
+<div class="section-header">
+  <div class="sec-num">Section 14</div>
+  <div class="sec-title">Design Tokens</div>
+  <div class="sec-sub">개발 참조용 — React Native / Expo 구현 시</div>
+</div>
+
+<div class="subsection">
+  <pre>// colors.ts
+export const colors = {
+  // Ultra Violet (밤하늘 그라데이션 전용 — 단독 사용 금지)
+  violet900: '#2E1F4E',
+  violet700: '#47366A',
+  violet500: '#5F4B8B',
+  violet400: '#7E6BA6',
+  violet300: '#A899C4',
+  violet200: '#D0C7E0',
+  violet100: '#EDE9F5',
+
+  // Accent - Scuba Blue
+  scuba600: '#009BAA',
+  scuba500: '#00B4C5',
+  scuba400: '#33C5D3',
+  scuba300: '#7DDAE3',
+  scuba200: '#B3E9EF',
+  scuba100: '#E0F5F8',
+
+  // Neutral - Cloud Dancer
+  cloudDancer500: '#F0EDE5',
+  cloudDancer400: '#E8E4DA',
+  cloudDancer300: '#DDD8CC',
+  cloudDancer200: '#C9C3B5',
+  cloudDancer100: '#F7F5F0',
+
+  // In-App Neutral (인앱 화면 전용 — Violet 대체)
+  black: '#1A1A1A',
+  gray900: '#333333',
+  gray700: '#555555',
+  gray500: '#888888',
+  gray400: '#999999',
+  gray300: '#aaaaaa',
+  gray200: '#EBEBEB',
+  gray100: '#F2F2F2',
+  white: '#FFFFFF',
+
+  // Semantic
+  success: '#00B4C5',
+  warning: '#E8A443',
+  error: '#D4726A',
+  info: '#8888AA',  // 중성 블루그레이 — 보라 단독 대체
+
+  // Dark Mode (온보딩/스플래시)
+  darkBg: '#2E1F4E',
+  darkCard: '#3A2B5C',
+  darkText: '#F0EDE5',
+};</pre>
+
+  <pre>// spacing.ts
+export const spacing = {
+  '2xs': 4,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  '2xl': 48,
+  '3xl': 64,
+};</pre>
+
+  <pre>// radius.ts
+export const radius = {
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  full: 9999,
+};</pre>
+
+  <pre>// typography.ts
+export const typography = {
+  h1: { fontSize: 28, lineHeight: 36, fontWeight: '700' },
+  h2: { fontSize: 24, lineHeight: 32, fontWeight: '700' },
+  h3: { fontSize: 20, lineHeight: 28, fontWeight: '600' },
+  h4: { fontSize: 17, lineHeight: 24, fontWeight: '600' },
+  bodyL: { fontSize: 16, lineHeight: 24, fontWeight: '400' },
+  bodyM: { fontSize: 15, lineHeight: 22, fontWeight: '400' },
+  bodyS: { fontSize: 14, lineHeight: 20, fontWeight: '400' },
+  caption: { fontSize: 12, lineHeight: 16, fontWeight: '400' },
+  overline: { fontSize: 11, lineHeight: 16, fontWeight: '600' },
+};</pre>
+
+  <pre>// motion.ts
+export const motion = {
+  quick: { duration: 150, easing: 'ease-out' },
+  normal: { duration: 300, easing: 'ease-in-out' },
+  slow: { duration: 500, easing: 'ease-out' },
+  gentle: { duration: 800, easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)' },
+};</pre>
+</div>
+</section>
+
+<!-- 푸터 -->
+<div style="text-align:center;padding:48px 0 80px;border-top:1px solid var(--border);margin-top:64px">
+  <div style="font-size:24px;font-weight:700;color:var(--accent);letter-spacing:4px;margin-bottom:12px">unoff</div>
+  <div style="font-size:14px;color:var(--text-dim);margin-bottom:8px">"꺼진 게 아니라, 충전 중이다."</div>
+  <div style="font-size:12px;color:var(--text-muted)">Brand Guide v2.1 | 2026-03-18</div>
+  <div style="font-size:12px;color:var(--text-muted);margin-top:4px">이 가이드는 UNOFF 브랜드의 모든 시각적·언어적 표현에 적용됩니다.</div>
+</div>
+
+</main><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// ── 접이식 사이드바 그룹 토글 ──
+function toggleGroup(id) {
+  const group = document.getElementById(id);
+  if (group) group.classList.toggle('open');
+}
+
+// ── 활성 섹션 하이라이트 ──
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = document.querySelectorAll('section[id]');
+
+const observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      navLinks.forEach(function(a) { a.classList.remove('active'); });
+      const active = document.querySelector('.nav-link[href="#' + entry.target.id + '"]');
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '-60px 0px -50% 0px' });
+
+sections.forEach(function(s) { observer.observe(s); });
+</script>
+</body>
+</html>

@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>unoff — Onboarding Flow Prototype</title>
+
+  <!-- Pretendard 폰트: UNOFF 공식 브랜드 폰트 -->
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  </style>
+
+  <style>
+    /* ─────────────────────────────────────────────
+       전역 초기화 및 페이지 기본 설정
+    ───────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      /* 페이지 전체 배경: 어두운 우주색 */
+      background: #120E1C;
+      min-height: 100vh;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 32px 24px 48px;
+      gap: 0;
+    }
+
+    /* 상단 프로토타입 라벨 */
+    .page-label {
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    /* ─────────────────────────────────────────────
+       iPhone 프레임 컨테이너
+       - 390 x 844 고정 크기
+       - 실제 iPhone처럼 보이게 테두리 적용
+    ───────────────────────────────────────────── */
+    .iphone-frame {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      border-radius: 54px;
+      overflow: hidden;
+      /* iPhone 테두리: 진한 그레이 */
+      box-shadow:
+        0 0 0 2px #2A2A2A,
+        0 0 0 6px #1A1A1A,
+        0 32px 80px rgba(0, 0, 0, 0.6);
+      background: #000;
+      /* 자식 화면들을 겹쳐 쌓기 위해 상대 포지셔닝 */
+      flex-shrink: 0;
+    }
+
+    /* 다이나믹 아일랜드: iPhone 15 스타일 검은 알약 */
+    .dynamic-island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 34px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100; /* 모든 화면 위에 표시 */
+    }
+
+    /* 홈 인디케이터: 하단 흰색 바 */
+    .home-indicator {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      border-radius: 9999px;
+      z-index: 100;
+      /* 화면마다 색이 다르므로 JS로 동적 변경 */
+      background: rgba(255, 255, 255, 0.35);
+      transition: background 0.3s ease;
+    }
+
+    /* ─────────────────────────────────────────────
+       화면(Screen) 공통 스타일
+       - 모든 화면은 iPhone 프레임 안에 절대 위치
+       - 기본적으로 투명+불가시 상태
+       - 활성 화면만 opacity 1로 표시
+    ───────────────────────────────────────────── */
+    .screen {
+      position: absolute;
+      inset: 0; /* top/right/bottom/left 모두 0 */
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none; /* 비활성 화면은 클릭 안 됨 */
+      transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+      overflow: hidden;
+    }
+
+    /* 활성화된 화면 */
+    .screen.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* 온보딩 슬라이드 전환은 따로 처리 (슬라이드 이동) */
+
+
+    /* ─────────────────────────────────────────────
+       SCREEN 1: SPLASH
+       배경: 밤하늘 그라데이션 (Violet → Scuba)
+    ───────────────────────────────────────────── */
+    .screen-splash {
+      background: linear-gradient(180deg, #1C0F30 0%, #2E1F4E 25%, #47366A 60%, #009BAA 100%);
+    }
+
+    /* 별빛 점들: 흰 원형 점으로 밤하늘 표현 */
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    /* 오로라 효과: Scuba 색상 반투명 띠 */
+    .aurora-splash {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+    }
+
+    /* 구름: 타원형 반투명 도형 */
+    .cloud-splash {
+      position: absolute;
+      background: rgba(247, 245, 240, 0.08);
+      border-radius: 50%;
+      filter: blur(12px);
+    }
+
+    /* 스플래시 중앙 텍스트 영역 */
+    .splash-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      width: 100%;
+    }
+
+    /* "unoff" 워드마크 */
+    .splash-logo {
+      display: block;
+      color: #fff;
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    /* 스플래시 서브텍스트 */
+    .splash-tagline {
+      color: rgba(247, 245, 240, 0.65);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+
+    /* ─────────────────────────────────────────────
+       온보딩 슬라이더 래퍼
+       - 3개 슬라이드를 가로로 나란히 배치
+       - translateX로 슬라이드 전환
+    ───────────────────────────────────────────── */
+    .screen-onboarding {
+      background: transparent;
+    }
+
+    .onboarding-slider {
+      display: flex;
+      width: 300%; /* 슬라이드 3개 × 100% */
+      height: 100%;
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    /* 개별 슬라이드: 프레임 너비와 동일하게 */
+    .slide {
+      width: calc(100% / 3); /* 390px */
+      height: 100%;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+
+    /* ─────────────────────────────────────────────
+       SLIDE 1 — "지금 어떤 상태든 괜찮아."
+       배경: Violet → Scuba 135도 그라데이션
+    ───────────────────────────────────────────── */
+    .slide-1 {
+      background: linear-gradient(135deg, #5F4B8B 0%, #3A5F8B 60%, #00B4C5 100%);
+    }
+
+    /* 슬라이드 1 상단 일러스트 영역: 밤하늘 풍경 */
+    .slide1-illustration {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%; /* 화면 상단 40% */
+    }
+
+    /* 달: 초승달 형태 (Scuba 200 색상, 글로우 효과) */
+    .moon {
+      position: absolute;
+      top: 56px;
+      right: 52px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #B3E9EF;
+      box-shadow: 0 0 16px rgba(125, 218, 227, 0.7), 0 0 32px rgba(125, 218, 227, 0.3);
+    }
+
+    /* 달의 그림자 (초승달 만들기: 위에 같은 색 원 겹침) */
+    .moon::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #4B6F9F; /* 뒤 배경색과 비슷한 색으로 가림 */
+    }
+
+    /* 언덕 레이어 1 (뒤쪽): 어두운 보라 */
+    .hill-back {
+      position: absolute;
+      bottom: 0;
+      left: -20px;
+      right: -20px;
+      height: 100px;
+      background: rgba(30, 20, 60, 0.6);
+      border-radius: 70% 70% 0 0;
+    }
+
+    /* 언덕 레이어 2 (앞쪽): 더 어두운 보라 */
+    .hill-front {
+      position: absolute;
+      bottom: 0;
+      left: -40px;
+      right: -40px;
+      height: 72px;
+      background: rgba(20, 12, 40, 0.75);
+      border-radius: 60% 60% 0 0;
+    }
+
+    /* 나무: 삼각형 + 사각형 기둥 */
+    .tree {
+      position: absolute;
+      bottom: 0;
+    }
+
+    .tree-trunk {
+      width: 6px;
+      height: 18px;
+      background: rgba(20, 12, 40, 0.9);
+      margin: 0 auto;
+    }
+
+    .tree-top {
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-bottom: 28px solid rgba(30, 18, 54, 0.95);
+      margin-bottom: -2px;
+    }
+
+    /* 오로라 곡선: 슬라이드 1 */
+    .aurora-slide1 {
+      position: absolute;
+      top: 30px;
+      left: -40px;
+      right: -40px;
+      height: 60px;
+      background: linear-gradient(90deg, transparent, rgba(0, 180, 197, 0.22), rgba(125, 218, 227, 0.18), transparent);
+      border-radius: 50%;
+      filter: blur(8px);
+      transform: rotate(-5deg);
+    }
+
+    /* 슬라이드 공통 하단 콘텐츠 영역 */
+    .slide-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      /* 상단 40% 일러스트 아래부터 내용 시작 */
+      top: 40%;
+      /* 하단 100px: 버튼(52px) + 여백(32px) + 여유(16px) */
+      padding: 24px 24px 100px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* "건너뛰기" 버튼: 우상단 */
+    .skip-btn {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 14px;
+      font-weight: 400;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      padding: 8px;
+      /* 클릭 영역 확보 */
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .skip-btn:active {
+      opacity: 0.7;
+    }
+
+    /* 도트 인디케이터 영역 */
+    .dot-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    /* 활성 도트: 길쭉한 형태 */
+    .dot.active-dot {
+      width: 20px;
+      border-radius: 3px;
+    }
+
+    /* STEP 라벨 */
+    .step-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* 슬라이드 메인 제목 */
+    .slide-title {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    /* 슬라이드 설명 텍스트 */
+    .slide-desc {
+      font-size: 16px;
+      line-height: 1.65;
+      flex: 1; /* 남은 공간 채우기 */
+    }
+
+    /* 하단 버튼 영역 */
+    .slide-btn-area {
+      position: absolute;
+      bottom: 32px;
+      left: 24px;
+      right: 24px;
+    }
+
+    /* Glass 버튼 (슬라이드 1): 반투명 흰색 */
+    .btn-glass {
+      width: 100%;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-glass:active {
+      background: rgba(255, 255, 255, 0.22);
+      transform: scale(0.98);
+    }
+
+    /* Secondary 버튼 (슬라이드 2): 투명 + Violet 보더 */
+    .btn-secondary {
+      width: 100%;
+      height: 52px;
+      background: transparent;
+      border: 1.5px solid #A899C4;
+      border-radius: 12px;
+      color: #5F4B8B;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-secondary:active {
+      background: rgba(168, 153, 196, 0.1);
+      transform: scale(0.98);
+    }
+
+    /* Primary 버튼 (슬라이드 3): Scuba 배경 */
+    .btn-primary {
+      width: 100%;
+      height: 52px;
+      background: #00B4C5;
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-primary:active {
+      background: #33C5D3;
+      transform: scale(0.98);
+    }
+
+
+    /* ─────────────────────────────────────────────
+       SLIDE 2 — "71.7만 명이 함께 쉬고 있어."
+       상단: 다크 별자리 영역 / 하단: White 배경
+    ───────────────────────────────────────────── */
+    .slide-2 {
+      background: #fff;
+    }
+
+    /* 별자리 영역: 화면 상단 40% 다크 배경 */
+    .constellation-area {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, #1C0F30 0%, #47366A 100%);
+      border-radius: 0 0 24px 24px;
+      overflow: hidden;
+    }
+
+    /* 별자리 점들: Scuba 계열 빛나는 점 */
+    .star-dot {
+      position: absolute;
+      border-radius: 50%;
+      background: #7DDAE3;
+    }
+
+    /* 별 글로우 효과: 큰 것들 */
+    .star-dot.glow {
+      box-shadow: 0 0 8px rgba(125, 218, 227, 0.8), 0 0 16px rgba(125, 218, 227, 0.4);
+    }
+
+    /* 별 글로우 효과: 더 밝은 것들 */
+    .star-dot.glow-bright {
+      background: #B3E9EF;
+      box-shadow: 0 0 12px rgba(179, 233, 239, 0.9), 0 0 24px rgba(179, 233, 239, 0.5);
+    }
+
+    /* 별자리 연결선: SVG로 처리 */
+    .constellation-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 슬라이드 2 하단 콘텐츠: White 배경 위 */
+    .slide2-content {
+      position: absolute;
+      top: 40%;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 24px 0;
+      background: #fff;
+    }
+
+    /* "71.7만 명" 숫자 텍스트 */
+    .stat-number {
+      font-size: 48px;
+      font-weight: 700;
+      color: #2E1F4E;
+      line-height: 1.1;
+      display: inline;
+    }
+
+    .stat-suffix {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2E1F4E;
+      line-height: 1.2;
+    }
+
+
+    /* ─────────────────────────────────────────────
+       SLIDE 3 — "네 속도로 충전해."
+       배경: Scuba 100 (연한 틸)
+    ───────────────────────────────────────────── */
+    .slide-3 {
+      background: #E0F5F8;
+    }
+
+    /* 배터리 일러스트 영역 */
+    .battery-area {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 큰 배터리 아이콘: SVG 인라인 */
+    .battery-icon-large {
+      width: 140px;
+      height: 70px;
+      position: relative;
+    }
+
+    /* 배터리 충전 카드 */
+    .battery-card {
+      background: #fff;
+      border: 1px solid #DDD8CC;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .battery-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .battery-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2E1F4E;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 배터리 트랙: 충전 바 배경 */
+    .battery-track {
+      height: 10px;
+      background: #B3E9EF;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    /* 배터리 충전 완료 부분 */
+    .battery-fill {
+      height: 100%;
+      width: 37%;
+      background: #00B4C5;
+      border-radius: 9999px;
+    }
+
+    .battery-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .battery-percent {
+      font-size: 14px;
+      font-weight: 600;
+      color: #5F4B8B;
+    }
+
+    /* "충전 중" 상태 칩 */
+    .status-chip {
+      font-size: 11px;
+      font-weight: 600;
+      color: #00B4C5;
+      background: #E0F5F8;
+      border-radius: 9999px;
+      padding: 4px 10px;
+      letter-spacing: 0.05em;
+    }
+
+
+    /* ─────────────────────────────────────────────
+       SCREEN 3: 로그인 화면
+       배경: White
+    ───────────────────────────────────────────── */
+    .screen-login {
+      background: #fff;
+    }
+
+    .login-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      /* 상단: 텍스트 영역 / 하단: 버튼 영역 */
+      padding: 0;
+    }
+
+    /* 로그인 상단 텍스트 블록 */
+    .login-top {
+      padding: 80px 24px 0;
+      flex: 1;
+    }
+
+    /* 로그인 화면 로고 */
+    .login-logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1A1A1A; /* 로그인 화면: Mono Black */
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+    }
+
+    /* 로그인 화면 메인 타이틀 */
+    .login-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2E1F4E;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    /* 로그인 화면 서브텍스트 */
+    .login-subtitle {
+      font-size: 15px;
+      font-weight: 400;
+      color: #7E6BA6;
+      margin-bottom: 0;
+    }
+
+    /* 소셜 버튼 영역: 하단에 고정 */
+    .social-btn-area {
+      padding: 0 24px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* 소셜 로그인 버튼 공통 스타일 */
+    .social-btn {
+      width: 100%;
+      height: 52px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.15s ease-out;
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: -0.01em;
+    }
+
+    .social-btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    /* 카카오 버튼 */
+    .btn-kakao {
+      background: #FEE500;
+      color: #191919;
+    }
+
+    /* 네이버 버튼 */
+    .btn-naver {
+      background: #03C75A;
+      color: #fff;
+    }
+
+    /* Apple 버튼 */
+    .btn-apple {
+      background: #000;
+      color: #fff;
+    }
+
+    /* 약관 동의 텍스트 */
+    .terms-text {
+      text-align: center;
+      font-size: 12px;
+      color: #7E6BA6;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    /* 소셜 버튼 아이콘 (SVG inline) */
+    .social-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+
+    /* ─────────────────────────────────────────────
+       상태바 텍스트 (시간 표시 영역)
+    ───────────────────────────────────────────── */
+    .status-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 28px 0;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .status-time {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 상태바 색상: 어두운 배경 → 흰색, 밝은 배경 → 어두운색 */
+    .status-bar.light .status-time,
+    .status-bar.light .status-icons {
+      color: #2E1F4E;
+    }
+
+    .status-bar.dark .status-time,
+    .status-bar.dark .status-icons {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+
+    /* ─────────────────────────────────────────────
+       페이지 하단 내비게이션 표시
+       현재 단계 인디케이터
+    ───────────────────────────────────────────── */
+    .page-nav {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav-step {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.3);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      transition: all 0.3s ease;
+      letter-spacing: 0.02em;
+    }
+
+    /* 현재 단계 강조 */
+    .nav-step.current {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-arrow {
+      color: rgba(255, 255, 255, 0.2);
+      font-size: 10px;
+    }
+
+    /* 하단 안내 텍스트 */
+    .page-hint {
+      margin-top: 12px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.25);
+      letter-spacing: 0.04em;
+    }
+
+
+    /* ─────────────────────────────────────────────
+       트랜지션: 온보딩 → 로그인 페이드업
+    ───────────────────────────────────────────── */
+    .screen-login {
+      transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    }
+
+    .screen-login:not(.active) {
+      transform: translateY(16px);
+    }
+
+    .screen-login.active {
+      transform: translateY(0);
+    }
+
+
+    /* ─────────────────────────────────────────────
+       별 반짝임 애니메이션 (Splash/Slide 1)
+    ───────────────────────────────────────────── */
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.65; }
+    }
+
+    @keyframes twinkle-slow {
+      0%, 100% { opacity: 0.1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* 오로라 부유 애니메이션 */
+    @keyframes aurora-float {
+      0%, 100% { transform: translateX(0) rotate(-4deg) scaleX(1); opacity: 0.12; }
+      50% { transform: translateX(8px) rotate(-2deg) scaleX(1.04); opacity: 0.18; }
+    }
+
+    @keyframes aurora-float2 {
+      0%, 100% { transform: translateX(0) rotate(3deg); opacity: 0.08; }
+      50% { transform: translateX(-6px) rotate(5deg); opacity: 0.14; }
+    }
+
+    /* 구름 부유 */
+    @keyframes cloud-float {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(6px); }
+    }
+
+    /* 로그인 화면 등장: 아래서 위로 페이드 */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 페이지 상단 라벨 -->
+  <div class="page-label">unoff — Onboarding Flow Prototype</div>
+
+  <!-- ─────────────────────────────────────
+       iPhone 프레임: 모든 화면이 여기 안에
+  ───────────────────────────────────────── -->
+  <div class="iphone-frame" id="iphone">
+
+    <!-- 다이나믹 아일랜드 -->
+    <div class="dynamic-island"></div>
+
+    <!-- 홈 인디케이터 -->
+    <div class="home-indicator" id="homeIndicator"></div>
+
+
+    <!-- ───────── SCREEN 1: SPLASH ───────── -->
+    <div class="screen screen-splash active" id="screenSplash">
+
+      <!-- 상태바 -->
+      <div class="status-bar dark">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <!-- 셀 신호 아이콘 -->
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <rect x="0" y="7" width="3" height="5" rx="0.5" fill="white" fill-opacity="0.9"/>
+            <rect x="4.5" y="5" width="3" height="7" rx="0.5" fill="white" fill-opacity="0.9"/>
+            <rect x="9" y="2" width="3" height="10" rx="0.5" fill="white" fill-opacity="0.9"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="white" fill-opacity="0.9"/>
+          </svg>
+          <!-- WiFi 아이콘 -->
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <path d="M8 9.5C8.55 9.5 9 9.95 9 10.5C9 11.05 8.55 11.5 8 11.5C7.45 11.5 7 11.05 7 10.5C7 9.95 7.45 9.5 8 9.5Z" fill="white" fill-opacity="0.9"/>
+            <path d="M4.5 7.2C5.6 6.1 7 5.5 8 5.5C9 5.5 10.4 6.1 11.5 7.2" stroke="white" stroke-opacity="0.9" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+            <path d="M1.5 4.5C3.2 2.8 5.5 1.8 8 1.8C10.5 1.8 12.8 2.8 14.5 4.5" stroke="white" stroke-opacity="0.9" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          </svg>
+          <!-- 배터리 아이콘 -->
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+            <rect x="0.5" y="0.5" width="20" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/>
+            <rect x="2" y="2" width="15" height="8" rx="2" fill="white" fill-opacity="0.9"/>
+            <path d="M22 4V8" stroke="white" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 별빛 점들: 10개 -->
+      <div class="star" style="width:2px;height:2px;top:80px;left:42px;opacity:0.45;animation:twinkle 3.2s ease-in-out infinite 0.2s;"></div>
+      <div class="star" style="width:3px;height:3px;top:96px;left:128px;opacity:0.55;animation:twinkle 2.8s ease-in-out infinite 0.8s;"></div>
+      <div class="star" style="width:2px;height:2px;top:72px;left:200px;opacity:0.3;animation:twinkle-slow 4.1s ease-in-out infinite 1.2s;"></div>
+      <div class="star" style="width:2px;height:2px;top:116px;left:280px;opacity:0.5;animation:twinkle 3.6s ease-in-out infinite 0.5s;"></div>
+      <div class="star" style="width:3px;height:3px;top:148px;left:56px;opacity:0.35;animation:twinkle-slow 5s ease-in-out infinite 2s;"></div>
+      <div class="star" style="width:2px;height:2px;top:180px;left:160px;opacity:0.6;animation:twinkle 2.5s ease-in-out infinite 1s;"></div>
+      <div class="star" style="width:2px;height:2px;top:220px;left:320px;opacity:0.4;animation:twinkle 3.8s ease-in-out infinite 0.3s;"></div>
+      <div class="star" style="width:3px;height:3px;top:260px;left:80px;opacity:0.25;animation:twinkle-slow 6s ease-in-out infinite 1.5s;"></div>
+      <div class="star" style="width:2px;height:2px;top:300px;left:240px;opacity:0.45;animation:twinkle 3.4s ease-in-out infinite 0.7s;"></div>
+      <div class="star" style="width:2px;height:2px;top:200px;left:350px;opacity:0.3;animation:twinkle-slow 4.5s ease-in-out infinite 1.8s;"></div>
+      <div class="star" style="width:2px;height:2px;top:340px;left:180px;opacity:0.2;animation:twinkle 5.2s ease-in-out infinite 2.5s;"></div>
+
+      <!-- 오로라 띠 1 -->
+      <div style="
+        position:absolute;
+        top:200px;left:-60px;right:-60px;
+        height:80px;
+        background: linear-gradient(90deg, transparent, rgba(0,180,197,0.12), rgba(125,218,227,0.10), transparent);
+        border-radius:50%;
+        filter:blur(16px);
+        transform:rotate(-6deg);
+        animation: aurora-float 7s ease-in-out infinite;
+      "></div>
+
+      <!-- 오로라 띠 2 -->
+      <div style="
+        position:absolute;
+        top:320px;left:-40px;right:-40px;
+        height:60px;
+        background: linear-gradient(90deg, transparent, rgba(0,180,197,0.08), rgba(51,197,211,0.08), transparent);
+        border-radius:50%;
+        filter:blur(20px);
+        transform:rotate(3deg);
+        animation: aurora-float2 9s ease-in-out infinite 2s;
+      "></div>
+
+      <!-- 구름 타원 -->
+      <div class="cloud-splash" style="
+        width:200px;height:60px;
+        bottom:240px;left:-30px;
+        animation: cloud-float 12s ease-in-out infinite;
+      "></div>
+
+      <!-- 스플래시 중앙 콘텐츠 -->
+      <div class="splash-content">
+        <span class="splash-logo">unoff</span>
+        <span class="splash-tagline">켜지기 전까지, 여기 있어.</span>
+      </div>
+
+    </div><!-- /screen-splash -->
+
+
+    <!-- ───────── SCREEN 2: 온보딩 슬라이더 ───────── -->
+    <div class="screen screen-onboarding" id="screenOnboarding">
+
+      <!-- 슬라이더 래퍼: 3개 슬라이드를 가로로 배치 -->
+      <div class="onboarding-slider" id="onboardingSlider">
+
+
+        <!-- ── SLIDE 1: 지금 어떤 상태든 괜찮아. ── -->
+        <div class="slide slide-1">
+
+          <!-- 상태바 (흰색) -->
+          <div class="status-bar dark">
+            <span class="status-time">9:41</span>
+            <div class="status-icons" style="color:rgba(255,255,255,0.9);">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="0.5" fill="white" fill-opacity="0.9"/><rect x="4.5" y="5" width="3" height="7" rx="0.5" fill="white" fill-opacity="0.9"/><rect x="9" y="2" width="3" height="10" rx="0.5" fill="white" fill-opacity="0.9"/><rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="white" fill-opacity="0.9"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5C8.55 9.5 9 9.95 9 10.5C9 11.05 8.55 11.5 8 11.5C7.45 11.5 7 11.05 7 10.5C7 9.95 7.45 9.5 8 9.5Z" fill="white" fill-opacity="0.9"/><path d="M4.5 7.2C5.6 6.1 7 5.5 8 5.5C9 5.5 10.4 6.1 11.5 7.2" stroke="white" stroke-opacity="0.9" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4.5C3.2 2.8 5.5 1.8 8 1.8C10.5 1.8 12.8 2.8 14.5 4.5" stroke="white" stroke-opacity="0.9" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="20" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/><rect x="2" y="2" width="15" height="8" rx="2" fill="white" fill-opacity="0.9"/><path d="M22 4V8" stroke="white" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+
+          <!-- 건너뛰기 버튼 -->
+          <button class="skip-btn" onclick="goToLogin()">건너뛰기</button>
+
+          <!-- 상단 일러스트: 밤하늘 풍경 -->
+          <div class="slide1-illustration">
+
+            <!-- 별빛 5개 -->
+            <div class="star" style="width:2px;height:2px;top:68px;left:38px;opacity:0.5;animation:twinkle 3.1s ease-in-out infinite 0.4s;"></div>
+            <div class="star" style="width:3px;height:3px;top:80px;left:110px;opacity:0.4;animation:twinkle-slow 4.2s ease-in-out infinite 1s;"></div>
+            <div class="star" style="width:2px;height:2px;top:60px;left:180px;opacity:0.6;animation:twinkle 2.7s ease-in-out infinite 0.2s;"></div>
+            <div class="star" style="width:2px;height:2px;top:92px;left:240px;opacity:0.35;animation:twinkle-slow 5.5s ease-in-out infinite 1.5s;"></div>
+            <div class="star" style="width:3px;height:3px;top:72px;left:310px;opacity:0.45;animation:twinkle 3.8s ease-in-out infinite 0.8s;"></div>
+            <div class="star" style="width:2px;height:2px;top:108px;left:70px;opacity:0.3;animation:twinkle-slow 6.2s ease-in-out infinite 2s;"></div>
+            <div class="star" style="width:2px;height:2px;top:100px;left:160px;opacity:0.4;animation:twinkle 4s ease-in-out infinite 1.2s;"></div>
+
+            <!-- 달 -->
+            <div class="moon"></div>
+
+            <!-- 오로라 곡선 -->
+            <div class="aurora-slide1"></div>
+
+            <!-- 언덕 뒤 레이어 -->
+            <div class="hill-back"></div>
+
+            <!-- 나무 1 -->
+            <div class="tree" style="left:48px;bottom:20px;">
+              <div class="tree-top"></div>
+              <div class="tree-trunk"></div>
+            </div>
+
+            <!-- 나무 2 (더 큰) -->
+            <div class="tree" style="left:88px;bottom:20px;">
+              <div class="tree-top" style="border-bottom-width:36px;border-left-width:16px;border-right-width:16px;"></div>
+              <div class="tree-trunk" style="height:22px;"></div>
+            </div>
+
+            <!-- 나무 3 (오른쪽) -->
+            <div class="tree" style="right:64px;bottom:20px;">
+              <div class="tree-top" style="border-bottom-width:24px;border-left-width:10px;border-right-width:10px;"></div>
+              <div class="tree-trunk" style="height:14px;width:4px;"></div>
+            </div>
+
+            <!-- 언덕 앞 레이어 -->
+            <div class="hill-front"></div>
+
+          </div><!-- /slide1-illustration -->
+
+          <!-- 하단 텍스트 콘텐츠 -->
+          <div class="slide-content" style="padding-top:20px;">
+
+            <!-- 도트 인디케이터 -->
+            <div class="dot-container">
+              <div class="dot active-dot" style="background:#fff;" onclick="goToSlide(0)"></div>
+              <div class="dot" style="background:rgba(255,255,255,0.35);" onclick="goToSlide(1)"></div>
+              <div class="dot" style="background:rgba(255,255,255,0.35);" onclick="goToSlide(2)"></div>
+            </div>
+
+            <!-- STEP 라벨 -->
+            <div class="step-label" style="color:rgba(255,255,255,0.58);">STEP 1</div>
+
+            <!-- 메인 제목 -->
+            <div class="slide-title" style="color:#fff;">지금 어떤 상태든<br>괜찮아.</div>
+
+            <!-- 설명 -->
+            <div class="slide-desc" style="color:rgba(255,255,255,0.72);">잠깐 멈춰도, 한참 쉬어도<br>여기선 모두 OFF 중이야.</div>
+
+          </div>
+
+          <!-- 다음 버튼 -->
+          <div class="slide-btn-area">
+            <button class="btn-glass" onclick="nextSlide()">다음</button>
+          </div>
+
+        </div><!-- /slide-1 -->
+
+
+        <!-- ── SLIDE 2: 71.7만 명이 함께 쉬고 있어. ── -->
+        <div class="slide slide-2">
+
+          <!-- 상태바 (어두운 배경 위 → 흰색) -->
+          <div class="status-bar dark" style="z-index:60;">
+            <span class="status-time">9:41</span>
+            <div class="status-icons" style="color:rgba(255,255,255,0.9);">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="0.5" fill="white" fill-opacity="0.9"/><rect x="4.5" y="5" width="3" height="7" rx="0.5" fill="white" fill-opacity="0.9"/><rect x="9" y="2" width="3" height="10" rx="0.5" fill="white" fill-opacity="0.9"/><rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="white" fill-opacity="0.9"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5C8.55 9.5 9 9.95 9 10.5C9 11.05 8.55 11.5 8 11.5C7.45 11.5 7 11.05 7 10.5C7 9.95 7.45 9.5 8 9.5Z" fill="white" fill-opacity="0.9"/><path d="M4.5 7.2C5.6 6.1 7 5.5 8 5.5C9 5.5 10.4 6.1 11.5 7.2" stroke="white" stroke-opacity="0.9" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4.5C3.2 2.8 5.5 1.8 8 1.8C10.5 1.8 12.8 2.8 14.5 4.5" stroke="white" stroke-opacity="0.9" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="20" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/><rect x="2" y="2" width="15" height="8" rx="2" fill="white" fill-opacity="0.9"/><path d="M22 4V8" stroke="white" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+
+          <!-- 건너뛰기 버튼 -->
+          <button class="skip-btn" style="color:rgba(255,255,255,0.55);z-index:70;" onclick="goToLogin()">건너뛰기</button>
+
+          <!-- 별자리 영역 (상단 40%) -->
+          <div class="constellation-area">
+
+            <!-- 별자리 연결선: SVG -->
+            <svg class="constellation-svg" viewBox="0 0 390 338">
+              <!-- 연결선들: rgba(179,233,239,0.2), 1px -->
+              <line x1="80" y1="90" x2="155" y2="60" stroke="rgba(179,233,239,0.22)" stroke-width="1"/>
+              <line x1="155" y1="60" x2="230" y2="100" stroke="rgba(179,233,239,0.22)" stroke-width="1"/>
+              <line x1="230" y1="100" x2="290" y2="72" stroke="rgba(179,233,239,0.20)" stroke-width="1"/>
+              <line x1="155" y1="60" x2="190" y2="148" stroke="rgba(179,233,239,0.18)" stroke-width="1"/>
+              <line x1="290" y1="72" x2="340" y2="130" stroke="rgba(179,233,239,0.15)" stroke-width="1"/>
+            </svg>
+
+            <!-- 별자리 빛나는 점들 (이모지 없음 — 점과 선만) -->
+            <!-- 점 1: 글로우 -->
+            <div class="star-dot glow" style="width:8px;height:8px;top:86px;left:76px;"></div>
+            <!-- 점 2: 브라이트 글로우 -->
+            <div class="star-dot glow-bright" style="width:10px;height:10px;top:56px;left:151px;"></div>
+            <!-- 점 3 -->
+            <div class="star-dot glow" style="width:7px;height:7px;top:96px;left:226px;"></div>
+            <!-- 점 4: 브라이트 -->
+            <div class="star-dot glow-bright" style="width:9px;height:9px;top:68px;left:286px;"></div>
+            <!-- 점 5 -->
+            <div class="star-dot" style="width:6px;height:6px;top:126px;left:186px;background:#7DDAE3;box-shadow:0 0 6px rgba(125,218,227,0.6);"></div>
+            <!-- 점 6 -->
+            <div class="star-dot" style="width:5px;height:5px;top:126px;left:336px;background:#7DDAE3;box-shadow:0 0 5px rgba(125,218,227,0.5);"></div>
+            <!-- 점 7: 작은 배경별 -->
+            <div class="star-dot" style="width:3px;height:3px;top:72px;left:50px;background:rgba(125,218,227,0.4);"></div>
+            <div class="star-dot" style="width:3px;height:3px;top:108px;left:120px;background:rgba(125,218,227,0.35);"></div>
+            <div class="star-dot" style="width:2px;height:2px;top:56px;left:310px;background:rgba(179,233,239,0.4);"></div>
+
+          </div><!-- /constellation-area -->
+
+          <!-- 하단 White 콘텐츠 영역 -->
+          <div class="slide2-content">
+
+            <!-- 도트 인디케이터 -->
+            <div class="dot-container">
+              <div class="dot" style="background:#D0C7E0;" onclick="goToSlide(0)"></div>
+              <div class="dot active-dot" style="background:#5F4B8B;" onclick="goToSlide(1)"></div>
+              <div class="dot" style="background:#D0C7E0;" onclick="goToSlide(2)"></div>
+            </div>
+
+            <!-- STEP 라벨 -->
+            <div class="step-label" style="color:#00B4C5;">STEP 2</div>
+
+            <!-- 메인 숫자 + 텍스트 -->
+            <div style="margin-bottom:12px;line-height:1.2;">
+              <span class="stat-number">71.7만 명</span><br>
+              <span class="stat-suffix">이 함께 쉬고 있어.</span>
+            </div>
+
+            <!-- 설명 텍스트 -->
+            <div style="font-size:16px;font-weight:400;color:#7E6BA6;line-height:1.65;">비교 없이, 각자의 속도로.<br>여기선 그냥 있어도 돼.</div>
+
+          </div>
+
+          <!-- 다음 버튼 -->
+          <div class="slide-btn-area">
+            <button class="btn-secondary" onclick="nextSlide()">다음</button>
+          </div>
+
+        </div><!-- /slide-2 -->
+
+
+        <!-- ── SLIDE 3: 네 속도로 충전해. ── -->
+        <div class="slide slide-3">
+
+          <!-- 상태바 (틸 배경 위 → 어두운 색) -->
+          <div class="status-bar light">
+            <span class="status-time">9:41</span>
+            <div class="status-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="0.5" fill="#2E1F4E" fill-opacity="0.7"/><rect x="4.5" y="5" width="3" height="7" rx="0.5" fill="#2E1F4E" fill-opacity="0.7"/><rect x="9" y="2" width="3" height="10" rx="0.5" fill="#2E1F4E" fill-opacity="0.7"/><rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="#2E1F4E" fill-opacity="0.7"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5C8.55 9.5 9 9.95 9 10.5C9 11.05 8.55 11.5 8 11.5C7.45 11.5 7 11.05 7 10.5C7 9.95 7.45 9.5 8 9.5Z" fill="#2E1F4E" fill-opacity="0.7"/><path d="M4.5 7.2C5.6 6.1 7 5.5 8 5.5C9 5.5 10.4 6.1 11.5 7.2" stroke="#2E1F4E" stroke-opacity="0.7" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4.5C3.2 2.8 5.5 1.8 8 1.8C10.5 1.8 12.8 2.8 14.5 4.5" stroke="#2E1F4E" stroke-opacity="0.7" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="20" height="11" rx="3.5" stroke="#2E1F4E" stroke-opacity="0.3"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#2E1F4E" fill-opacity="0.7"/><path d="M22 4V8" stroke="#2E1F4E" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+
+          <!-- 건너뛰기 버튼 -->
+          <button class="skip-btn" style="color:rgba(46,31,78,0.45);" onclick="goToLogin()">건너뛰기</button>
+
+          <!-- 상단 배터리 일러스트 영역 -->
+          <div class="battery-area">
+            <!-- 큰 배터리 SVG 인라인 -->
+            <svg width="160" height="80" viewBox="0 0 160 80" fill="none">
+              <!-- 배터리 외곽 -->
+              <rect x="2" y="8" width="144" height="64" rx="12" stroke="#00B4C5" stroke-width="3" fill="none"/>
+              <!-- 배터리 단자 -->
+              <path d="M148 28 L148 52" stroke="#00B4C5" stroke-width="4" stroke-linecap="round"/>
+              <path d="M154 32 L154 48" stroke="#00B4C5" stroke-width="3" stroke-linecap="round"/>
+              <!-- 37% 충전 채움 -->
+              <rect x="8" y="14" width="51" height="52" rx="8" fill="#00B4C5"/>
+              <!-- 충전 중 번개 아이콘 -->
+              <path d="M88 24 L78 42 L85 42 L76 58 L96 36 L89 36 L98 22 Z" fill="#009BAA" fill-opacity="0.5"/>
+              <!-- 배터리 분할선 -->
+              <line x1="66" y1="16" x2="66" y2="64" stroke="#B3E9EF" stroke-width="0.8" stroke-opacity="0.4"/>
+              <line x1="100" y1="16" x2="100" y2="64" stroke="#B3E9EF" stroke-width="0.8" stroke-opacity="0.3"/>
+            </svg>
+          </div>
+
+          <!-- 하단 텍스트 콘텐츠 (슬라이드 3 전용: 버튼도 내부에 포함) -->
+          <div class="slide-content" style="padding-top:20px; padding-bottom:24px;">
+
+            <!-- 도트 인디케이터 -->
+            <div class="dot-container">
+              <div class="dot" style="background:#7DDAE3;opacity:0.5;" onclick="goToSlide(0)"></div>
+              <div class="dot" style="background:#7DDAE3;opacity:0.5;" onclick="goToSlide(1)"></div>
+              <div class="dot active-dot" style="background:#00B4C5;" onclick="goToSlide(2)"></div>
+            </div>
+
+            <!-- STEP 라벨 -->
+            <div class="step-label" style="color:#00B4C5;">STEP 3</div>
+
+            <!-- 메인 제목 -->
+            <div class="slide-title" style="color:#2E1F4E;">네 속도로<br>충전해.</div>
+
+            <!-- 설명: flex:0 으로 카드 공간 확보 -->
+            <div style="font-size:16px;line-height:1.65;color:#7E6BA6;flex:0;margin-bottom:16px;">0%에서 시작해도 괜찮아.<br>여기선 그게 기본값이야.</div>
+
+            <!-- 배터리 카드: 설명 아래 고정 배치 -->
+            <div class="battery-card" style="flex:0;margin-top:0;margin-bottom:16px;">
+              <div class="battery-card-header">
+                <div class="battery-card-title">
+                  <svg width="18" height="10" viewBox="0 0 18 10" fill="none">
+                    <rect x="0.5" y="0.5" width="14" height="9" rx="2.5" stroke="#5F4B8B" stroke-width="1"/>
+                    <rect x="2" y="2" width="5" height="6" rx="1.5" fill="#00B4C5"/>
+                    <path d="M16 3V7" stroke="#5F4B8B" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  내 배터리
+                </div>
+              </div>
+              <div class="battery-track">
+                <div class="battery-fill"></div>
+              </div>
+              <div class="battery-footer">
+                <span class="battery-percent">37%</span>
+                <span class="status-chip">충전 중</span>
+              </div>
+            </div>
+
+            <!-- 들어와 볼래? 버튼: 카드 바로 아래 -->
+            <button class="btn-primary" style="flex:0;" onclick="goToLogin()">들어와 볼래?</button>
+
+          </div><!-- /slide-content -->
+
+        </div><!-- /slide-3 -->
+
+      </div><!-- /onboarding-slider -->
+    </div><!-- /screen-onboarding -->
+
+
+    <!-- ───────── SCREEN 3: 로그인 ───────── -->
+    <div class="screen screen-login" id="screenLogin">
+
+      <!-- 상태바 (흰 배경 위 → 어두운 색) -->
+      <div class="status-bar light">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="0.5" fill="#2E1F4E" fill-opacity="0.7"/><rect x="4.5" y="5" width="3" height="7" rx="0.5" fill="#2E1F4E" fill-opacity="0.7"/><rect x="9" y="2" width="3" height="10" rx="0.5" fill="#2E1F4E" fill-opacity="0.7"/><rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="#2E1F4E" fill-opacity="0.7"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5C8.55 9.5 9 9.95 9 10.5C9 11.05 8.55 11.5 8 11.5C7.45 11.5 7 11.05 7 10.5C7 9.95 7.45 9.5 8 9.5Z" fill="#2E1F4E" fill-opacity="0.7"/><path d="M4.5 7.2C5.6 6.1 7 5.5 8 5.5C9 5.5 10.4 6.1 11.5 7.2" stroke="#2E1F4E" stroke-opacity="0.7" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M1.5 4.5C3.2 2.8 5.5 1.8 8 1.8C10.5 1.8 12.8 2.8 14.5 4.5" stroke="#2E1F4E" stroke-opacity="0.7" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="20" height="11" rx="3.5" stroke="#2E1F4E" stroke-opacity="0.3"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#2E1F4E" fill-opacity="0.7"/><path d="M22 4V8" stroke="#2E1F4E" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <div class="login-content">
+
+        <!-- 상단 텍스트 영역 -->
+        <div class="login-top">
+          <!-- 로그인 로고: 항상 Black -->
+          <div class="login-logo">unoff</div>
+
+          <!-- 메인 타이틀 -->
+          <div class="login-title">다시 올 때도<br>편하게 들어와.</div>
+
+          <!-- 서브텍스트 -->
+          <div class="login-subtitle">3초면 끝나. 부담 없이.</div>
+        </div>
+
+        <!-- 소셜 버튼 영역: 하단 고정 -->
+        <div class="social-btn-area">
+
+          <!-- 카카오 로그인 -->
+          <button class="social-btn btn-kakao">
+            <!-- 카카오 말풍선 아이콘 SVG -->
+            <svg class="social-icon" viewBox="0 0 20 20" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C5.582 2 2 4.874 2 8.4C2 10.592 3.336 12.524 5.384 13.682L4.652 16.636C4.594 16.868 4.862 17.05 5.06 16.912L8.598 14.614C9.06 14.668 9.526 14.696 10 14.696C14.418 14.696 18 11.822 18 8.298C18 4.774 14.418 2 10 2Z" fill="#191919"/>
+            </svg>
+            카카오로 계속하기
+          </button>
+
+          <!-- 네이버 로그인 -->
+          <button class="social-btn btn-naver">
+            <!-- 네이버 N 아이콘 SVG -->
+            <svg class="social-icon" viewBox="0 0 20 20" fill="none">
+              <path d="M11.4 10.54L8.52 6H6V14H8.6V9.46L11.48 14H14V6H11.4V10.54Z" fill="white"/>
+            </svg>
+            네이버로 계속하기
+          </button>
+
+          <!-- Apple 로그인 -->
+          <button class="social-btn btn-apple">
+            <!-- Apple 아이콘 SVG -->
+            <svg class="social-icon" viewBox="0 0 20 20" fill="none">
+              <path d="M14.378 10.638C14.368 8.972 15.272 8.066 16 7.5C15.15 6.35 13.9 5.73 12.75 5.7C11.55 5.67 10.43 6.44 9.82 6.44C9.2 6.44 8.22 5.72 7.2 5.74C5.88 5.76 4.65 6.52 3.96 7.74C2.56 10.2 3.6 13.82 4.96 15.82C5.64 16.8 6.44 17.9 7.5 17.86C8.52 17.82 8.9 17.22 10.1 17.22C11.28 17.22 11.64 17.86 12.7 17.84C13.78 17.82 14.48 16.84 15.14 15.86C15.66 15.1 16.06 14.26 16.32 13.38C14.82 12.74 14.382 11.322 14.378 10.638ZM12.1 4.54C12.65 3.87 12.92 3.02 12.8 2.16C11.96 2.24 11.18 2.66 10.62 3.32C10.07 3.97 9.78 4.81 9.88 5.64C10.74 5.66 11.55 5.22 12.1 4.54Z" fill="white"/>
+            </svg>
+            Apple로 계속하기
+          </button>
+
+          <!-- 약관 동의 텍스트 -->
+          <div class="terms-text">계속하면 이용약관에 동의하게 돼.</div>
+
+        </div><!-- /social-btn-area -->
+
+      </div><!-- /login-content -->
+
+    </div><!-- /screen-login -->
+
+  </div><!-- /iphone-frame -->
+
+
+  <!-- ─────────────────────────────────────
+       현재 단계 인디케이터 (프레임 밖 하단)
+  ───────────────────────────────────────── -->
+  <div class="page-nav" id="pageNav">
+    <span class="nav-step current" id="navSplash">Splash</span>
+    <span class="nav-arrow">›</span>
+    <span class="nav-step" id="navOb1">Onboarding 1</span>
+    <span class="nav-arrow">›</span>
+    <span class="nav-step" id="navOb2">Onboarding 2</span>
+    <span class="nav-arrow">›</span>
+    <span class="nav-step" id="navOb3">Onboarding 3</span>
+    <span class="nav-arrow">›</span>
+    <span class="nav-step" id="navLogin">Login</span>
+  </div>
+
+  <div class="page-hint">Click buttons or swipe to navigate</div>
+
+
+  <!-- ─────────────────────────────────────
+       JavaScript: 전환 로직
+  ───────────────────────────────────────── -->
+  <script>
+    /*
+     * 현재 어떤 화면/슬라이드를 보여주는지 추적하는 변수
+     * state: 'splash' | 'onboarding' | 'login'
+     * slideIndex: 0 = 슬라이드1, 1 = 슬라이드2, 2 = 슬라이드3
+     */
+    let currentState = 'splash';
+    let currentSlide = 0;
+
+    // 터치 스와이프 감지용 변수
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isDragging = false;
+
+    // DOM 요소 참조
+    const screenSplash = document.getElementById('screenSplash');
+    const screenOnboarding = document.getElementById('screenOnboarding');
+    const screenLogin = document.getElementById('screenLogin');
+    const slider = document.getElementById('onboardingSlider');
+    const homeIndicator = document.getElementById('homeIndicator');
+
+    // 하단 단계 표시 요소들
+    const navItems = {
+      splash: document.getElementById('navSplash'),
+      ob1: document.getElementById('navOb1'),
+      ob2: document.getElementById('navOb2'),
+      ob3: document.getElementById('navOb3'),
+      login: document.getElementById('navLogin'),
+    };
+
+    /*
+     * 하단 단계 인디케이터 업데이트
+     * 현재 단계를 강조 표시한다
+     */
+    function updateNavIndicator() {
+      // 모든 항목 비활성화
+      Object.values(navItems).forEach(el => el.classList.remove('current'));
+
+      if (currentState === 'splash') {
+        navItems.splash.classList.add('current');
+      } else if (currentState === 'onboarding') {
+        const keys = ['ob1', 'ob2', 'ob3'];
+        navItems[keys[currentSlide]].classList.add('current');
+      } else if (currentState === 'login') {
+        navItems.login.classList.add('current');
+      }
+    }
+
+    /*
+     * 홈 인디케이터 색상 업데이트
+     * - 어두운 배경 → 흰색
+     * - 밝은 배경(로그인, 슬라이드3) → 어두운 색
+     */
+    function updateHomeIndicator() {
+      if (currentState === 'login' || (currentState === 'onboarding' && currentSlide === 2)) {
+        homeIndicator.style.background = 'rgba(46, 31, 78, 0.2)';
+      } else {
+        homeIndicator.style.background = 'rgba(255, 255, 255, 0.35)';
+      }
+    }
+
+    /*
+     * 슬라이더 위치 업데이트
+     * translateX로 슬라이드를 밀어서 전환
+     */
+    function updateSlider() {
+      // 슬라이더 너비는 390px × 3 = 1170px
+      // 각 슬라이드는 390px 폭이므로, index × 390px 만큼 왼쪽으로 이동
+      const offset = currentSlide * (100 / 3); // 퍼센트로 계산
+      slider.style.transform = `translateX(-${offset}%)`;
+    }
+
+    /*
+     * 다음 슬라이드로 이동
+     * 마지막 슬라이드에서 호출하면 아무 동작 없음 (버튼으로는 안 옴 — 버튼이 "들어와 볼래?"로 바뀜)
+     */
+    function nextSlide() {
+      if (currentSlide < 2) {
+        currentSlide++;
+        updateSlider();
+        updateNavIndicator();
+        updateHomeIndicator();
+      }
+    }
+
+    /*
+     * 특정 슬라이드로 이동 (도트 클릭 시)
+     */
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlider();
+      updateNavIndicator();
+      updateHomeIndicator();
+    }
+
+    /*
+     * 로그인 화면으로 전환
+     * 온보딩 → 로그인: 페이드업 효과 (CSS transition이 처리)
+     */
+    function goToLogin() {
+      currentState = 'login';
+
+      // 온보딩 화면 숨기기
+      screenOnboarding.classList.remove('active');
+
+      // 약간의 딜레이 후 로그인 화면 표시 (자연스러운 전환을 위해)
+      setTimeout(() => {
+        screenLogin.classList.add('active');
+        updateNavIndicator();
+        updateHomeIndicator();
+      }, 80);
+    }
+
+    /*
+     * Splash → 온보딩 1 전환
+     * 페이지 로드 후 1500ms 뒤 자동 실행
+     */
+    function splashToOnboarding() {
+      currentState = 'onboarding';
+      currentSlide = 0;
+
+      // 스플래시 화면 페이드아웃
+      screenSplash.classList.remove('active');
+
+      // 스플래시 페이드아웃과 함께 온보딩 페이드인
+      setTimeout(() => {
+        screenOnboarding.classList.add('active');
+        updateSlider();
+        updateNavIndicator();
+        updateHomeIndicator();
+      }, 100);
+    }
+
+    /*
+     * 터치 이벤트: 스와이프로 슬라이드 전환
+     * 온보딩 화면에서만 작동
+     */
+    const iphoneFrame = document.getElementById('iphone');
+
+    // 터치 시작: 시작 위치 기억
+    iphoneFrame.addEventListener('touchstart', (e) => {
+      if (currentState !== 'onboarding') return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isDragging = true;
+    }, { passive: true });
+
+    // 터치 이동: 기본 스크롤 방지 (수평 스와이프 시)
+    iphoneFrame.addEventListener('touchmove', (e) => {
+      if (!isDragging || currentState !== 'onboarding') return;
+
+      const deltaX = e.touches[0].clientX - touchStartX;
+      const deltaY = e.touches[0].clientY - touchStartY;
+
+      // 수평 이동이 수직 이동보다 클 때만 슬라이드로 인식
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    // 터치 끝: 50px 이상 드래그했으면 슬라이드 전환
+    iphoneFrame.addEventListener('touchend', (e) => {
+      if (!isDragging || currentState !== 'onboarding') return;
+      isDragging = false;
+
+      const deltaX = e.changedTouches[0].clientX - touchStartX;
+      const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+      // 수평 스와이프 확인 (수직 이동이 40px 미만 + 수평 이동 50px 이상)
+      if (Math.abs(deltaX) > 50 && Math.abs(deltaY) < 40) {
+        if (deltaX < 0) {
+          // 왼쪽으로 스와이프: 다음 슬라이드
+          if (currentSlide < 2) {
+            nextSlide();
+          } else {
+            // 마지막 슬라이드에서 왼쪽 스와이프 → 로그인
+            goToLogin();
+          }
+        } else {
+          // 오른쪽으로 스와이프: 이전 슬라이드
+          if (currentSlide > 0) {
+            currentSlide--;
+            updateSlider();
+            updateNavIndicator();
+            updateHomeIndicator();
+          }
+        }
+      }
+    });
+
+    /*
+     * 마우스 드래그도 지원 (데스크톱 미리보기용)
+     */
+    let mouseStartX = 0;
+    let isMouseDragging = false;
+
+    iphoneFrame.addEventListener('mousedown', (e) => {
+      if (currentState !== 'onboarding') return;
+      mouseStartX = e.clientX;
+      isMouseDragging = true;
+      // 텍스트 선택 방지
+      e.preventDefault();
+    });
+
+    iphoneFrame.addEventListener('mousemove', (e) => {
+      if (!isMouseDragging) return;
+      e.preventDefault();
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (!isMouseDragging || currentState !== 'onboarding') {
+        isMouseDragging = false;
+        return;
+      }
+      isMouseDragging = false;
+
+      const deltaX = e.clientX - mouseStartX;
+
+      if (Math.abs(deltaX) > 50) {
+        if (deltaX < 0) {
+          // 왼쪽 드래그: 다음
+          if (currentSlide < 2) {
+            nextSlide();
+          } else {
+            goToLogin();
+          }
+        } else {
+          // 오른쪽 드래그: 이전
+          if (currentSlide > 0) {
+            currentSlide--;
+            updateSlider();
+            updateNavIndicator();
+            updateHomeIndicator();
+          }
+        }
+      }
+    });
+
+    /*
+     * 페이지 로드 완료 후 스플래시 자동 전환 시작
+     * 1500ms(1.5초) 후 온보딩 1로 이동
+     */
+    window.addEventListener('load', () => {
+      setTimeout(splashToOnboarding, 1500);
+    });
+
+  </script>
+
+</body>
+</html>

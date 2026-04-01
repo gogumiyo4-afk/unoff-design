@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNOFF Design System — Component Sheet</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+/* ── 리셋 & 기본 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  background: #FFFFFF;
+  color: #2E1F4E;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 페이지 레이아웃 ── */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px;
+}
+
+/* ── 섹션 헤더 ── */
+.section {
+  margin-bottom: 80px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.section-num {
+  font-size: 11px;
+  font-weight: 600;
+  color: #A899C4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2E1F4E;
+}
+.section-divider {
+  flex: 1;
+  height: 1px;
+  background: #DDD8CC;
+}
+
+/* ── 그리드 ── */
+.grid { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.grid-col { display: flex; flex-direction: column; gap: 12px; }
+
+/* ── 라벨 ── */
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #A899C4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.spec {
+  font-size: 11px;
+  color: #7E6BA6;
+  font-weight: 400;
+}
+
+/* ── 페이지 타이틀 ── */
+.page-title {
+  margin-bottom: 64px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #DDD8CC;
+}
+.page-title h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1A1A1A;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.page-title p {
+  font-size: 14px;
+  color: #7E6BA6;
+}
+
+/* ───────────────────────────────────────────
+   1. 컬러 팔레트
+─────────────────────────────────────────── */
+.swatch-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch-item { display: flex; flex-direction: column; gap: 6px; }
+.swatch {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+}
+.swatch-name { font-size: 10px; font-weight: 600; color: #2E1F4E; }
+.swatch-hex { font-size: 10px; color: #7E6BA6; font-family: monospace; }
+.gradient-swatch {
+  width: 220px;
+  height: 56px;
+  border-radius: 12px;
+}
+
+/* ───────────────────────────────────────────
+   2. 타이포그래피
+─────────────────────────────────────────── */
+.typo-row {
+  display: flex;
+  align-items: baseline;
+  gap: 32px;
+  padding: 20px 0;
+  border-bottom: 1px solid #F7F5F0;
+}
+.typo-row:last-child { border-bottom: none; }
+.typo-meta { width: 180px; flex-shrink: 0; }
+.typo-meta .label { display: block; margin-bottom: 2px; }
+.typo-meta .spec { display: block; }
+
+/* ───────────────────────────────────────────
+   3. 버튼
+─────────────────────────────────────────── */
+.btn-group { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.btn-label-block { display: flex; flex-direction: column; gap: 4px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: 12px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease-out;
+  text-decoration: none;
+  white-space: nowrap;
+  min-width: 180px;
+}
+.btn-primary { background: #00B4C5; color: #FFFFFF; }
+.btn-primary:hover { background: #33C5D3; }
+.btn-primary:active { background: #009BAA; transform: scale(0.97); }
+
+.btn-secondary {
+  background: transparent;
+  color: #5F4B8B;
+  border: 1.5px solid #A899C4;
+}
+.btn-secondary:hover { border-color: #7E6BA6; }
+.btn-secondary:active { transform: scale(0.97); opacity: 0.9; }
+
+.btn-text {
+  background: transparent;
+  color: #7E6BA6;
+  font-size: 14px;
+  font-weight: 400;
+  height: auto;
+  padding: 4px 0;
+  min-width: auto;
+  border-radius: 0;
+}
+.btn-text:active { color: #5F4B8B; }
+
+.btn-glass {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  backdrop-filter: blur(8px);
+}
+
+.btn-fab {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  padding: 0;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #5F4B8B 0%, #00B4C5 100%);
+  box-shadow: 0 4px 16px rgba(0, 180, 197, 0.35);
+  color: #FFFFFF;
+}
+
+/* 소셜 로그인 */
+.btn-kakao {
+  background: #FEE500;
+  color: #1A1A1A;
+  font-size: 15px;
+  gap: 10px;
+  min-width: 220px;
+}
+.btn-naver {
+  background: #03C75A;
+  color: #FFFFFF;
+  font-size: 15px;
+  gap: 10px;
+  min-width: 220px;
+}
+.btn-apple {
+  background: #000000;
+  color: #FFFFFF;
+  font-size: 15px;
+  gap: 10px;
+  min-width: 220px;
+}
+
+/* 버튼 상태 행 */
+.btn-states { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.state-tag {
+  font-size: 10px;
+  color: #A899C4;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: center;
+  margin-top: 4px;
+}
+.btn-onboarding-bg {
+  background: linear-gradient(135deg, #2E1F4E 0%, #5F4B8B 50%, #009BAA 100%);
+  padding: 24px;
+  border-radius: 16px;
+}
+
+/* ───────────────────────────────────────────
+   4. 상태 뱃지
+─────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.badge-off { background: #EDE9F5; color: #A899C4; }
+.badge-charging { background: #E0F5F8; color: #00B4C5; }
+.badge-on { background: #E0F5F8; color: #009BAA; }
+.badge-pause { background: #E8E4DA; color: #C9C3B5; }
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00B4C5;
+  display: inline-block;
+}
+
+/* ───────────────────────────────────────────
+   5. 반응 아이콘
+─────────────────────────────────────────── */
+.reaction-group { display: flex; gap: 24px; flex-wrap: wrap; }
+.reaction-item { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.reaction-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.reaction-inactive {
+  background: transparent;
+  color: #A899C4;
+}
+.reaction-active {
+  background: #E0F5F8;
+  color: #00B4C5;
+}
+
+/* ───────────────────────────────────────────
+   6. 카드
+─────────────────────────────────────────── */
+.post-card {
+  background: #FFFFFF;
+  border: 1px solid #DDD8CC;
+  border-radius: 12px;
+  padding: 16px;
+  width: 320px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.card-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #E8E4DA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.card-username { font-size: 13px; font-weight: 600; color: #2E1F4E; }
+.card-time { font-size: 11px; color: #A899C4; }
+.card-body {
+  font-size: 14px;
+  color: #2E1F4E;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  word-break: keep-all;
+}
+.card-footer {
+  display: flex;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #F7F5F0;
+}
+
+.hot-banner-card {
+  background: #2E1F4E;
+  border-radius: 12px;
+  padding: 20px;
+  width: 320px;
+  position: relative;
+  overflow: hidden;
+}
+.hot-banner-card::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(0,180,197,0.3) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hot-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #7DDAE3;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.hot-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+.hot-meta { font-size: 12px; color: #A899C4; margin-top: 12px; }
+
+/* 카테고리 칩 */
+.chip-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #DDD8CC;
+  background: transparent;
+  color: #5F4B8B;
+  transition: all 0.15s;
+  font-family: 'Pretendard', sans-serif;
+}
+.chip-active {
+  background: #E0F5F8;
+  border-color: #00B4C5;
+  color: #00B4C5;
+  font-weight: 600;
+}
+
+/* 프로필 카드 */
+.profile-card {
+  background: #FFFFFF;
+  border: 1px solid #DDD8CC;
+  border-radius: 12px;
+  padding: 20px;
+  width: 240px;
+}
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #E8E4DA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.profile-name { font-size: 15px; font-weight: 600; color: #2E1F4E; margin-bottom: 4px; }
+.battery-bar-wrap { margin-top: 12px; }
+.battery-bar-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: #7E6BA6;
+}
+.battery-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: #E8E4DA;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.battery-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #A899C4 0%, #00B4C5 100%);
+  transition: width 0.5s ease-out;
+}
+
+/* ───────────────────────────────────────────
+   7. 인풋 필드
+─────────────────────────────────────────── */
+.input-wrap { display: flex; flex-direction: column; gap: 6px; width: 300px; }
+.input-label-text { font-size: 12px; font-weight: 600; color: #5F4B8B; }
+.input-field {
+  width: 100%;
+  height: 48px;
+  background: #E8E4DA;
+  border: none;
+  border-radius: 8px;
+  padding: 0 16px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 15px;
+  color: #2E1F4E;
+  outline: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+.input-field::placeholder { color: #C9C3B5; }
+.input-field-focus {
+  border-bottom-color: #00B4C5;
+}
+.input-field-error {
+  border-bottom-color: #D4726A;
+}
+.input-error-msg { font-size: 12px; color: #D4726A; }
+
+/* 댓글 입력창 */
+.comment-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid #DDD8CC;
+  border-radius: 9999px;
+  padding: 8px 8px 8px 16px;
+  width: 300px;
+}
+.comment-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  color: #2E1F4E;
+  outline: none;
+}
+.comment-input::placeholder { color: #C9C3B5; }
+.comment-send-btn {
+  width: 32px;
+  height: 32px;
+  background: #00B4C5;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* ───────────────────────────────────────────
+   8. 네비게이션
+─────────────────────────────────────────── */
+.nav-frame {
+  background: #FFFFFF;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #DDD8CC;
+}
+.bottom-tab {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 64px;
+  background: #FFFFFF;
+  border-top: 1px solid #F0EDE5;
+  padding: 0 8px;
+  width: 360px;
+}
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  position: relative;
+}
+.tab-label { font-size: 10px; font-weight: 500; }
+.tab-active .tab-label { color: #2E1F4E; font-weight: 600; }
+.tab-inactive .tab-label { color: #A899C4; }
+.tab-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #00B4C5;
+  position: absolute;
+  bottom: 4px;
+}
+
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 20px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #F7F5F0;
+  width: 360px;
+}
+.header-logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1A1A1A;
+  letter-spacing: -0.03em;
+}
+
+.back-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 20px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #F7F5F0;
+  width: 360px;
+}
+.back-header-title { font-size: 17px; font-weight: 600; color: #2E1F4E; }
+
+.category-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 20px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #F0EDE5;
+  width: 360px;
+  overflow-x: auto;
+}
+.category-tab {
+  flex-shrink: 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+.category-tab-active {
+  color: #00B4C5;
+  font-weight: 600;
+}
+.category-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #00B4C5;
+  border-radius: 2px 2px 0 0;
+}
+.category-tab-inactive { color: #A899C4; }
+
+/* ───────────────────────────────────────────
+   9. 배터리 충전 시스템
+─────────────────────────────────────────── */
+.battery-levels { display: flex; flex-direction: column; gap: 16px; }
+.battery-level-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.battery-level-label { width: 120px; font-size: 13px; font-weight: 600; color: #2E1F4E; flex-shrink: 0; }
+.battery-level-sublabel { font-size: 11px; color: #A899C4; }
+.battery-track {
+  flex: 1;
+  max-width: 280px;
+  height: 8px;
+  background: #E8E4DA;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.battery-fill { height: 100%; border-radius: 9999px; }
+.bf-lv1 { width: 10%; background: #A899C4; }
+.bf-lv2 { width: 30%; background: linear-gradient(90deg, #7E6BA6, #7DDAE3); }
+.bf-lv3 { width: 55%; background: #7DDAE3; }
+.bf-lv4 { width: 72%; background: #33C5D3; }
+.bf-lv5 { width: 92%; background: #00B4C5; }
+.battery-pct { font-size: 12px; font-weight: 600; color: #5F4B8B; width: 36px; text-align: right; }
+
+/* ───────────────────────────────────────────
+   10. 모달 & 바텀시트
+─────────────────────────────────────────── */
+.modal-box {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  width: 320px;
+  border: 1px solid #DDD8CC;
+}
+.modal-title { font-size: 18px; font-weight: 700; color: #2E1F4E; margin-bottom: 8px; word-break: keep-all; }
+.modal-desc { font-size: 14px; color: #7E6BA6; line-height: 1.6; margin-bottom: 20px; word-break: keep-all; }
+.modal-btn-row { display: flex; gap: 8px; }
+.modal-btn-row .btn { flex: 1; min-width: 0; font-size: 15px; }
+
+.crisis-modal {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  width: 320px;
+  border: 2px solid #E0F5F8;
+}
+.crisis-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.crisis-icon {
+  width: 40px;
+  height: 40px;
+  background: #E0F5F8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+.crisis-title { font-size: 16px; font-weight: 700; color: #2E1F4E; word-break: keep-all; }
+.crisis-desc { font-size: 13px; color: #7E6BA6; margin-bottom: 16px; line-height: 1.6; word-break: keep-all; }
+.crisis-phone-list { display: flex; flex-direction: column; gap: 8px; }
+.crisis-phone-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F7F5F0;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.crisis-phone-name { font-size: 13px; font-weight: 600; color: #2E1F4E; }
+.crisis-phone-num { font-size: 15px; font-weight: 700; color: #00B4C5; font-variant-numeric: tabular-nums; }
+
+.bottom-sheet {
+  background: #FFFFFF;
+  border-radius: 20px 20px 0 0;
+  padding: 12px 0 0;
+  width: 360px;
+  border: 1px solid #DDD8CC;
+  border-bottom: none;
+}
+.sheet-handle-wrap { display: flex; justify-content: center; padding: 8px 0 16px; }
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: #DDD8CC;
+  border-radius: 9999px;
+}
+.sheet-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.sheet-option:hover { background: #F7F5F0; }
+.sheet-option-label { font-size: 15px; color: #2E1F4E; }
+.sheet-option-danger .sheet-option-label { color: #D4726A; }
+.sheet-sep { height: 1px; background: #F7F5F0; margin: 4px 0; }
+
+.teaser-modal {
+  background: linear-gradient(145deg, #2E1F4E 0%, #47366A 60%, #009BAA 100%);
+  border-radius: 20px;
+  padding: 32px 24px;
+  width: 320px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.teaser-modal::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(0,180,197,0.2) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.teaser-badge {
+  display: inline-block;
+  background: rgba(0,180,197,0.2);
+  color: #7DDAE3;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(125,218,227,0.3);
+  margin-bottom: 16px;
+}
+.teaser-title { font-size: 20px; font-weight: 700; color: #FFFFFF; margin-bottom: 8px; word-break: keep-all; }
+.teaser-desc { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 20px; word-break: keep-all; }
+.teaser-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 24px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 9999px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* ───────────────────────────────────────────
+   11. 빈 상태 (Empty State)
+─────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  width: 280px;
+}
+.empty-illust { width: 120px; height: 120px; }
+.empty-title { font-size: 16px; font-weight: 600; color: #2E1F4E; word-break: keep-all; line-height: 1.4; }
+.empty-desc { font-size: 14px; color: #A899C4; word-break: keep-all; line-height: 1.6; }
+
+/* ───────────────────────────────────────────
+   12. 토스트 & 알림
+─────────────────────────────────────────── */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  width: 300px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.toast-success { background: #E0F5F8; color: #009BAA; }
+.toast-error { background: #FDF2F1; color: #D4726A; }
+.toast-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #F7F5F0;
+  width: 340px;
+}
+.notif-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #E0F5F8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.notif-content { flex: 1; }
+.notif-text { font-size: 13px; color: #2E1F4E; line-height: 1.5; word-break: keep-all; }
+.notif-time { font-size: 11px; color: #A899C4; margin-top: 2px; }
+.notif-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00B4C5;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.notif-item-read { opacity: 0.6; }
+
+/* ───────────────────────────────────────────
+   13. 탭 아이콘
+─────────────────────────────────────────── */
+.icon-grid { display: flex; flex-wrap: wrap; gap: 24px; }
+.icon-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.icon-bg {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #F7F5F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-name { font-size: 10px; color: #7E6BA6; text-align: center; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 페이지 타이틀 -->
+  <div class="page-title">
+    <h1>unoff — Design System</h1>
+    <p>UI 컴포넌트 & 디자인 오브젝트 종합 레퍼런스 시트 · Figma 작업 참조용 · 2026-03-16</p>
+  </div>
+
+  <!-- ──────────────────────────────────────
+       1. 컬러 팔레트
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">컬러 팔레트</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- Violet -->
+    <div class="grid-col" style="margin-bottom:32px;">
+      <div class="label">Ultra Violet — 깊이의 색</div>
+      <div class="swatch-row">
+        <div class="swatch-item">
+          <div class="swatch" style="background:#2E1F4E;"></div>
+          <div class="swatch-name">Violet 900</div>
+          <div class="swatch-hex">#2E1F4E</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#47366A;"></div>
+          <div class="swatch-name">Violet 700</div>
+          <div class="swatch-hex">#47366A</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#5F4B8B;"></div>
+          <div class="swatch-name">Violet 500</div>
+          <div class="swatch-hex">#5F4B8B</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#7E6BA6;"></div>
+          <div class="swatch-name">Violet 400</div>
+          <div class="swatch-hex">#7E6BA6</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#A899C4;"></div>
+          <div class="swatch-name">Violet 300</div>
+          <div class="swatch-hex">#A899C4</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#D0C7E0;"></div>
+          <div class="swatch-name">Violet 200</div>
+          <div class="swatch-hex">#D0C7E0</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#EDE9F5; border:1px solid #DDD8CC;"></div>
+          <div class="swatch-name">Violet 100</div>
+          <div class="swatch-hex">#EDE9F5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scuba -->
+    <div class="grid-col" style="margin-bottom:32px;">
+      <div class="label">Scuba Blue — 충전의 색</div>
+      <div class="swatch-row">
+        <div class="swatch-item">
+          <div class="swatch" style="background:#009BAA;"></div>
+          <div class="swatch-name">Scuba 600</div>
+          <div class="swatch-hex">#009BAA</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#00B4C5;"></div>
+          <div class="swatch-name">Scuba 500</div>
+          <div class="swatch-hex">#00B4C5</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#33C5D3;"></div>
+          <div class="swatch-name">Scuba 400</div>
+          <div class="swatch-hex">#33C5D3</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#7DDAE3;"></div>
+          <div class="swatch-name">Scuba 300</div>
+          <div class="swatch-hex">#7DDAE3</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#B3E9EF; border:1px solid #DDD8CC;"></div>
+          <div class="swatch-name">Scuba 200</div>
+          <div class="swatch-hex">#B3E9EF</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#E0F5F8; border:1px solid #DDD8CC;"></div>
+          <div class="swatch-name">Scuba 100</div>
+          <div class="swatch-hex">#E0F5F8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cloud -->
+    <div class="grid-col" style="margin-bottom:32px;">
+      <div class="label">Cloud Dancer — 안식의 색</div>
+      <div class="swatch-row">
+        <div class="swatch-item">
+          <div class="swatch" style="background:#F0EDE5; border:1px solid #DDD8CC;"></div>
+          <div class="swatch-name">Cloud 500</div>
+          <div class="swatch-hex">#F0EDE5</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#E8E4DA;"></div>
+          <div class="swatch-name">Cloud 400</div>
+          <div class="swatch-hex">#E8E4DA</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#DDD8CC;"></div>
+          <div class="swatch-name">Cloud 300</div>
+          <div class="swatch-hex">#DDD8CC</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#C9C3B5;"></div>
+          <div class="swatch-name">Cloud 200</div>
+          <div class="swatch-hex">#C9C3B5</div>
+        </div>
+        <div class="swatch-item">
+          <div class="swatch" style="background:#F7F5F0; border:1px solid #DDD8CC;"></div>
+          <div class="swatch-name">Cloud 100</div>
+          <div class="swatch-hex">#F7F5F0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Semantic + Mono -->
+    <div class="grid" style="margin-bottom:32px;">
+      <div class="grid-col">
+        <div class="label">Semantic</div>
+        <div class="swatch-row">
+          <div class="swatch-item">
+            <div class="swatch" style="background:#00B4C5;"></div>
+            <div class="swatch-name">Success</div>
+            <div class="swatch-hex">#00B4C5</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch" style="background:#E8A443;"></div>
+            <div class="swatch-name">Warning</div>
+            <div class="swatch-hex">#E8A443</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch" style="background:#D4726A;"></div>
+            <div class="swatch-name">Error</div>
+            <div class="swatch-hex">#D4726A</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch" style="background:#7E6BA6;"></div>
+            <div class="swatch-name">Info</div>
+            <div class="swatch-hex">#7E6BA6</div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-col">
+        <div class="label">Neutral</div>
+        <div class="swatch-row">
+          <div class="swatch-item">
+            <div class="swatch" style="background:#1A1A1A;"></div>
+            <div class="swatch-name">Black</div>
+            <div class="swatch-hex">#1A1A1A</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch" style="background:#FFFFFF; border:1px solid #DDD8CC;"></div>
+            <div class="swatch-name">White</div>
+            <div class="swatch-hex">#FFFFFF</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 그라데이션 -->
+    <div class="grid-col">
+      <div class="label">오로라 그라데이션 — FAB · 구분선 · 특수 배너 전용</div>
+      <div class="swatch-row">
+        <div class="swatch-item">
+          <div class="gradient-swatch" style="background: linear-gradient(90deg, #5F4B8B 0%, #00B4C5 100%);"></div>
+          <div class="swatch-name">Twilight (가로)</div>
+          <div class="swatch-hex">Violet 500 → Scuba 500</div>
+        </div>
+        <div class="swatch-item">
+          <div class="gradient-swatch" style="background: linear-gradient(135deg, #5F4B8B 0%, #00B4C5 100%);"></div>
+          <div class="swatch-name">Twilight (대각선)</div>
+          <div class="swatch-hex">135deg · FAB 전용</div>
+        </div>
+        <div class="swatch-item">
+          <div class="gradient-swatch" style="background: linear-gradient(180deg, #47366A 0%, #009BAA 100%);"></div>
+          <div class="swatch-name">Dawn (세로)</div>
+          <div class="swatch-hex">Violet 700 → Scuba 600</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       2. 타이포그래피 스케일
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">타이포그래피 스케일</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">H1</span>
+        <span class="spec">28px · Bold 700 · lh 36px</span>
+      </div>
+      <span style="font-size:28px; font-weight:700; color:#2E1F4E; letter-spacing:-0.02em; line-height:36px; word-break:keep-all;">지금 어떤 상태든 괜찮아</span>
+    </div>
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">H2</span>
+        <span class="spec">24px · Bold 700 · lh 32px</span>
+      </div>
+      <span style="font-size:24px; font-weight:700; color:#2E1F4E; letter-spacing:-0.015em; line-height:32px;">배터리 조금씩 오르고 있어</span>
+    </div>
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">H3</span>
+        <span class="spec">20px · SemiBold 600 · lh 28px</span>
+      </div>
+      <span style="font-size:20px; font-weight:600; color:#2E1F4E; line-height:28px;">면접 공백기 어떻게 설명해요</span>
+    </div>
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">H4</span>
+        <span class="spec">17px · SemiBold 600 · lh 24px</span>
+      </div>
+      <span style="font-size:17px; font-weight:600; color:#2E1F4E; line-height:24px;">오늘의 이야기 — 취업 준비</span>
+    </div>
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">Body L</span>
+        <span class="spec">16px · Regular 400 · lh 24px</span>
+      </div>
+      <span style="font-size:16px; font-weight:400; color:#2E1F4E; line-height:24px; word-break:keep-all;">여기에 마음 편히 적어봐. 여기선 모두 OFF 중이야.</span>
+    </div>
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">Body M</span>
+        <span class="spec">15px · Regular 400 · lh 22px</span>
+      </div>
+      <span style="font-size:15px; font-weight:400; color:#2E1F4E; line-height:22px; word-break:keep-all;">6개월째 OFF 중인데 요즘 조금씩 배터리가 차오르는 것 같아.</span>
+    </div>
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">Body S</span>
+        <span class="spec">14px · Regular 400 · lh 20px</span>
+      </div>
+      <span style="font-size:14px; font-weight:400; color:#7E6BA6; line-height:20px; word-break:keep-all;">나도 그랬어. 흔한 일이야. 천천히 가도 돼.</span>
+    </div>
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">Caption</span>
+        <span class="spec">12px · Regular 400 · lh 16px</span>
+      </div>
+      <span style="font-size:12px; font-weight:400; color:#A899C4; line-height:16px;">3분 전 · 익명의 충전기 · 게시판</span>
+    </div>
+    <div class="typo-row">
+      <div class="typo-meta">
+        <span class="label">Overline</span>
+        <span class="spec">11px · SemiBold 600 · lh 16px · ls 0.06em</span>
+      </div>
+      <span style="font-size:11px; font-weight:600; color:#A899C4; line-height:16px; letter-spacing:0.06em; text-transform:uppercase;">충전 중 · OFF · 잠깐 멈춤</span>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       3. 버튼
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">버튼</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="grid">
+      <!-- Primary -->
+      <div class="grid-col">
+        <div class="label">Primary</div>
+        <div class="spec">Scuba 500 · White · radius 12 · h52</div>
+        <div class="btn-states">
+          <div>
+            <button class="btn btn-primary">여기 있어도 돼</button>
+            <div class="state-tag">Default</div>
+          </div>
+          <div>
+            <button class="btn btn-primary" style="background:#33C5D3;">여기 있어도 돼</button>
+            <div class="state-tag">Hover</div>
+          </div>
+          <div>
+            <button class="btn btn-primary" style="background:#009BAA; transform:scale(0.97);">여기 있어도 돼</button>
+            <div class="state-tag">Pressed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary -->
+      <div class="grid-col">
+        <div class="label">Secondary</div>
+        <div class="spec">transparent · Violet 300 border 1.5px · Violet 500 text</div>
+        <div class="btn-states">
+          <div>
+            <button class="btn btn-secondary">나중에</button>
+            <div class="state-tag">Default</div>
+          </div>
+          <div>
+            <button class="btn btn-secondary" style="border-color:#7E6BA6;">나중에</button>
+            <div class="state-tag">Hover</div>
+          </div>
+          <div>
+            <button class="btn btn-secondary" style="transform:scale(0.97); opacity:0.9;">나중에</button>
+            <div class="state-tag">Pressed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Button -->
+      <div class="grid-col">
+        <div class="label">Text Button</div>
+        <div class="spec">Violet 400 · no background · 14px Regular</div>
+        <div class="btn-states">
+          <div>
+            <button class="btn btn-text">궁금하면 봐</button>
+            <div class="state-tag">Default</div>
+          </div>
+          <div>
+            <button class="btn btn-text" style="color:#5F4B8B;">궁금하면 봐</button>
+            <div class="state-tag">Pressed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Glass Button -->
+      <div class="grid-col">
+        <div class="label">Glass Button</div>
+        <div class="spec">rgba(255,255,255,0.15) · White border 0.38 · 온보딩 전용</div>
+        <div class="btn-onboarding-bg">
+          <button class="btn btn-glass">들어와 볼래?</button>
+        </div>
+      </div>
+
+      <!-- FAB -->
+      <div class="grid-col">
+        <div class="label">FAB</div>
+        <div class="spec">오로라 그라데이션 · 56×56 · radius full</div>
+        <button class="btn btn-fab">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 소셜 로그인 -->
+      <div class="grid-col">
+        <div class="label">소셜 로그인</div>
+        <div class="spec">카카오 · 네이버 · Apple</div>
+        <div class="btn-group">
+          <button class="btn btn-kakao">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M9 1.5C4.86 1.5 1.5 4.13 1.5 7.37c0 2.09 1.38 3.93 3.46 4.98l-.88 3.26 3.82-2.51c.34.05.7.08 1.06.08 4.14 0 7.5-2.63 7.5-5.87C16.5 4.13 13.14 1.5 9 1.5z" fill="#1A1A1A"/>
+            </svg>
+            카카오로 시작하기
+          </button>
+          <button class="btn btn-naver">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M10.2 9.27L7.56 5H5v8h2.8V8.73L10.44 13H13V5h-2.8v4.27z" fill="white"/>
+            </svg>
+            네이버로 시작하기
+          </button>
+          <button class="btn btn-apple">
+            <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
+              <path d="M13.16 9.55c-.02-2.07 1.69-3.07 1.77-3.12-1.34-1.78-2.8-1.82-3.08-1.83-1.7-.06-2.83 1.13-3.47 1.13-.65 0-1.71-1.1-3.18-1.08C3.34 4.67 1.76 5.7 1 7.25c-1.27 2.31-.33 5.76 1.05 7.65.63.88 1.38 1.88 2.36 1.84.95-.04 1.3-.61 2.44-.61 1.14 0 1.45.61 2.44.59.99-.02 1.63-.9 2.27-1.79.71-.99 1.01-1.96 1.02-2.01-.02-.01-1.42-.5-1.42-2.37z" fill="white"/>
+              <path d="M10.91 2.35C11.42 1.7 11.77.8 11.67 0c-.82.04-1.82.56-2.36 1.2-.5.57-.95 1.49-.83 2.37.86.06 1.78-.43 2.43-1.22z" fill="white"/>
+            </svg>
+            Apple로 시작하기
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       4. 상태 뱃지
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">상태 뱃지 (ON/OFF)</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="grid" style="align-items:center;">
+      <div class="grid-col" style="align-items:flex-start; gap:16px;">
+        <div>
+          <span class="badge badge-off">OFF</span>
+          <div class="spec" style="margin-top:6px;">Violet 100 bg · Violet 300 text · radius full · h24 px12</div>
+        </div>
+        <div>
+          <span class="badge badge-charging">충전 중</span>
+          <div class="spec" style="margin-top:6px;">Scuba 100 bg · Scuba 500 text</div>
+        </div>
+        <div>
+          <span class="badge badge-on"><span class="badge-dot"></span>ON</span>
+          <div class="spec" style="margin-top:6px;">Scuba 100 bg · Scuba 600 text · 미니 도트</div>
+        </div>
+        <div>
+          <span class="badge badge-pause">잠깐 멈춤</span>
+          <div class="spec" style="margin-top:6px;">Cloud 400 bg · Cloud 200 text</div>
+        </div>
+      </div>
+      <div class="grid-col" style="background:#F7F5F0; padding:24px; border-radius:12px; gap:12px;">
+        <div class="spec">실사용 예시 — 프로필 뱃지</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="badge badge-off">OFF</span>
+          <span class="badge badge-charging">충전 중</span>
+          <span class="badge badge-on"><span class="badge-dot"></span>ON</span>
+          <span class="badge badge-pause">잠깐 멈춤</span>
+        </div>
+        <div class="spec">Overline · 11px SemiBold · letter-spacing 0.03em</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       5. 반응 아이콘
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">반응 아이콘</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="reaction-group">
+      <!-- 같아요 -->
+      <div class="reaction-item">
+        <div class="label" style="text-align:center;">같아요 🤝</div>
+        <div style="display:flex; gap:12px;">
+          <div>
+            <button class="reaction-btn reaction-inactive">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7 11V20H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3zm0 0l4-8a3 3 0 0 1 3 3v2h4.5a1.5 1.5 0 0 1 1.46 1.84l-1.5 6A1.5 1.5 0 0 1 17 16H7V11z" stroke="#A899C4" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              같아요 24
+            </button>
+            <div class="state-tag">비활성</div>
+          </div>
+          <div>
+            <button class="reaction-btn reaction-active">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7 11V20H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3zm0 0l4-8a3 3 0 0 1 3 3v2h4.5a1.5 1.5 0 0 1 1.46 1.84l-1.5 6A1.5 1.5 0 0 1 17 16H7V11z" stroke="#00B4C5" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              같아요 25
+            </button>
+            <div class="state-tag">활성</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 힘내요 -->
+      <div class="reaction-item">
+        <div class="label" style="text-align:center;">힘내요 💪</div>
+        <div style="display:flex; gap:12px;">
+          <div>
+            <button class="reaction-btn reaction-inactive">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 3 6.5 5.5 6.5 8.5c0 1.5.6 2.8 1.5 3.8L12 17l4-4.7c.9-1 1.5-2.3 1.5-3.8C17.5 5.5 15 3 12 3z" stroke="#A899C4" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 17v4" stroke="#A899C4" stroke-width="1.5" stroke-linecap="round"/></svg>
+              힘내요 8
+            </button>
+            <div class="state-tag">비활성</div>
+          </div>
+          <div>
+            <button class="reaction-btn reaction-active">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3C9 3 6.5 5.5 6.5 8.5c0 1.5.6 2.8 1.5 3.8L12 17l4-4.7c.9-1 1.5-2.3 1.5-3.8C17.5 5.5 15 3 12 3z" stroke="#00B4C5" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 17v4" stroke="#00B4C5" stroke-width="1.5" stroke-linecap="round"/></svg>
+              힘내요 9
+            </button>
+            <div class="state-tag">활성</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 나도 그랬어 -->
+      <div class="reaction-item">
+        <div class="label" style="text-align:center;">나도 그랬어 💭</div>
+        <div style="display:flex; gap:12px;">
+          <div>
+            <button class="reaction-btn reaction-inactive">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H4z" stroke="#A899C4" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 20l4-4 4 4" stroke="#A899C4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              나도 그랬어 5
+            </button>
+            <div class="state-tag">비활성</div>
+          </div>
+          <div>
+            <button class="reaction-btn reaction-active">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H4z" stroke="#00B4C5" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 20l4-4 4 4" stroke="#00B4C5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              나도 그랬어 6
+            </button>
+            <div class="state-tag">활성</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec" style="margin-top:16px;">활성: Scuba 500 컬러 + Scuba 100 배경 원형 · 비활성: Violet 300 컬러</div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       6. 카드 컴포넌트
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">카드 컴포넌트</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="grid">
+      <!-- 게시글 카드 -->
+      <div class="grid-col">
+        <div class="label">게시글 카드</div>
+        <div class="spec">White bg · Cloud 300 border 1px · radius 12 · padding 16</div>
+        <div class="post-card">
+          <div class="card-header">
+            <div class="card-user">
+              <div class="card-avatar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#A899C4" stroke-width="1.5"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#A899C4" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div class="card-username">익명의 충전기</div>
+                <div class="card-time">3분 전</div>
+              </div>
+            </div>
+            <span class="badge badge-charging">충전 중</span>
+          </div>
+          <div class="card-body">
+            면접에서 공백기 어떻게 설명해요? 저만 어려운 건지 모르겠어서요. 다들 어떻게 하셨나요?
+          </div>
+          <div class="card-footer">
+            <button class="reaction-btn reaction-active" style="font-size:12px; padding:4px 8px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M7 11V20H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3zm0 0l4-8a3 3 0 0 1 3 3v2h4.5a1.5 1.5 0 0 1 1.46 1.84l-1.5 6A1.5 1.5 0 0 1 17 16H7V11z" stroke="#00B4C5" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              같아요 42
+            </button>
+            <button class="reaction-btn reaction-inactive" style="font-size:12px; padding:4px 8px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H4z" stroke="#A899C4" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              댓글 12
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 핫 배너 카드 -->
+      <div class="grid-col">
+        <div class="label">핫 배너 카드</div>
+        <div class="spec">Violet 900 bg · White text · radius 12</div>
+        <div class="hot-banner-card">
+          <div class="hot-label">HOT</div>
+          <div class="hot-title">71.7만 명이 지금 같이 쉬고 있어. 너만 혼자가 아니야.</div>
+          <div class="hot-meta">오늘의 이야기 · 게시판</div>
+        </div>
+      </div>
+
+      <!-- 카테고리 칩 -->
+      <div class="grid-col">
+        <div class="label">카테고리 칩</div>
+        <div class="spec">비선택: Cloud 300 border · 선택: Scuba 100 bg + Scuba 500 border</div>
+        <div class="chip-group">
+          <button class="chip chip-active">전체</button>
+          <button class="chip">취업 고민</button>
+          <button class="chip">일상 이야기</button>
+          <button class="chip">공백기 팁</button>
+          <button class="chip">ON 성공</button>
+        </div>
+      </div>
+
+      <!-- 프로필 카드 -->
+      <div class="grid-col">
+        <div class="label">프로필 카드</div>
+        <div class="spec">White bg · Cloud 300 border · avatar 64×64</div>
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="profile-avatar">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#A899C4" stroke-width="1.5"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#A899C4" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="profile-name">조용한 충전기</div>
+              <span class="badge badge-on" style="margin-top:4px;"><span class="badge-dot"></span>ON</span>
+            </div>
+          </div>
+          <div class="battery-bar-wrap">
+            <div class="battery-bar-label">
+              <span>배터리</span>
+              <span>Lv.4 · 72%</span>
+            </div>
+            <div class="battery-bar-bg">
+              <div class="battery-bar-fill" style="width:72%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       7. 인풋 필드
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">인풋 필드</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="grid">
+      <div class="grid-col">
+        <div class="label">Default</div>
+        <div class="spec">Cloud 400 bg · Violet 300 placeholder · radius 8 · h48</div>
+        <div class="input-wrap">
+          <span class="input-label-text">닉네임</span>
+          <input class="input-field" type="text" placeholder="여기에 마음 편히 적어봐" readonly>
+        </div>
+      </div>
+
+      <div class="grid-col">
+        <div class="label">Focus</div>
+        <div class="spec">Cloud 400 bg + Scuba 500 하단 보더 2px</div>
+        <div class="input-wrap">
+          <span class="input-label-text">닉네임</span>
+          <input class="input-field input-field-focus" type="text" value="조용한 충전기" readonly>
+        </div>
+      </div>
+
+      <div class="grid-col">
+        <div class="label">Error</div>
+        <div class="spec">Cloud 400 bg + Error 하단 보더 2px + 에러 메시지</div>
+        <div class="input-wrap">
+          <span class="input-label-text">이메일</span>
+          <input class="input-field input-field-error" type="text" value="잘못된 형식" readonly>
+          <span class="input-error-msg">이메일 형식을 확인해봐.</span>
+        </div>
+      </div>
+
+      <div class="grid-col">
+        <div class="label">댓글 입력창</div>
+        <div class="spec">White bg + Cloud 300 border + 전송 버튼</div>
+        <div class="comment-input-wrap">
+          <input class="comment-input" type="text" placeholder="조용히 한마디..." readonly>
+          <button class="comment-send-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M12 5l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       8. 네비게이션
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">네비게이션</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="grid" style="flex-direction:column; gap:32px;">
+      <!-- 상단 헤더 -->
+      <div class="grid-col">
+        <div class="label">상단 헤더 — unoff 로고 + 검색</div>
+        <div class="nav-frame">
+          <div class="top-header">
+            <span class="header-logo">unoff</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#5F4B8B" stroke-width="1.5"/><path d="M16.5 16.5L21 21" stroke="#5F4B8B" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 뒤로가기 헤더 -->
+      <div class="grid-col">
+        <div class="label">뒤로가기 헤더 — 화살표 + 제목</div>
+        <div class="nav-frame">
+          <div class="back-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="#5F4B8B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="back-header-title">게시글 상세</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 카테고리 탭 -->
+      <div class="grid-col">
+        <div class="label">카테고리 탭 — 수평 스크롤, 활성/비활성</div>
+        <div class="nav-frame">
+          <div class="category-tabs">
+            <div class="category-tab category-tab-active">전체</div>
+            <div class="category-tab category-tab-inactive">취업 고민</div>
+            <div class="category-tab category-tab-inactive">일상 이야기</div>
+            <div class="category-tab category-tab-inactive">공백기 팁</div>
+            <div class="category-tab category-tab-inactive">ON 성공</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 탭바 -->
+      <div class="grid-col">
+        <div class="label">하단 탭바 — 4탭, 활성/비활성</div>
+        <div class="spec">White bg · 상단 shadow 0 -1px 4px rgba(46,31,78,0.04) · h64</div>
+        <div class="nav-frame">
+          <div class="bottom-tab">
+            <!-- 홈 (활성) -->
+            <div class="tab-item tab-active">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M3 10.5L12 3L21 10.5V20a1 1 0 0 1-1 1H15v-5h-6v5H4a1 1 0 0 1-1-1V10.5z" stroke="#2E1F4E" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+              <span class="tab-label">홈</span>
+              <div class="tab-dot"></div>
+            </div>
+            <!-- 게시판 (비활성) -->
+            <div class="tab-item tab-inactive">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M4 4h16v12H4z" stroke="#A899C4" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M8 20l4-4 4 4" stroke="#A899C4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="tab-label">게시판</span>
+            </div>
+            <!-- 알림 (비활성 + 도트) -->
+            <div class="tab-item tab-inactive" style="position:relative;">
+              <div style="position:relative; display:inline-block;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 10a6 6 0 1 1 12 0v5l2 2H4l2-2V10z" stroke="#A899C4" stroke-width="1.5" stroke-linejoin="round"/>
+                  <path d="M10 19a2 2 0 0 0 4 0" stroke="#A899C4" stroke-width="1.5"/>
+                </svg>
+                <div style="position:absolute; top:1px; right:1px; width:8px; height:8px; background:#00B4C5; border-radius:50%; border:1.5px solid white;"></div>
+              </div>
+              <span class="tab-label">알림</span>
+            </div>
+            <!-- MY (비활성) -->
+            <div class="tab-item tab-inactive">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="5" y="3" width="14" height="18" rx="2" stroke="#A899C4" stroke-width="1.5"/>
+                <rect x="8" y="3" width="8" height="3" rx="1" stroke="#A899C4" stroke-width="1.5"/>
+                <rect x="8" y="9" width="8" height="6" rx="1" stroke="#A899C4" stroke-width="1" stroke-dasharray="0.5 2.5"/>
+                <path d="M9 19h6" stroke="#A899C4" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span class="tab-label">MY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       9. 배터리 충전 시스템
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <span class="section-title">배터리 충전 시스템</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="battery-levels">
+      <div class="battery-level-row">
+        <div class="battery-level-label">Lv.1 <span class="battery-level-sublabel">방전</span></div>
+        <div class="battery-track"><div class="battery-fill bf-lv1"></div></div>
+        <div class="battery-pct">10%</div>
+        <div class="spec">Violet 300</div>
+      </div>
+      <div class="battery-level-row">
+        <div class="battery-level-label">Lv.2 <span class="battery-level-sublabel">충전 시작</span></div>
+        <div class="battery-track"><div class="battery-fill bf-lv2"></div></div>
+        <div class="battery-pct">30%</div>
+        <div class="spec">Violet 400 → Scuba 300</div>
+      </div>
+      <div class="battery-level-row">
+        <div class="battery-level-label">Lv.3 <span class="battery-level-sublabel">절반 충전</span></div>
+        <div class="battery-track"><div class="battery-fill bf-lv3"></div></div>
+        <div class="battery-pct">55%</div>
+        <div class="spec">Scuba 300</div>
+      </div>
+      <div class="battery-level-row">
+        <div class="battery-level-label">Lv.4 <span class="battery-level-sublabel">거의 다 됐어</span></div>
+        <div class="battery-track"><div class="battery-fill bf-lv4"></div></div>
+        <div class="battery-pct">72%</div>
+        <div class="spec">Scuba 400</div>
+      </div>
+      <div class="battery-level-row">
+        <div class="battery-level-label">Lv.5 <span class="battery-level-sublabel">완충</span></div>
+        <div class="battery-track"><div class="battery-fill bf-lv5"></div></div>
+        <div class="battery-pct">92%</div>
+        <div class="spec">Scuba 500</div>
+      </div>
+    </div>
+
+    <div class="spec" style="margin-top:20px;">배경: Cloud 400 #E8E4DA · 애니메이션: 0.5s ease-out · 트랙 h8 radius full</div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       10. 모달 & 바텀시트
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <span class="section-title">모달 & 바텀시트</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="grid">
+      <!-- 확인 모달 -->
+      <div class="grid-col">
+        <div class="label">확인 모달</div>
+        <div class="modal-box">
+          <div class="modal-title">정말 삭제할까요?</div>
+          <div class="modal-desc">삭제한 게시글은 다시 복구할 수 없어. 그래도 지울래?</div>
+          <div class="modal-btn-row">
+            <button class="btn btn-secondary" style="font-size:15px; height:44px;">아니, 둘게</button>
+            <button class="btn" style="background:#D4726A; color:white; font-size:15px; height:44px;">삭제할게</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 위기 감지 팝업 -->
+      <div class="grid-col">
+        <div class="label">위기 감지 팝업</div>
+        <div class="crisis-modal">
+          <div class="crisis-top">
+            <div class="crisis-icon">💙</div>
+            <div class="crisis-title">잠깐, 지금 많이 힘들지?</div>
+          </div>
+          <div class="crisis-desc">혼자 버티지 않아도 돼. 언제든 전화해도 괜찮아.</div>
+          <div class="crisis-phone-list">
+            <div class="crisis-phone-item">
+              <span class="crisis-phone-name">자살예방상담전화</span>
+              <span class="crisis-phone-num">1393</span>
+            </div>
+            <div class="crisis-phone-item">
+              <span class="crisis-phone-name">정신건강 위기상담</span>
+              <span class="crisis-phone-num">1577-0199</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 바텀시트 -->
+      <div class="grid-col">
+        <div class="label">바텀시트</div>
+        <div class="spec">드래그 핸들 40×4 · Cloud 300 · radius 20 20 0 0</div>
+        <div class="bottom-sheet">
+          <div class="sheet-handle-wrap">
+            <div class="sheet-handle"></div>
+          </div>
+          <div class="sheet-option">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M11 4H4v15a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9l-5-5zm0 0v5h5" stroke="#5F4B8B" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span class="sheet-option-label">수정하기</span>
+          </div>
+          <div class="sheet-option">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M8.59 5.41a2 2 0 0 1 2.83 0l7.17 7.17a2 2 0 0 1 0 2.83l-2.83 2.83a2 2 0 0 1-2.83 0L5.76 11.07a2 2 0 0 1 0-2.83L8.59 5.41z" stroke="#5F4B8B" stroke-width="1.5"/></svg>
+            <span class="sheet-option-label">공유하기</span>
+          </div>
+          <div class="sheet-sep"></div>
+          <div class="sheet-option sheet-option-danger">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#D4726A" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span class="sheet-option-label">삭제하기</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 곧 만나요 티저 -->
+      <div class="grid-col">
+        <div class="label">"곧 만나요" 티저 모달</div>
+        <div class="teaser-modal">
+          <div class="teaser-badge">COMING SOON</div>
+          <div class="teaser-title">공동구매 모임, 곧 만나요</div>
+          <div class="teaser-desc">같이 OFF 중인 사람들과 실제로 만나볼 수 있는 공간을 준비하고 있어.</div>
+          <button class="teaser-cta">알림 받을게</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       11. 빈 상태 (Empty State)
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <span class="section-title">빈 상태 (Empty State)</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="grid">
+      <!-- 피드 비어있을 때 -->
+      <div class="grid-col">
+        <div class="label">피드 — 비어있을 때</div>
+        <div class="empty-state">
+          <svg class="empty-illust" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 구름 배경 -->
+            <ellipse cx="60" cy="90" rx="40" ry="8" fill="#F0EDE5"/>
+            <!-- 큰 구름 -->
+            <circle cx="50" cy="72" r="16" fill="#EDE9F5"/>
+            <circle cx="66" cy="68" r="20" fill="#EDE9F5"/>
+            <circle cx="78" cy="74" r="12" fill="#EDE9F5"/>
+            <circle cx="38" cy="76" r="10" fill="#EDE9F5"/>
+            <!-- 별 -->
+            <circle cx="30" cy="30" r="2.5" fill="#7DDAE3" opacity="0.7"/>
+            <circle cx="88" cy="24" r="2" fill="#A899C4" opacity="0.5"/>
+            <circle cx="72" cy="38" r="1.5" fill="#7DDAE3" opacity="0.4"/>
+            <circle cx="20" cy="50" r="1.5" fill="#A899C4" opacity="0.3"/>
+            <circle cx="95" cy="48" r="2" fill="#7DDAE3" opacity="0.5"/>
+            <!-- 빈 말풍선 -->
+            <rect x="36" y="44" width="48" height="32" rx="10" fill="#FFFFFF" stroke="#DDD8CC" stroke-width="1.5"/>
+            <path d="M52 76 L48 84 L60 76" fill="#FFFFFF" stroke="#DDD8CC" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- 점점점 -->
+            <circle cx="48" cy="60" r="3" fill="#DDD8CC"/>
+            <circle cx="60" cy="60" r="3" fill="#DDD8CC"/>
+            <circle cx="72" cy="60" r="3" fill="#DDD8CC"/>
+          </svg>
+          <div class="empty-title">아직 조용해.<br>네가 첫 이야기를 시작해볼래?</div>
+          <div class="empty-desc">지금 어떤 상태든 괜찮아.</div>
+        </div>
+      </div>
+
+      <!-- 검색 결과 없을 때 -->
+      <div class="grid-col">
+        <div class="label">검색 — 결과 없을 때</div>
+        <div class="empty-state">
+          <svg class="empty-illust" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 그림자 -->
+            <ellipse cx="60" cy="100" rx="30" ry="6" fill="#F0EDE5"/>
+            <!-- 별 장식 -->
+            <circle cx="25" cy="28" r="2" fill="#7DDAE3" opacity="0.5"/>
+            <circle cx="92" cy="32" r="2.5" fill="#A899C4" opacity="0.4"/>
+            <circle cx="85" cy="58" r="1.5" fill="#7DDAE3" opacity="0.3"/>
+            <!-- 돋보기 원형 -->
+            <circle cx="52" cy="55" r="28" fill="#EDE9F5" stroke="#D0C7E0" stroke-width="2"/>
+            <circle cx="52" cy="55" r="20" fill="#FFFFFF" stroke="#DDD8CC" stroke-width="1.5"/>
+            <!-- 물음표 -->
+            <text x="44" y="63" font-size="22" font-family="Pretendard, sans-serif" font-weight="700" fill="#A899C4">?</text>
+            <!-- 돋보기 손잡이 -->
+            <line x1="74" y1="76" x2="92" y2="94" stroke="#C9C3B5" stroke-width="6" stroke-linecap="round"/>
+            <!-- 떠다니는 원 -->
+            <circle cx="22" cy="72" r="6" fill="#E0F5F8" opacity="0.8"/>
+            <circle cx="96" cy="65" r="4" fill="#EDE9F5" opacity="0.8"/>
+          </svg>
+          <div class="empty-title">찾는 이야기가 없어.<br>다른 키워드로 해볼까?</div>
+          <div class="empty-desc">공백기, 취업 고민, 일상 이야기</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       12. 토스트 & 알림
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <span class="section-title">토스트 & 알림</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="grid" style="flex-direction:column; gap:40px;">
+      <!-- 토스트 -->
+      <div class="grid-col">
+        <div class="label">토스트 메시지</div>
+        <div class="grid" style="gap:16px;">
+          <div>
+            <div class="toast toast-success">
+              <div class="toast-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#009BAA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              게시글이 등록됐어.
+            </div>
+            <div class="spec" style="margin-top:6px;">성공 · Scuba 100 bg · Scuba 600 text</div>
+          </div>
+          <div>
+            <div class="toast toast-error">
+              <div class="toast-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16v.5" stroke="#D4726A" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#D4726A" stroke-width="1.5"/></svg>
+              </div>
+              앗, 뭔가 안 됐어. 다시 해볼까?
+            </div>
+            <div class="spec" style="margin-top:6px;">에러 · Error light bg · Error text</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 알림 리스트 -->
+      <div class="grid-col">
+        <div class="label">알림 리스트 아이템</div>
+        <div style="border:1px solid #DDD8CC; border-radius:12px; overflow:hidden; width:340px;">
+          <!-- 읽지 않은 알림 -->
+          <div class="notif-item">
+            <div class="notif-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 11V20H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3zm0 0l4-8a3 3 0 0 1 3 3v2h4.5a1.5 1.5 0 0 1 1.46 1.84l-1.5 6A1.5 1.5 0 0 1 17 16H7V11z" stroke="#009BAA" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="notif-content">
+              <div class="notif-text"><strong>조용한 충전기</strong>님이 내 글에 "같아요"를 눌렀어.</div>
+              <div class="notif-time">5분 전</div>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+          <!-- 읽은 알림 -->
+          <div class="notif-item notif-item-read">
+            <div class="notif-icon-wrap" style="background:#F7F5F0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H4z" stroke="#A899C4" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="notif-content">
+              <div class="notif-text">새 댓글이 달렸어. 와볼래?</div>
+              <div class="notif-time">2시간 전</div>
+            </div>
+          </div>
+          <!-- ON 전환 알림 -->
+          <div class="notif-item">
+            <div class="notif-icon-wrap" style="background:#EDE9F5;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h8l-1 8 9-12h-8l1-8z" stroke="#5F4B8B" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="notif-content">
+              <div class="notif-text">배터리가 Lv.4까지 올라왔어. 거의 다 됐어.</div>
+              <div class="notif-time">어제</div>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────
+       13. 탭 아이콘 (SVG Inline)
+  ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">13</span>
+      <span class="section-title">탭 아이콘 (SVG Inline)</span>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="spec" style="margin-bottom:24px;">24×24 · stroke 1.5~2px · round cap/join · Violet 500 기본 · 활성 시 Violet 900</div>
+
+    <div class="icon-grid">
+      <!-- 홈 -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 10.5L12 3L21 10.5V20a1 1 0 0 1-1 1H15v-5h-6v5H4a1 1 0 0 1-1-1V10.5z" stroke="#5F4B8B" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-name">홈</div>
+      </div>
+
+      <!-- 게시판 -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 4h16v12H4z" stroke="#5F4B8B" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M8 20l4-4 4 4" stroke="#5F4B8B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-name">게시판</div>
+      </div>
+
+      <!-- 알림 + 도트 -->
+      <div class="icon-item">
+        <div class="icon-bg" style="position:relative;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 10a6 6 0 1 1 12 0v5l2 2H4l2-2V10z" stroke="#5F4B8B" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M10 19a2 2 0 0 0 4 0" stroke="#5F4B8B" stroke-width="1.5"/>
+          </svg>
+          <div style="position:absolute; top:8px; right:8px; width:8px; height:8px; background:#00B4C5; border-radius:50%; border:1.5px solid #F7F5F0;"></div>
+        </div>
+        <div class="icon-name">알림</div>
+      </div>
+
+      <!-- MY (배터리) -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="7" width="16" height="10" rx="2" stroke="#5F4B8B" stroke-width="1.5"/>
+            <path d="M20 10v4" stroke="#5F4B8B" stroke-width="2" stroke-linecap="round"/>
+            <rect x="6" y="9" width="8" height="6" rx="1" fill="#5F4B8B" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="icon-name">MY</div>
+      </div>
+
+      <!-- 검색 -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="11" cy="11" r="7" stroke="#5F4B8B" stroke-width="1.5"/>
+            <path d="M16.5 16.5L21 21" stroke="#5F4B8B" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="icon-name">검색</div>
+      </div>
+
+      <!-- 글쓰기 -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 3a2.83 2.83 0 0 1 4 4L7.5 20.5 3 21l.5-4.5L17 3z" stroke="#5F4B8B" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M15 5l4 4" stroke="#5F4B8B" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="icon-name">글쓰기</div>
+      </div>
+
+      <!-- 뒤로가기 -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="#5F4B8B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-name">뒤로가기</div>
+      </div>
+
+      <!-- 더보기 -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="5" r="1.5" fill="#5F4B8B"/>
+            <circle cx="12" cy="12" r="1.5" fill="#5F4B8B"/>
+            <circle cx="12" cy="19" r="1.5" fill="#5F4B8B"/>
+          </svg>
+        </div>
+        <div class="icon-name">더보기</div>
+      </div>
+
+      <!-- 저장 (북마크) -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 3h14a1 1 0 0 1 1 1v17l-8-4-8 4V4a1 1 0 0 1 1-1z" stroke="#5F4B8B" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-name">저장</div>
+      </div>
+
+      <!-- 공유 -->
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="5" r="3" stroke="#5F4B8B" stroke-width="1.5"/>
+            <circle cx="6" cy="12" r="3" stroke="#5F4B8B" stroke-width="1.5"/>
+            <circle cx="18" cy="19" r="3" stroke="#5F4B8B" stroke-width="1.5"/>
+            <path d="M8.7 10.7l6.6-3.4M8.7 13.3l6.6 3.4" stroke="#5F4B8B" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="icon-name">공유</div>
+      </div>
+    </div>
+
+    <!-- 아이콘 활성 상태 비교 -->
+    <div style="margin-top:32px; background:#F7F5F0; border-radius:12px; padding:24px; display:flex; gap:32px; flex-wrap:wrap; align-items:center;">
+      <div class="spec">아이콘 상태 비교</div>
+      <div class="icon-item">
+        <div class="icon-bg" style="background:#EDE9F5;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3L21 10.5V20a1 1 0 0 1-1 1H15v-5h-6v5H4a1 1 0 0 1-1-1V10.5z" stroke="#2E1F4E" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="icon-name" style="color:#2E1F4E; font-weight:700;">활성</div>
+        <div class="spec">Violet 900 · stroke 2px</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-bg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3L21 10.5V20a1 1 0 0 1-1 1H15v-5h-6v5H4a1 1 0 0 1-1-1V10.5z" stroke="#A899C4" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="icon-name">비활성</div>
+        <div class="spec">Violet 300 · stroke 1.5px</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

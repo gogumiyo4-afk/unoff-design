@@ -1,0 +1,2453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNOFF 앱서비스 상세기획</title>
+<style>
+  :root {
+    --bg: #0F0F1A;
+    --surface: #1A1A2E;
+    --surface-alt: #16213E;
+    --border: #2A2A4A;
+    --text: #E8E8F0;
+    --text-dim: #8888AA;
+    --accent: #7B68EE;
+    --accent-dim: rgba(123,104,238,0.15);
+    --green: #4ECDC4;
+    --green-dim: rgba(78,205,196,0.15);
+    --yellow: #FFD93D;
+    --yellow-dim: rgba(255,217,61,0.15);
+    --red: #FF6B6B;
+    --red-dim: rgba(255,107,107,0.15);
+    --blue: #4D96FF;
+    --blue-dim: rgba(77,150,255,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ─── 상단 네비게이션 ─── */
+  .top-nav {
+    position: sticky; top:0; z-index:100;
+    background: rgba(15,15,26,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .top-nav .logo { font-size: 15px; font-weight: 700; color: var(--accent); letter-spacing: 1px; }
+  .top-nav .title { font-size: 14px; color: var(--text); font-weight: 500; margin-left: 4px; }
+  .top-nav .updated {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* ─── 레이아웃 ─── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ─── 사이드바 ─── */
+  .sidebar {
+    width: 280px; min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky; top: 45px;
+    height: calc(100vh - 45px);
+    overflow-y: auto;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* 사이드바 그룹 (접이식) */
+  .nav-group { margin-bottom: 4px; }
+  .nav-group-title {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--text);
+    user-select: none; transition: background 0.2s;
+  }
+  .nav-group-title:hover { background: rgba(255,255,255,0.03); }
+  .nav-group-title .arrow {
+    font-size: 10px; color: var(--text-dim);
+    transition: transform 0.2s;
+    width: 12px; text-align: center;
+  }
+  .nav-group.open .arrow { transform: rotate(90deg); }
+  .nav-group-title .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    margin-left: auto; flex-shrink: 0;
+  }
+  .status-dot.done { background: var(--green); }
+  .status-dot.wip { background: var(--yellow); }
+  .status-dot.todo { background: var(--border); }
+  .nav-items {
+    display: none;
+    padding: 0 0 8px 0;
+  }
+  .nav-group.open .nav-items { display: block; }
+  .nav-items a {
+    display: block; padding: 5px 20px 5px 40px;
+    font-size: 12px; color: var(--text-dim);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .nav-items a:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+  .nav-items a.active { color: var(--accent); border-left-color: var(--accent); }
+
+  /* 사이드바 라벨 */
+  .sidebar-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-dim); padding: 16px 20px 6px; font-weight: 600;
+  }
+
+  /* ─── 메인 콘텐츠 ─── */
+  .main { flex:1; padding: 40px 48px; max-width: 960px; }
+
+  /* ─── 구분선 (기능 영역 사이) ─── */
+  .feature-divider {
+    margin: 64px 0 48px;
+    border: none;
+    border-top: 2px solid var(--accent);
+    opacity: 0.3;
+  }
+
+  /* ─── 타이포 ─── */
+  h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  h1 small { font-size: 14px; color: var(--text-dim); font-weight: 400; display: block; margin-top: 4px; }
+  .feature-title {
+    font-size: 24px; font-weight: 700; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .feature-title .ft-badge {
+    font-size: 11px; padding: 3px 10px; border-radius: 4px;
+    font-weight: 600; background: var(--accent-dim); color: var(--accent);
+  }
+  h2 {
+    font-size: 18px; font-weight: 600; margin-top: 40px; margin-bottom: 14px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2 .badge { font-size: 10px; padding: 2px 7px; border-radius: 3px; font-weight: 600; }
+  h2 .badge.fe { background: var(--blue-dim); color: var(--blue); }
+  h2 .badge.be { background: var(--green-dim); color: var(--green); }
+  h2 .badge.data { background: var(--yellow-dim); color: var(--yellow); }
+  h2 .badge.both { background: var(--accent-dim); color: var(--accent); }
+  h3 { font-size: 15px; font-weight: 600; margin-top: 24px; margin-bottom: 10px; color: var(--accent); }
+  p { margin-bottom: 12px; font-size: 14px; }
+
+  /* ─── 메타 헤더 ─── */
+  .meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    padding: 14px 18px; background: var(--surface);
+    border-radius: 8px; margin-bottom: 28px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .meta dt { color: var(--text-dim); margin-bottom: 1px; font-size: 11px; }
+  .meta dd { color: var(--text); font-weight: 500; }
+
+  /* ─── 카드 ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+  .card.highlight { border-left: 3px solid var(--accent); }
+  .card.warn { border-left: 3px solid var(--yellow); }
+  .card.danger { border-left: 3px solid var(--red); }
+  .card strong { display: inline; }
+  .card ul { margin-top: 8px; padding-left: 20px; }
+  .card li { margin-bottom: 4px; }
+
+  /* ─── 테이블 ─── */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px; }
+  th {
+    text-align: left; padding: 9px 12px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-dim); font-weight: 600;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  td { padding: 9px 12px; border: 1px solid var(--border); vertical-align: top; }
+
+  /* ─── 코드 ─── */
+  pre {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; }
+  :not(pre) > code {
+    background: var(--surface-alt); padding: 1px 5px;
+    border-radius: 3px; border: 1px solid var(--border);
+  }
+
+  /* ─── 플로우 ─── */
+  .flow { display: flex; flex-direction: column; gap: 3px; margin: 14px 0; }
+  .flow-step { display: flex; align-items: flex-start; gap: 10px; }
+  .flow-num {
+    min-width: 26px; height: 26px;
+    background: var(--accent); color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .flow-line { width: 2px; height: 14px; background: var(--border); margin-left: 12px; }
+  .flow-content { padding: 3px 0; font-size: 13px; }
+  .flow-content small { display: block; color: var(--text-dim); font-size: 11px; }
+
+  /* ─── 체크리스트 ─── */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; gap: 8px; align-items: flex-start; font-size: 13px;
+  }
+  .checklist li::before {
+    content: ''; width: 14px; height: 14px; flex-shrink: 0;
+    border: 2px solid var(--border); border-radius: 3px; margin-top: 3px;
+  }
+  .checklist li.done { color: var(--text-dim); }
+  .checklist li.done::before {
+    background: var(--green); border-color: var(--green);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-size: 10px; background-repeat: no-repeat; background-position: center;
+  }
+
+  /* ─── 태그 ─── */
+  .tag { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 3px; margin-right: 3px; font-weight: 600; }
+  .tag.required { background: var(--red-dim); color: var(--red); }
+  .tag.optional { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+  .tag.mvp { background: var(--green-dim); color: var(--green); }
+  .tag.phase2 { background: var(--yellow-dim); color: var(--yellow); }
+
+  /* ─── 업데이트 로그 ─── */
+  .update-log {
+    font-size: 12px; color: var(--text-dim);
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px; margin-top: 6px;
+  }
+  .update-log strong { color: var(--text); }
+
+  /* ─── 한눈에 보기 (비개발자용) ─── */
+  .glance {
+    background: linear-gradient(135deg, rgba(123,104,238,0.08), rgba(78,205,196,0.08));
+    border: 1px solid rgba(123,104,238,0.2);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .glance-title {
+    font-size: 14px; font-weight: 700; color: var(--accent);
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .glance-title .icon { font-size: 16px; }
+  .glance-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  @media (max-width: 768px) { .glance-grid { grid-template-columns: 1fr; } }
+  .glance-item h4 {
+    font-size: 12px; color: var(--text-dim); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .glance-item p {
+    font-size: 13px; color: var(--text); margin: 0; line-height: 1.6;
+  }
+  .glance-full {
+    margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid rgba(123,104,238,0.15);
+  }
+  .glance-full h4 {
+    font-size: 12px; color: var(--text-dim); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .glance-full p { font-size: 13px; margin: 0; line-height: 1.6; }
+  .glance-steps {
+    display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .glance-step {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: var(--text);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .glance-step .step-num {
+    background: var(--accent); color: #fff;
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+
+  /* ─── 준비중 플레이스홀더 ─── */
+  .coming-soon {
+    text-align: center; padding: 48px 24px;
+    color: var(--text-dim); font-size: 14px;
+  }
+  .coming-soon .icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+
+  /* ─── 반응형 ─── */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 24px 16px; }
+  }
+  @media print {
+    .sidebar, .top-nav { display: none; }
+    .main { max-width: 100%; padding: 20px; }
+    body { background: #fff; color: #111; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ -->
+<!-- 상단 네비게이션 -->
+<!-- ═══════════════════════════════════ -->
+<nav class="top-nav">
+  <span class="logo">UNOFF</span>
+  <span class="title">앱서비스 상세기획</span>
+  <span class="updated">최종 수정: 2026-03-18</span>
+</nav>
+
+<div class="layout">
+
+<!-- ═══════════════════════════════════ -->
+<!-- 사이드바 -->
+<!-- ═══════════════════════════════════ -->
+<aside class="sidebar">
+
+  <div class="sidebar-label">기능별 기획</div>
+
+  <!-- 회원가입/로그인 -->
+  <div class="nav-group open" data-group="auth">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      회원가입 / 로그인
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#auth-glance">한눈에 보기</a>
+      <a href="#auth-flow">유저 플로우</a>
+      <a href="#auth-onboarding-copy">온보딩 슬라이드 카피</a>
+      <a href="#auth-login-screen">로그인 화면</a>
+      <a href="#auth-social">소셜 로그인</a>
+      <a href="#auth-phone-otp">연락처 OTP 인증</a>
+      <a href="#auth-signup-profile">프로필 설정</a>
+      <a href="#auth-complete">가입 완료 화면</a>
+      <a href="#auth-error-ux">에러 UX</a>
+      <a href="#auth-architecture">인증 아키텍처</a>
+      <a href="#auth-db">DB 스키마</a>
+      <a href="#auth-rls">RLS 정책</a>
+      <a href="#auth-edge-fn">Edge Functions</a>
+      <a href="#auth-session">세션 관리</a>
+      <a href="#auth-data">수집 데이터</a>
+      <a href="#auth-privacy">개인정보 처리</a>
+      <a href="#auth-edge-cases">엣지케이스</a>
+      <a href="#auth-checklist">개발 체크리스트</a>
+    </div>
+  </div>
+
+  <!-- 온보딩 (서베이 7단계) -->
+  <div class="nav-group" data-group="onboarding">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      온보딩 (서베이 7단계)
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#ob-glance">한눈에 보기</a>
+      <a href="#ob-flow">전체 플로우</a>
+      <a href="#ob-step1">Step 1: 연령 확인</a>
+      <a href="#ob-step2">Step 2: 상태 선택</a>
+      <a href="#ob-step3">Step 3: 공백 이유</a>
+      <a href="#ob-step4">Step 4: 관심 분야</a>
+      <a href="#ob-step5">Step 5: 닉네임 설정</a>
+      <a href="#ob-step6">Step 6: 알림 허용</a>
+      <a href="#ob-step7">Step 7: 환영</a>
+      <a href="#ob-db">DB 저장 항목</a>
+      <a href="#ob-edge-cases">엣지케이스</a>
+      <a href="#ob-checklist">개발 체크리스트</a>
+    </div>
+  </div>
+
+  <!-- 홈 피드 -->
+  <div class="nav-group" data-group="home">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      홈 피드
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#home-glance">한눈에 보기</a>
+      <a href="#home-layout">화면 구성</a>
+      <a href="#home-battery-card">배터리 카드</a>
+      <a href="#home-categories">카테고리 바로가기</a>
+      <a href="#home-feed-list">최근 글 피드</a>
+    </div>
+  </div>
+
+  <!-- 자유게시판 -->
+  <div class="nav-group" data-group="board">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      자유게시판
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#board-glance">한눈에 보기</a>
+      <a href="#board-list">글 목록</a>
+      <a href="#board-write">글쓰기</a>
+      <a href="#board-detail">글 상세 + 댓글</a>
+    </div>
+  </div>
+
+  <!-- 참견해줘 -->
+  <div class="nav-group" data-group="cheer">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      참견해줘
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#cheer-glance">한눈에 보기</a>
+      <a href="#cheer-list">목록</a>
+      <a href="#cheer-best">BEST 참견</a>
+    </div>
+  </div>
+
+  <!-- 면접창고 -->
+  <div class="nav-group" data-group="interview">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      면접창고
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#interview-glance">한눈에 보기</a>
+      <a href="#interview-flow">3단계 플로우</a>
+      <a href="#interview-blacklist">BLACKLIST 뱃지</a>
+    </div>
+  </div>
+
+  <!-- 같이하자 -->
+  <div class="nav-group" data-group="together">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      같이하자
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#together-glance">한눈에 보기</a>
+      <a href="#together-challenge">챌린지 생성/참여</a>
+      <a href="#together-cert">사진 인증</a>
+    </div>
+  </div>
+
+  <!-- 만들어줘 -->
+  <div class="nav-group" data-group="suggest">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      만들어줘
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#suggest-glance">한눈에 보기</a>
+      <a href="#suggest-write">비공개 의견 보내기</a>
+      <a href="#suggest-vote">전체 투표</a>
+    </div>
+  </div>
+
+  <!-- DM -->
+  <div class="nav-group" data-group="dm">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      다이렉트 메시지 (DM)
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#dm-glance">한눈에 보기</a>
+      <a href="#dm-list">대화 목록</a>
+      <a href="#dm-official">운영팀 답변</a>
+      <a href="#dm-safety">안전 경고</a>
+    </div>
+  </div>
+
+  <!-- 공지사항 -->
+  <div class="nav-group" data-group="notice">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      공지사항
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#notice-glance">한눈에 보기</a>
+      <a href="#notice-pinned">필독 공지</a>
+      <a href="#notice-ban">강제탈퇴 가이드</a>
+    </div>
+  </div>
+
+  <!-- 알림 -->
+  <div class="nav-group" data-group="notification">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      알림
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#noti-glance">한눈에 보기</a>
+      <a href="#noti-list">알림 목록</a>
+      <a href="#noti-types">알림 종류</a>
+    </div>
+  </div>
+
+  <!-- 검색 -->
+  <div class="nav-group" data-group="search">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      검색
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#search-glance">한눈에 보기</a>
+      <a href="#search-types">검색 유형</a>
+      <a href="#search-recent">최근 검색 + 인기 태그</a>
+    </div>
+  </div>
+
+  <!-- 프로필 / 설정 -->
+  <div class="nav-group" data-group="profile">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      프로필 / 설정
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#profile-glance">한눈에 보기</a>
+      <a href="#profile-my">MY 페이지</a>
+      <a href="#profile-moon">달 충전 게이지 프로필</a>
+      <a href="#profile-edit">프로필 편집</a>
+      <a href="#profile-settings">설정</a>
+    </div>
+  </div>
+
+  <!-- 탈퇴 / 탑독 전환 -->
+  <div class="nav-group" data-group="topdog">
+    <div class="nav-group-title" onclick="toggleGroup(this)">
+      <span class="arrow">&#9654;</span>
+      탈퇴 / 탑독 전환
+      <span class="status-dot wip" title="작업중"></span>
+    </div>
+    <div class="nav-items">
+      <a href="#topdog-glance">한눈에 보기</a>
+      <a href="#topdog-p04">P-04: 탑독 전환 화면</a>
+      <a href="#topdog-p05">P-05: 멘토 인증</a>
+      <a href="#topdog-badge">멘토 뱃지</a>
+    </div>
+  </div>
+
+  <div class="sidebar-label" style="margin-top:24px;">문서</div>
+  <div class="nav-group open">
+    <div class="nav-items" style="display:block;">
+      <a href="#changelog">변경 이력</a>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ═══════════════════════════════════ -->
+<!-- 메인 콘텐츠 -->
+<!-- ═══════════════════════════════════ -->
+<main class="main">
+
+<h1 id="top">
+  UNOFF 앱서비스 상세기획
+  <small>프론트엔드 + 백엔드 + 데이터 통합 기획서 — 기능이 준비되는 대로 계속 업데이트</small>
+</h1>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  회원가입 / 로그인                                      ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="auth-overview">
+
+<div class="feature-title">
+  회원가입 / 로그인
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>LoginScreen, PhoneAuthScreen, SignupProfileScreen, SurveyScreen</dd></dl>
+  <dl><dt>백엔드</dt><dd>Supabase Auth (OAuth + Phone OTP)</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-17</dd></dl>
+</div>
+
+<!-- 한눈에 보기 (비개발자용) -->
+<div class="glance" id="auth-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>사용자가 UNOFF에 처음 들어올 때 계정을 만들고, 다음에 다시 올 때 자동으로 로그인되게 해주는 기능이에요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>가입 방법은?</h4>
+      <p><strong>카카오/Apple 소셜 로그인</strong> 또는 <strong>연락처(SMS) 인증번호</strong>로 가입해요. 비밀번호 없이 전화번호 OTP만으로 로그인할 수 있어서 가장 간편해요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>왜 이렇게 만드나요?</h4>
+      <p>비밀번호를 없앴어요. 소셜 로그인은 터치 2~3번, 연락처 로그인은 전화번호 입력 → 인증번호 입력이면 끝이에요. 20~35세 청년에게 익숙한 방식(당근, 토스)이고, 비밀번호 분실 문의도 없어져요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>보안은?</h4>
+      <p>소셜 계정은 카카오/Apple이 직접 인증하고, 연락처 OTP는 매번 새 일회용 코드를 발송해서 안전해요. 개인정보는 탈퇴 시 30일 내 완전 삭제하고, 개인정보보호법을 준수해요.</p>
+    </div>
+  </div>
+  <div class="glance-full">
+    <h4>사용자가 겪는 흐름</h4>
+    <div class="glance-steps">
+      <div class="glance-step"><span class="step-num">1</span> 앱 열기</div>
+      <div class="glance-step"><span class="step-num">2</span> 소셜 로그인 또는 "연락처로 시작하기" 선택</div>
+      <div class="glance-step"><span class="step-num">3</span> (연락처 선택 시) 전화번호 → 인증번호 입력</div>
+      <div class="glance-step"><span class="step-num">4</span> 프로필 설정: 이름 → 생년월일 → 닉네임</div>
+      <div class="glance-step"><span class="step-num">5</span> 간단한 서베이 (상태, 관심분야 등)</div>
+      <div class="glance-step"><span class="step-num">6</span> 홈 피드 진입</div>
+    </div>
+    <p style="margin-top:10px; color:var(--text-dim); font-size:12px;">
+      다음 접속부터는 자동 로그인 — 앱 열면 바로 홈 화면으로 들어가요.
+    </p>
+  </div>
+</div>
+
+<!-- 유저 플로우 -->
+<h2 id="auth-flow">유저 플로우 <span class="badge both">FE + BE</span></h2>
+
+<div class="card">
+<pre><code>앱 실행
+  │
+  ├─ AsyncStorage에 온보딩 완료 여부 확인
+  │   └─ NO → 온보딩 슬라이드 → LoginScreen
+  │
+  ├─ Supabase 세션 확인
+  │   └─ 세션 없음 → LoginScreen
+  │
+  ├─ 프로필 설정 완료 확인 (@unoff_profile_done)
+  │   └─ NO → SignupProfileScreen (이름→생년월일→닉네임)
+  │
+  ├─ 서베이 완료 확인 (@unoff_survey_done)
+  │   └─ NO → SurveyScreen (상태→이유→관심분야→알림→환영)
+  │
+  └─ 전부 완료 → HomeScreen (메인 탭)
+
+LoginScreen
+  ├─ 소셜 로그인 (카카오/Apple)
+  │   └─ Supabase OAuth → 세션 생성 → 라우팅 허브 (위 플로우)
+  │
+  └─ "연락처로 시작하기"
+      └─ PhoneAuthScreen
+          ├─ 전화번호 입력 → SMS OTP 발송
+          └─ 6자리 인증번호 입력 → 검증 → 세션 생성 → 라우팅 허브</code></pre>
+</div>
+
+
+<!-- 온보딩 슬라이드 카피 -->
+<h2 id="auth-onboarding-copy">온보딩 슬라이드 카피 <span class="badge fe">프론트엔드</span></h2>
+
+<p>앱 최초 실행 시 로그인 전에 표시되는 3장의 슬라이드 카피. 밤하늘 배경에 흰 텍스트 레이아웃.</p>
+
+<table>
+  <tr><th>화면</th><th>메인 카피</th><th>서브 카피</th></tr>
+  <tr><td>Splash</td><td>아직 이름없는 사람들의 쉼터</td><td>—</td></tr>
+  <tr><td>Slide 1</td><td>남들보다 느리다고<br>남들과 다르다고</td><td>멈춰 있는 건 아니니까</td></tr>
+  <tr><td>Slide 2</td><td>71.1만 명이 함께 쉬고 있어</td><td>비교없이, 각자의 속도로</td></tr>
+  <tr><td>Slide 3</td><td>여기선 공백도 경력이고<br>엇박자도 리듬이 됩니다.</td><td>0%에서 시작해도 괜찮아</td></tr>
+</table>
+
+<div class="card highlight">
+  <strong>Slide 2 유저 수 (71.1만명):</strong> 현재 시점 통계 기반 카피. 앱 성장에 따라 업데이트 가능. 실시간 DB 값이 아닌 마케팅 문구.
+</div>
+
+
+<!-- 로그인 화면 -->
+<h2 id="auth-login-screen">로그인 화면 (LoginScreen) <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th><th>비고</th></tr>
+  <tr><td>UNOFF 로고</td><td>좌측 상단, <code>unoff</code> 소문자</td><td>흰 배경</td></tr>
+  <tr><td>Splash 카피</td><td>"아직 이름없는 사람들의 쉼터"</td><td>Splash 화면 전용 — 앱 로딩 시 표시</td></tr>
+  <tr><td>헤드라인</td><td>"다시 올 때도 편하게 들어와."</td><td>Violet 900, 28px Bold</td></tr>
+  <tr><td>서브텍스트</td><td>"3초면 끝나. 부담 없이."</td><td>Violet 400, 15px</td></tr>
+  <tr><td>카카오로 계속하기</td><td>노란색 버튼 (#FEE500)</td><td>한국 1순위</td></tr>
+  <tr><td>네이버로 계속하기</td><td>초록색 버튼 (#03C75A)</td><td>추후 구현</td></tr>
+  <tr><td>Apple로 계속하기</td><td>검정색 버튼</td><td>iOS 앱스토어 필수</td></tr>
+  <tr><td>구분선</td><td>"──── 또는 ────"</td><td>Gray 200 선 + Gray 400 텍스트</td></tr>
+  <tr><td>연락처로 시작하기</td><td>Secondary 버튼 (Violet 300 테두리)</td><td>PhoneAuthScreen으로 이동</td></tr>
+  <tr><td>약관 안내</td><td>"계속하면 이용약관에 동의하게 돼."</td><td>Violet 400 텍스트</td></tr>
+</table>
+
+<h3>UX 규칙</h3>
+<ul>
+  <li>소셜 로그인 버튼 순서: 카카오 → 네이버 → Apple (사용률 순)</li>
+  <li>"연락처로 시작하기"는 구분선 아래 Secondary 스타일 — 소셜을 우선 유도하되 연락처도 눈에 띄게</li>
+  <li>뒤로 가기: 앱 바로 종료 (확인 다이얼로그 없음)</li>
+  <li>소셜/연락처 로그인 모두 비밀번호 없음 — 비밀번호 찾기 불필요</li>
+</ul>
+
+
+<!-- 소셜 로그인 -->
+<h2 id="auth-social">소셜 로그인 <span class="badge both">FE + BE</span></h2>
+
+<h3>프로바이더</h3>
+<table>
+  <tr><th>제공자</th><th>SDK / 방식</th><th>수집 정보</th><th>Supabase 연동</th><th>구현 상태</th></tr>
+  <tr><td><strong>카카오</strong></td><td><code>expo-auth-session</code> + <code>expo-web-browser</code></td><td>이메일, 닉네임(선택), 프로필이미지(선택)</td><td>Supabase OAuth (외부 브라우저)</td><td><span class="tag mvp">구현됨</span></td></tr>
+  <tr><td><strong>네이버</strong></td><td>미정 (Supabase 미지원 — 커스텀 필요)</td><td>이메일, 이름, 프로필이미지</td><td>Edge Function 커스텀 OAuth 예정</td><td><span class="tag phase2">미구현</span></td></tr>
+  <tr><td><strong>Apple</strong></td><td><code>expo-auth-session</code></td><td>이메일(숨김 가능), 이름</td><td>Supabase OAuth 기본 지원</td><td><span class="tag mvp">구현됨</span></td></tr>
+</table>
+
+<div class="card warn">
+  <strong>기획 vs 코드 차이점</strong>
+  <ul>
+    <li><strong>카카오:</strong> 기획서는 Edge Function 커스텀 OAuth 방식이지만, 현재 코드는 Supabase 내장 OAuth + expo-web-browser로 구현됨. 기능은 동일.</li>
+    <li><strong>네이버:</strong> Supabase가 네이버를 직접 지원하지 않아 Edge Function 커스텀 구현 필요. 현재 코드에 TODO 스텁만 있음.</li>
+    <li><strong>탭 구조:</strong> 2026-03-18 변경 확정 — 4탭(홈/게시판/검색/MY). 알림은 탭에서 제거, 검색이 세 번째 탭으로 진입. 코드 업데이트 필요.</li>
+  </ul>
+</div>
+
+<h3>소셜 로그인 플로우 (카카오 기준)</h3>
+<div class="flow">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-content">유저 "카카오로 시작" 탭<small>FE — LoginScreen</small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-content">카카오 SDK → 인앱 브라우저 로그인 화면<small>FE — 카카오 SDK</small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-content">유저 동의 → 카카오 액세스 토큰 반환<small>FE — callback</small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-content">카카오 토큰을 Edge Function으로 전송<small>FE → BE — <code>POST /functions/v1/auth-social</code></small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-content">카카오 API로 유저 정보 조회<small>BE — <code>GET kapi.kakao.com/v2/user/me</code></small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">6</div><div class="flow-content">Supabase Auth에서 이메일로 기존 유저 확인<small>BE — <code>auth.admin.getUserByEmail()</code></small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">7</div><div class="flow-content"><strong>분기:</strong> 기존 유저 → JWT 발급 / 신규 → 자동 가입 + JWT 발급<small>BE — <code>auth.admin.createUser()</code></small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">8</div><div class="flow-content">JWT → 앱으로 반환 → SecureStore 저장<small>FE — <code>expo-secure-store</code></small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">9</div><div class="flow-content">신규 → OnboardingSurvey / 기존 → HomeScreen<small>FE — <code>onboarding_completed</code>로 분기</small></div></div>
+</div>
+
+
+
+<!-- 연락처 OTP 인증 -->
+<h2 id="auth-phone-otp">연락처 OTP 인증 (PhoneAuthScreen) <span class="badge both">FE + BE</span></h2>
+
+<p>비밀번호 없이 전화번호 + 일회용 인증번호(OTP)로 가입/로그인하는 방식. Supabase Phone Auth + Twilio SMS를 사용.</p>
+
+<h3>Phase 1: 전화번호 입력</h3>
+<table>
+  <tr><th>요소</th><th>설명</th><th>비고</th></tr>
+  <tr><td>타이틀</td><td>"전화번호를 알려줘."</td><td>28px Bold, Violet 900</td></tr>
+  <tr><td>서브텍스트</td><td>"인증번호가 문자로 갈 거야."</td><td>15px, Gray 400</td></tr>
+  <tr><td>전화번호 입력</td><td>자동 포맷팅 (010-0000-0000)</td><td>phone-pad 키보드, 22px</td></tr>
+  <tr><td>유효성</td><td>010으로 시작, 10~11자리</td><td>미충족 시 버튼 비활성</td></tr>
+  <tr><td>"인증번호 받기" 버튼</td><td>Primary (Scuba 500)</td><td><code>signInWithOtp({ phone })</code></td></tr>
+</table>
+
+<h3>Phase 2: OTP 인증번호 입력</h3>
+<table>
+  <tr><th>요소</th><th>설명</th><th>비고</th></tr>
+  <tr><td>타이틀</td><td>"인증번호를 입력해줘."</td><td></td></tr>
+  <tr><td>서브텍스트</td><td>"010-1234-5678로 보냈어."</td><td>실제 입력 번호 표시</td></tr>
+  <tr><td>OTP 입력</td><td>6개 개별 박스 (숨겨진 TextInput)</td><td>현재 칸: Scuba 테두리, 입력 완료: Violet 배경</td></tr>
+  <tr><td>재전송</td><td>60초 쿨다운 타이머 → "인증번호 다시 받기"</td><td>Scuba 500 텍스트</td></tr>
+  <tr><td>"확인" 버튼</td><td>6자리 입력 시 활성화</td><td><code>verifyOtp({ phone, token, type: 'sms' })</code></td></tr>
+</table>
+
+<h3>OTP 인증 플로우</h3>
+<div class="flow">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-content">"연락처로 시작하기" 탭 → PhoneAuthScreen</div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-content">전화번호 입력 → "인증번호 받기"<small>FE → <code>supabase.auth.signInWithOtp({ phone: '+821012345678' })</code></small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-content">Supabase → Twilio → SMS 발송 (6자리 숫자)</div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-content">인증번호 입력 → "확인"<small>FE → <code>supabase.auth.verifyOtp({ phone, token, type: 'sms' })</code></small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-content">인증 성공 → Supabase 세션 생성 → 라우팅 허브로 이동</div></div>
+</div>
+
+<div class="card warn">
+  <strong>비용 참고</strong>
+  <ul>
+    <li>SMS 발송: Twilio 기준 건당 약 30~50원 (한국)</li>
+    <li>Supabase Phone Auth 무료 플랜: 월 제한 있음 — 프로덕션에서는 유료 플랜 필요</li>
+    <li>재전송 쿨다운 60초로 무분별한 발송 방지</li>
+  </ul>
+</div>
+
+
+<!-- 프로필 설정 -->
+<h2 id="auth-signup-profile">프로필 설정 (SignupProfileScreen) <span class="badge fe">프론트엔드</span></h2>
+
+<p>소셜 로그인/연락처 로그인 모두 이 화면을 거쳐 기본 정보를 수집함. 3단계 프로그레스 바로 진행.</p>
+
+<table>
+  <tr><th>Step</th><th>수집 항목</th><th>규칙</th><th>에러 메시지</th><th>필수 여부</th></tr>
+  <tr><td>1. 이름</td><td>이름 (1~20자)</td><td>1자 이상</td><td>—</td><td>필수</td></tr>
+  <tr><td>2. 생년월일</td><td>YYYY/MM/DD</td><td>만 20~35세</td><td>"아직은, 만 20-35세만 가입할 수 있어:)"</td><td>필수</td></tr>
+  <tr><td>3. 닉네임</td><td>2~12자, 한글/영문/숫자</td><td>특수문자·공백 불가</td><td>"2자에서 12자 사이로 적어줘"</td><td>선택 (기본: "OFF 중인 누군가")</td></tr>
+</table>
+
+<h3>저장 위치</h3>
+<ul>
+  <li><strong>AsyncStorage:</strong> <code>@unoff_profile_done</code> (완료 플래그), <code>@unoff_user_nickname</code>, <code>@unoff_user_profile</code> (JSON)</li>
+  <li><strong>Supabase:</strong> <code>user_metadata</code>에 name, birthDate, nickname 저장 (오프라인 시 AsyncStorage만 저장, 추후 동기화)</li>
+</ul>
+
+<h3>연령 제한 처리</h3>
+<ul>
+  <li>만 20~35세 범위 밖 → Alert: "지금은 20~35세를 위한 공간이야. 곧 더 넓혀갈 거야."</li>
+  <li>"알림 받을게" 선택 시 → waitlist 테이블에 등록 (TODO)</li>
+</ul>
+
+
+<!-- 가입 완료 화면 -->
+<h2 id="auth-complete">가입 완료 화면 (01-D) <span class="badge fe">프론트엔드</span></h2>
+
+<p>소셜/OTP 인증 완료 후, 온보딩 서베이 진입 전에 노출되는 환영 화면.</p>
+
+<table>
+  <tr><th>요소</th><th>설명</th><th>비고</th></tr>
+  <tr><td>배경</td><td>오로라 밤하늘 (Violet + Scuba 그라데이션)</td><td>별똥별 모션 애니메이션 포함</td></tr>
+  <tr><td>헤드라인</td><td>"N번째 언더독, 환영해! 네 자리가 생겼어"</td><td>N = Supabase users 테이블 실시간 COUNT</td></tr>
+  <tr><td>서브텍스트</td><td>"잠깐만. 너에 대해 좀 더 알고 싶어."</td><td>온보딩 서베이 예고</td></tr>
+  <tr><td>CTA</td><td>"나 소개해줄게" → 온보딩 Step 1로 이동</td><td>Primary 버튼</td></tr>
+</table>
+
+<div class="card highlight">
+  <strong>가입자 수 카운팅 규칙</strong>
+  <ul>
+    <li>Supabase: <code>SELECT COUNT(*) FROM public.users WHERE deleted_at IS NULL</code></li>
+    <li>로딩 중: "N번째" 숫자 자리에 스켈레톤 또는 "..." 표시</li>
+    <li>오프라인: 카운팅 없이 "새 언더독, 환영해! 네 자리가 생겼어"로 대체</li>
+  </ul>
+</div>
+
+
+<!-- 에러 UX -->
+<h2 id="auth-error-ux">에러 UX <span class="badge fe">프론트엔드</span></h2>
+<table>
+  <tr><th>상황</th><th>메시지</th><th>대응</th></tr>
+  <tr><td>네트워크 없음</td><td>"인터넷 연결을 확인해줘"</td><td>재시도 버튼</td></tr>
+  <tr><td>소셜 로그인 취소</td><td>(동작 없음, 화면 유지)</td><td>—</td></tr>
+  <tr><td>이미 가입된 소셜</td><td>자동 로그인</td><td>—</td></tr>
+  <tr><td>OTP 전송 실패</td><td>"인증번호 전송에 실패했어. 잠깐 후 다시 시도해줘."</td><td>재시도 (60초 쿨다운)</td></tr>
+  <tr><td>OTP 인증번호 틀림</td><td>"인증번호가 맞지 않아. 다시 확인해줘."</td><td>입력 초기화 + 재입력</td></tr>
+  <tr><td>OTP 만료 (5분)</td><td>"인증번호가 만료됐어."</td><td>"인증번호 다시 받기" 유도</td></tr>
+  <tr><td>서버 오류</td><td>"잠깐 문제가 생겼어"</td><td>재시도 버튼</td></tr>
+  <tr><td>연령 범위 초과</td><td>"지금은 20~35세를 위한 공간이야."</td><td>"알림 받을게" / "괜찮아, 다음에"</td></tr>
+</table>
+
+
+<!-- 인증 아키텍처 -->
+<h2 id="auth-architecture">인증 아키텍처 <span class="badge be">백엔드</span></h2>
+
+<pre><code>┌─────────────┐     ┌──────────────────┐     ┌───────────────┐
+│  React Native │────▶│  Supabase Auth    │────▶│  PostgreSQL    │
+│  (Expo)       │     │                  │     │  (users 등)    │
+└──────┬────────┘     └──────────────────┘     └───────────────┘
+       │                       ▲
+       │  카카오/네이버 토큰      │  유저 생성/조회
+       ▼                       │
+┌──────────────┐    ┌─────────┴──────────┐
+│  카카오 API   │◀───│  Edge Function      │
+│  네이버 API   │    │  (auth-social)      │
+└──────────────┘    └────────────────────┘</code></pre>
+
+<div class="card highlight">
+  <strong>핵심 원칙</strong>
+  <ul>
+    <li>Supabase Auth가 메인 인증 시스템</li>
+    <li>카카오/네이버 → Edge Function 커스텀 OAuth / Apple → Supabase 기본 지원</li>
+    <li>JWT는 Supabase Auth만 발급 (직접 생성 금지)</li>
+  </ul>
+</div>
+
+<table>
+  <tr><th>엔드포인트</th><th>메서드</th><th>용도</th></tr>
+  <tr><td><code>/functions/v1/auth-social</code></td><td>POST</td><td>소셜 로그인 — 토큰 검증 + 유저 생성/로그인</td></tr>
+  <tr><td><code>/functions/v1/auth-withdraw</code></td><td>POST</td><td>회원 탈퇴 — soft delete + 익명화</td></tr>
+</table>
+
+
+<!-- DB 스키마 -->
+<h2 id="auth-db">DB 스키마 <span class="badge be">백엔드</span></h2>
+
+<h3>auth.users (Supabase Auth 내장 — 직접 수정 안 함)</h3>
+<div class="card">
+  <code>id</code> UUID PK / <code>email</code> / <code>encrypted_password</code> / <code>raw_app_meta_data</code> (provider 등) / <code>created_at</code>
+</div>
+
+<h3>public.users (앱 프로필)</h3>
+<pre><code>CREATE TABLE public.users (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+
+  -- 기본 프로필
+  name TEXT NOT NULL DEFAULT '',
+  phone TEXT UNIQUE,                 -- 연락처 OTP 가입 시 저장
+  email TEXT UNIQUE,                 -- 소셜 가입 시 저장 (nullable)
+  nickname TEXT UNIQUE NOT NULL DEFAULT 'OFF 중인 누군가',
+  bio TEXT DEFAULT '' CHECK (char_length(bio) &lt;= 50),
+  birth_date DATE NOT NULL,
+
+  -- ON/OFF 상태
+  status TEXT NOT NULL DEFAULT 'off'
+    CHECK (status IN ('off', 'slow', 'on', 'pause')),
+
+  -- 온보딩 서베이
+  gap_duration TEXT CHECK (gap_duration IN (
+    'under_3m', '3m_to_1y', 'over_1y', 'burnout', 'browsing', NULL)),
+  gap_reason TEXT CHECK (gap_reason IN (
+    'job_search', 'resign', 'health', 'voluntary', 'hard_to_say', NULL)),
+  interests TEXT[] DEFAULT '{}',
+
+  -- 배터리
+  battery_percent INTEGER NOT NULL DEFAULT 0 CHECK (battery_percent BETWEEN 0 AND 100),
+  battery_level INTEGER NOT NULL DEFAULT 1 CHECK (battery_level BETWEEN 1 AND 5),
+
+  -- 인증
+  auth_provider TEXT NOT NULL DEFAULT 'phone'
+    CHECK (auth_provider IN ('phone', 'kakao', 'naver', 'apple')),
+  is_school_verified BOOLEAN DEFAULT FALSE,
+
+  -- 알림
+  push_enabled BOOLEAN DEFAULT FALSE,
+  notification_settings JSONB DEFAULT '{"comments":true,"reactions":true,"together":true,
+    "matching":true,"battery":true,"notice":true,"quiet_start":"23:00","quiet_end":"08:00"}',
+
+  -- 약관 동의 (법적 증거)
+  terms_agreed_at TIMESTAMPTZ,
+  privacy_agreed_at TIMESTAMPTZ,
+  marketing_agreed BOOLEAN DEFAULT FALSE,
+  marketing_agreed_at TIMESTAMPTZ,
+
+  -- 메타
+  onboarding_completed BOOLEAN DEFAULT FALSE,
+  last_active_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ DEFAULT NULL
+);</code></pre>
+
+<h3>public.waitlist (연령 초과 대기)</h3>
+<pre><code>CREATE TABLE public.waitlist (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  birth_date DATE,
+  reason TEXT DEFAULT 'age_limit',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);</code></pre>
+
+
+<!-- RLS -->
+<h2 id="auth-rls">RLS 정책 <span class="badge be">백엔드</span></h2>
+
+<div class="card highlight">
+  <strong>원칙:</strong> 모든 테이블 RLS 활성화. <code>anon</code> 키는 클라이언트 노출 OK (RLS 보호). <code>service_role</code>은 서버(Edge Function)에서만.
+</div>
+
+<pre><code>-- users RLS
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "users_select_own" ON public.users
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "users_select_public" ON public.users
+  FOR SELECT USING (
+    deleted_at IS NULL
+    AND id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = auth.uid())
+  );
+
+CREATE POLICY "users_update_own" ON public.users
+  FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "users_insert_none" ON public.users
+  FOR INSERT WITH CHECK (false);  -- Edge Function(service_role)만 INSERT
+
+CREATE POLICY "users_delete_none" ON public.users
+  FOR DELETE USING (false);  -- soft delete만 허용
+
+-- waitlist RLS
+ALTER TABLE public.waitlist ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "waitlist_insert_anon" ON public.waitlist FOR INSERT WITH CHECK (true);
+CREATE POLICY "waitlist_select_none" ON public.waitlist FOR SELECT USING (false);</code></pre>
+
+
+<!-- Edge Functions -->
+<h2 id="auth-edge-fn">Edge Functions <span class="badge be">백엔드</span></h2>
+
+<h3>auth-social</h3>
+<pre><code>// POST /functions/v1/auth-social
+// Body: { provider: 'kakao' | 'naver', token: string }
+
+async function handler(req) {
+  const { provider, token } = await req.json()
+
+  // 1. 소셜 API로 유저 정보 조회
+  const userInfo = provider === 'kakao'
+    ? await fetch('https://kapi.kakao.com/v2/user/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(r => r.json())
+    : await fetch('https://openapi.naver.com/v1/nid/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(r => r.json())
+
+  const { email, name } = userInfo
+
+  // 2. 기존 유저 확인
+  const { data: existing } = await supabaseAdmin.auth.admin.getUserByEmail(email)
+
+  if (existing) {
+    const existingProvider = existing.app_metadata?.provider
+    if (existingProvider && existingProvider !== provider) {
+      return error(409, {
+        message: `이 이메일은 ${existingProvider}로 가입되어 있어`,
+        existing_provider: existingProvider
+      })
+    }
+    // 로그인
+    const { data: session } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'magiclink', email
+    })
+    return ok({ session, is_new: false })
+  }
+
+  // 3. 신규 가입
+  const { data: newUser } = await supabaseAdmin.auth.admin.createUser({
+    email, email_confirm: true, app_metadata: { provider }
+  })
+
+  await supabaseAdmin.from('users').insert({
+    id: newUser.id, email,
+    nickname: name || 'OFF 중인 누군가',
+    auth_provider: provider,
+    birth_date: '2000-01-01',  // 온보딩에서 재입력
+    terms_agreed_at: new Date().toISOString(),
+    privacy_agreed_at: new Date().toISOString(),
+  })
+
+  const { data: session } = await supabaseAdmin.auth.admin.generateLink({
+    type: 'magiclink', email
+  })
+  return ok({ session, is_new: true })
+}</code></pre>
+
+<div class="card danger">
+  <strong>보안</strong>
+  <ul>
+    <li>Edge Function에서만 <code>SUPABASE_SERVICE_ROLE_KEY</code> 사용</li>
+    <li>소셜 토큰은 반드시 해당 API로 검증 (클라이언트 토큰 신뢰 금지)</li>
+    <li>Rate Limiting: IP당 분당 10회</li>
+  </ul>
+</div>
+
+
+<!-- 세션 관리 -->
+<h2 id="auth-session">세션 관리 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>값</th><th>설명</th></tr>
+  <tr><td>access_token</td><td>1시간</td><td>Supabase 기본</td></tr>
+  <tr><td>refresh_token</td><td>30일</td><td>자동 로그인 유지</td></tr>
+  <tr><td>저장소</td><td>expo-secure-store</td><td>iOS Keychain / Android Keystore</td></tr>
+  <tr><td>갱신</td><td>자동</td><td>Supabase JS Client 내부 처리</td></tr>
+</table>
+
+<h3>세션 체크</h3>
+<pre><code>const { data: { session } } = await supabase.auth.getSession()
+session ? navigateTo('Home') : navigateTo('Login')
+
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') navigateTo('Login')
+})</code></pre>
+
+<h3>회원 탈퇴</h3>
+<div class="flow">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-content">MY → 설정 → 계정 관리 → 탈퇴 요청</div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-content">소셜 재인증 (본인 확인)</div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-content">Edge Function <code>auth-withdraw</code> — soft delete + 닉네임 "탈퇴한 사용자" + 이메일 해시화</div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-content">30일 유예 후 완전 삭제 (pg_cron)</div></div>
+</div>
+
+
+<!-- 수집 데이터 -->
+<h2 id="auth-data">수집 데이터 <span class="badge data">데이터</span></h2>
+
+<table>
+  <tr><th>항목</th><th>시점</th><th>필수</th><th>용도</th><th>DB 컬럼</th></tr>
+  <tr><td>이메일</td><td>가입</td><td><span class="tag required">필수</span></td><td>계정 식별, 인증</td><td>email</td></tr>
+  <tr><td>비밀번호</td><td>이메일 가입</td><td><span class="tag required">필수</span></td><td>인증</td><td>auth.users.encrypted_password</td></tr>
+  <tr><td>생년월일</td><td>온보딩 1</td><td><span class="tag required">필수</span></td><td>연령 제한 (만 20~35)</td><td>birth_date</td></tr>
+  <tr><td>공백 상태</td><td>온보딩 2</td><td><span class="tag optional">선택</span></td><td>매칭, 추천</td><td>gap_duration</td></tr>
+  <tr><td>공백 이유</td><td>온보딩 3</td><td><span class="tag optional">선택</span></td><td>매칭</td><td>gap_reason</td></tr>
+  <tr><td>관심 분야</td><td>온보딩 4</td><td><span class="tag optional">선택</span></td><td>추천, 매칭</td><td>interests[]</td></tr>
+  <tr><td>닉네임</td><td>온보딩 5</td><td><span class="tag optional">선택</span></td><td>표시명</td><td>nickname</td></tr>
+  <tr><td>이용약관</td><td>가입</td><td><span class="tag required">필수</span></td><td>법적</td><td>terms_agreed_at</td></tr>
+  <tr><td>개인정보</td><td>가입</td><td><span class="tag required">필수</span></td><td>법적</td><td>privacy_agreed_at</td></tr>
+  <tr><td>마케팅</td><td>가입</td><td><span class="tag optional">선택</span></td><td>프로모션</td><td>marketing_agreed</td></tr>
+</table>
+
+
+<!-- 개인정보 -->
+<h2 id="auth-privacy">개인정보 처리 <span class="badge data">데이터</span></h2>
+
+<table>
+  <tr><th>항목</th><th>보관 기간</th><th>삭제 방식</th></tr>
+  <tr><td>이메일</td><td>탈퇴 후 30일</td><td>해시화 → 원문 삭제</td></tr>
+  <tr><td>비밀번호 (해시)</td><td>탈퇴 시 즉시</td><td>auth.users 삭제</td></tr>
+  <tr><td>생년월일</td><td>탈퇴 후 30일</td><td>삭제</td></tr>
+  <tr><td>닉네임</td><td>탈퇴 즉시</td><td>"탈퇴한 사용자" 대체</td></tr>
+  <tr><td>소셜 토큰</td><td>인증 즉시</td><td>서버 메모리 즉시 삭제 (DB 저장 안 함)</td></tr>
+  <tr><td>마케팅 동의 이력</td><td>철회 후 6개월</td><td>법적 분쟁 대비 보관 후 삭제</td></tr>
+</table>
+
+<div class="card warn">
+  <strong>법적 요구사항:</strong> 개인정보보호법 21조 (목적 달성 시 파기) / 정보통신망법 (철회 5일 내 처리) / 마케팅 동의·철회는 timestamp 필수
+</div>
+
+
+<!-- 엣지케이스 -->
+<h2 id="auth-edge-cases">엣지케이스 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>상황</th><th>대응</th><th>담당</th></tr>
+  <tr><td>카카오 가입 → 같은 이메일로 네이버 시도</td><td>"이 이메일은 카카오로 가입되어 있어" + 하이라이트</td><td>BE + FE</td></tr>
+  <tr><td>Apple 이메일 숨기기</td><td>relay 이메일 사용, "Apple 이메일로 가입했어" 안내</td><td>FE + BE</td></tr>
+  <tr><td>온보딩 중 앱 종료</td><td><code>onboarding_completed=false</code> → 다음 로그인 시 이어서</td><td>FE</td></tr>
+  <tr><td>연령 범위 초과</td><td>가입 차단 + "곧 넓혀갈 거야" + waitlist</td><td>FE + BE</td></tr>
+  <tr><td>탈퇴 후 재가입</td><td>30일 내: "계정 남아있어. 복구할래?" / 이후: 새 가입</td><td>BE</td></tr>
+  <tr><td>닉네임 중복</td><td>실시간 체크 → "이미 쓰고 있는 닉네임이야"</td><td>FE + BE</td></tr>
+  <tr><td>인증 링크 만료 (24h)</td><td>"만료됐어. 다시 보내줄게." + 재발송</td><td>FE</td></tr>
+  <tr><td>동시 다기기 로그인</td><td>허용 (Supabase 기본)</td><td>BE</td></tr>
+</table>
+
+
+<!-- 체크리스트 -->
+<h2 id="auth-checklist">개발 체크리스트 <span class="badge both">FE + BE</span></h2>
+
+<h3>백엔드 (Supabase)</h3>
+<ul class="checklist">
+  <li>Supabase Auth 이메일 인증 활성화</li>
+  <li>딥링크 URL 설정 (unoff://auth/*)</li>
+  <li>public.users 테이블 + RLS</li>
+  <li>public.waitlist 테이블 + RLS</li>
+  <li>Edge Function: auth-social 배포</li>
+  <li>Edge Function: auth-withdraw 배포</li>
+  <li>카카오 개발자 콘솔 앱 등록</li>
+  <li>네이버 개발자 콘솔 앱 등록</li>
+  <li>Apple Sign In 설정</li>
+  <li>인증/비밀번호 이메일 템플릿 커스텀</li>
+  <li>Rate Limiting (IP당 분당 10회)</li>
+  <li>pg_cron: 탈퇴 30일 후 완전 삭제</li>
+</ul>
+
+<h3>프론트엔드 (React Native)</h3>
+<ul class="checklist">
+  <li>LoginScreen UI</li>
+  <li>SignUpScreen UI + 유효성 검사</li>
+  <li>EmailLoginScreen UI</li>
+  <li>비밀번호 찾기 화면</li>
+  <li>이메일 인증 대기 화면</li>
+  <li>카카오 SDK 연동</li>
+  <li>네이버 SDK 연동</li>
+  <li>Apple 인증 연동</li>
+  <li>SecureStore 토큰 관리</li>
+  <li>AuthProvider (세션 + 라우팅)</li>
+  <li>딥링크 핸들러</li>
+  <li>에러 메시지 전체 케이스</li>
+  <li>OnboardingSurvey 7단계</li>
+  <li>온보딩 중 앱 종료 → 이어하기</li>
+  <li>5회 실패 잠금 UI</li>
+</ul>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  온보딩                                                ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="onboarding">
+
+<div class="feature-title">
+  온보딩
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>OnboardingSurvey (7단계)</dd></dl>
+  <dl><dt>진입 조건</dt><dd>회원가입 직후 (소셜/이메일 모두)</dd></dl>
+  <dl><dt>구현 상태</dt><dd><span class="tag wip">업데이트됨</span> (7단계 재구성)</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="ob-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>처음 가입한 사용자에게 7가지 간단한 질문을 하는 화면이에요. 나이, 지금 상태, 관심 분야 같은 걸 물어봐요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>왜 필요한가요?</h4>
+      <p>비슷한 상태의 사람끼리 연결해주고, 맞춤 콘텐츠를 보여주려면 기본 정보가 필요해요. 하지만 <strong>모든 질문은 건너뛸 수 있어서</strong> 부담이 없어요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>어떤 느낌인가요?</h4>
+      <p>"편하게 말해줘" 톤. 취조가 아니라 대화예요. 답하기 싫으면 건너뛰면 되고, 나중에 프로필에서 바꿀 수 있어요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>만 20~35세만?</h4>
+      <p>네. 범위 밖이면 "곧 더 넓혀갈 거야"라고 안내하고, 대기 리스트에 이메일을 등록할 수 있어요. 거절이 아니라 대기예요.</p>
+    </div>
+  </div>
+  <div class="glance-full">
+    <h4>사용자가 겪는 흐름</h4>
+    <div class="glance-steps">
+      <div class="glance-step"><span class="step-num">1</span> 몇 살이야?</div>
+      <div class="glance-step"><span class="step-num">2</span> 지금 어떤 상태야?</div>
+      <div class="glance-step"><span class="step-num">3</span> 이유가 있어?</div>
+      <div class="glance-step"><span class="step-num">4</span> 관심 분야는?</div>
+      <div class="glance-step"><span class="step-num">5</span> 뭐라고 부를까?</div>
+      <div class="glance-step"><span class="step-num">6</span> 알림 허용</div>
+      <div class="glance-step"><span class="step-num">7</span> 환영!</div>
+    </div>
+    <p style="margin-top:10px; color:var(--text-dim); font-size:12px;">
+      상단 프로그레스 바로 진행 상황이 보이고, 모든 단계에서 뒤로 가기와 건너뛰기가 가능해요.
+    </p>
+  </div>
+</div>
+
+
+<!-- 전체 플로우 -->
+<h2 id="ob-flow">전체 플로우 <span class="badge both">FE + BE</span></h2>
+
+<div class="card highlight">
+  <strong>설계 원칙</strong>
+  <ul>
+    <li>최대한 가볍게. 부담 주지 않기.</li>
+    <li>모든 단계에서 "건너뛰기" 가능 (Step 1 연령 확인만 필수)</li>
+    <li>상단 프로그레스 바 표시 (1/7, 2/7...)</li>
+    <li>뒤로 가기 가능 (이전 단계로 돌아가기, 입력값 유지)</li>
+    <li>중간에 앱 종료해도 다음 로그인 시 이어서 진행</li>
+  </ul>
+</div>
+
+<pre><code>가입 완료
+  │
+  ├─ Step 1: 연령 확인 (필수)
+  │   ├─ 만 20~35세 → Step 2로
+  │   └─ 범위 밖 → 연령 초과 안내 → 대기 리스트 등록 or 종료
+  │
+  ├─ Step 2: 상태 선택 (건너뛰기 가능)
+  ├─ Step 3: 공백 이유 (건너뛰기 가능)
+  ├─ Step 4: 관심 분야 (건너뛰기 가능)
+  ├─ Step 5: 닉네임 설정 + 달 게이지 프로필 선택 (건너뛰기 → "OFF 중인 누군가")
+  ├─ Step 6: 알림 허용 (건너뛰기 → 미허용)
+  └─ Step 7: 환영 → HomeScreen</code></pre>
+
+
+<!-- Step 1 -->
+<h2 id="ob-step1">Step 1: 연령 확인 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>질문</td><td>"반가워. 몇 살이야?"</td></tr>
+  <tr><td>입력</td><td>생년월일 선택 (날짜 피커 스크롤)</td></tr>
+  <tr><td>조건</td><td>만 20~35세만 가입 가능</td></tr>
+  <tr><td>건너뛰기</td><td>불가 (유일한 필수 단계)</td></tr>
+</table>
+
+<h3>연령 초과 시</h3>
+<div class="card warn">
+  <p>"지금은 20~35세를 위한 공간이야. 곧 더 넓혀갈 거야. 기다려줄 수 있어?"</p>
+  <ul>
+    <li><strong>"알림 받을게"</strong> → 이메일 입력 → waitlist 테이블에 저장</li>
+    <li><strong>"괜찮아, 다음에"</strong> → 앱 종료</li>
+  </ul>
+  <p style="color:var(--text-dim); font-size:12px;">톤: 거절이 아닌 대기. 따뜻하고 미안한 뉘앙스.</p>
+</div>
+
+
+<!-- Step 2 -->
+<h2 id="ob-step2">Step 2: 상태 선택 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>질문</td><td>"지금 어떤 상태야? (편하게 골라줘. 안 골라도 돼.)"</td></tr>
+  <tr><td>선택 방식</td><td>단일 선택 (카드 UI, 탭하면 배경색 변경)</td></tr>
+  <tr><td>건너뛰기</td><td>가능 → 상태 미설정 (프로필에서 나중에 변경 가능)</td></tr>
+</table>
+
+<h3>선택지</h3>
+<table>
+  <tr><th>선택지</th><th>DB 값</th></tr>
+  <tr><td>잠깐 쉬는 중 (3개월 미만)</td><td><code>under_3m</code></td></tr>
+  <tr><td>쉬고 있는 중 (3개월~1년)</td><td><code>3m_to_1y</code></td></tr>
+  <tr><td>오래 쉬고 있어 (1년 이상)</td><td><code>over_1y</code></td></tr>
+  <tr><td>번아웃 회복 중</td><td><code>burnout</code></td></tr>
+  <tr><td>그냥 구경 중</td><td><code>browsing</code></td></tr>
+</table>
+
+
+<!-- Step 3 -->
+<h2 id="ob-step3">Step 3: 공백 이유 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>질문</td><td>"혹시 이유가 있어? (말하기 싫으면 건너뛰어도 돼.)"</td></tr>
+  <tr><td>선택 방식</td><td>단일 선택</td></tr>
+  <tr><td>건너뛰기</td><td>가능</td></tr>
+</table>
+
+<h3>선택지</h3>
+<table>
+  <tr><th>선택지</th><th>DB 값</th><th>비고</th></tr>
+  <tr><td>구직이 잘 안 돼</td><td><code>job_search</code></td><td></td></tr>
+  <tr><td>퇴사/권고사직</td><td><code>resign</code></td><td></td></tr>
+  <tr><td>건강 문제</td><td><code>health</code></td><td></td></tr>
+  <tr><td>원래 좀 쉬려고</td><td><code>voluntary</code></td><td></td></tr>
+  <tr><td>말하기 어려워</td><td><code>hard_to_say</code></td><td>사실상 건너뛰기의 다른 표현</td></tr>
+</table>
+
+
+<!-- Step 4 -->
+<h2 id="ob-step4">Step 4: 관심 분야 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>질문</td><td>"어떤 분야에 관심 있어? (2~3개 골라줘)"</td></tr>
+  <tr><td>선택 방식</td><td>복수 선택 (칩 UI, 탭하면 토글)</td></tr>
+  <tr><td>제한</td><td>최대 3개 (4개 이상 시 "3개까지 골라줘" 토스트)</td></tr>
+  <tr><td>건너뛰기</td><td>가능</td></tr>
+</table>
+
+<h3>선택지</h3>
+<p>IT/개발, 디자인/크리에이티브, 경영/비즈니스, 교육/연구, 예술/문화, 기타</p>
+
+
+<!-- Step 5 -->
+<h2 id="ob-step5">Step 5: 닉네임 설정 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>질문</td><td>"뭐라고 부를까?"</td></tr>
+  <tr><td>기본값</td><td>"OFF 중인 누군가"</td></tr>
+  <tr><td>건너뛰기</td><td>"이대로 할게" → 기본 닉네임 + 기본 달 게이지 유지</td></tr>
+</table>
+
+<h3>유효성 검사</h3>
+<table>
+  <tr><th>규칙</th><th>에러 메시지</th></tr>
+  <tr><td>2~12자</td><td>"2자에서 12자 사이로 적어줘"</td></tr>
+  <tr><td>한글/영문/숫자만</td><td>"특수문자는 쓸 수 없어"</td></tr>
+  <tr><td>중복 체크</td><td>"이미 쓰고 있는 닉네임이야. 다른 걸 생각해봐"</td></tr>
+  <tr><td>금칙어 (욕설/개인정보)</td><td>"이 닉네임은 사용할 수 없어"</td></tr>
+  <tr><td>공백만</td><td>"공백만으로는 안 돼"</td></tr>
+</table>
+
+<h3>달 충전 게이지 프로필 선택</h3>
+<p>닉네임 입력 화면에서 달 게이지 프로필을 선택. 닉네임 설정 시 함께 선택하며, 이후 프로필 편집에서도 변경 가능.</p>
+<div class="card">
+  <strong>달 단계 (10단계):</strong> 신월(0%) ~ 보름달(100%), 10% 단위 구분<br>
+  <strong>초기값:</strong> 신월 (0%) — 배터리 충전에 따라 자동 변경됨<br>
+  <strong>DB 컬럼:</strong> <code>public.users.moon_phase INTEGER DEFAULT 0</code> (0~9, 10단계)
+</div>
+
+<div class="card warn">
+  <strong>닉네임 변경 불가 정책:</strong> 닉네임은 가입 시 1회 설정 후 변경 불가. 운영팀에 사유와 함께 별도 요청 시에만 가능.
+</div>
+
+
+<!-- Step 6 (구 Step 8-알림) -->
+<h2 id="ob-step6">Step 6: 알림 허용 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>질문</td><td>"새 글이 올라오면 알려줄까?"</td></tr>
+  <tr><td>서브텍스트</td><td>"언제든 끌 수 있어!"</td></tr>
+  <tr><td>"좋아, 알려줘"</td><td>→ OS 알림 권한 요청 팝업 트리거</td></tr>
+  <tr><td>"나중에 할게"</td><td>→ 알림 미허용 (설정에서 변경 가능)</td></tr>
+</table>
+
+<div class="card warn">
+  <strong>구현 참고:</strong> 현재 코드에 OS 알림 권한 요청은 TODO 상태. <code>expo-notifications</code> 패키지 추가 필요.
+</div>
+
+
+<!-- Step 7 (구 Step 8-환영) -->
+<h2 id="ob-step7">Step 7: 환영 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>메시지</td><td>"환영해, [닉네임]."</td></tr>
+  <tr><td>동적 데이터</td><td>"지금 너랑 같은 상태인 사람이 [N]명 있어."</td></tr>
+  <tr><td>CTA</td><td>"둘러볼게" → HomeScreen 진입</td></tr>
+</table>
+
+<div class="card highlight">
+  <strong>동적 유저 수 규칙</strong>
+  <ul>
+    <li>[N]은 실시간: Step 2에서 선택한 상태와 같은 유저 수</li>
+    <li>상태 미선택 시: 전체 OFF 상태 유저 수</li>
+    <li>10명 미만이면 숫자 생략: "너와 같은 상태인 사람들이 여기 있어."</li>
+  </ul>
+</div>
+
+<div class="card warn">
+  <strong>배터리 게이지 UI 삭제:</strong> 환영 화면에서 배터리 충전 애니메이션 제거. 배터리 0→5% 충전 처리는 백엔드에서 자동으로 진행되며, 환영 화면에서는 표시하지 않음.
+</div>
+
+
+<!-- DB 저장 -->
+<h2 id="ob-db">DB 저장 항목 <span class="badge be">백엔드</span></h2>
+
+<table>
+  <tr><th>Step</th><th>DB 컬럼</th><th>타입</th><th>필수</th></tr>
+  <tr><td>1</td><td><code>birth_date</code></td><td>DATE</td><td><span class="tag required">필수</span></td></tr>
+  <tr><td>2</td><td><code>gap_duration</code></td><td>TEXT (enum)</td><td><span class="tag optional">선택</span></td></tr>
+  <tr><td>3</td><td><code>gap_reason</code></td><td>TEXT (enum)</td><td><span class="tag optional">선택</span></td></tr>
+  <tr><td>4</td><td><code>interests</code></td><td>TEXT[]</td><td><span class="tag optional">선택</span></td></tr>
+  <tr><td>5</td><td><code>nickname</code></td><td>TEXT UNIQUE</td><td><span class="tag optional">선택</span> (기본값 있음)</td></tr>
+  <tr><td>5</td><td><code>moon_phase</code></td><td>INTEGER (0~9)</td><td>자동 (0으로 시작)</td></tr>
+  <tr><td>6</td><td><code>push_enabled</code></td><td>BOOLEAN</td><td><span class="tag optional">선택</span></td></tr>
+  <tr><td>7</td><td><code>onboarding_completed</code></td><td>BOOLEAN → true</td><td>자동</td></tr>
+  <tr><td>7</td><td><code>battery_percent</code></td><td>INTEGER → 5</td><td>자동 (첫 접속 보너스)</td></tr>
+</table>
+
+<div class="card warn">
+  <strong>현재 코드 상태:</strong> 서베이 UI는 이전 6단계(Step 5 바라는 것, Step 6 나는요 뱃지 포함)로 구현됐으나, 이번 기획 변경으로 7단계로 재구성. 달 게이지 프로필 선택 UI 및 Supabase 저장 로직 업데이트 필요.
+</div>
+
+
+<!-- 엣지케이스 -->
+<h2 id="ob-edge-cases">엣지케이스 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>상황</th><th>대응</th></tr>
+  <tr><td>온보딩 중 앱 종료</td><td><code>onboarding_completed=false</code> → 다음 로그인 시 이어서. 이전 입력값 AsyncStorage에 유지.</td></tr>
+  <tr><td>연령 범위 초과</td><td>가입 차단 + 대기 리스트 안내 (waitlist 테이블)</td></tr>
+  <tr><td>닉네임 중복</td><td>실시간 API 체크 → 에러 메시지</td></tr>
+  <tr><td>금칙어 닉네임</td><td>"이 닉네임은 사용할 수 없어"</td></tr>
+  <tr><td>모든 건너뛰기</td><td>허용. 기본값(닉네임 "OFF 중인 누군가", 상태 미설정)으로 진행.</td></tr>
+  <tr><td>뒤로 가기</td><td>이전 단계로 돌아가기. 이전 입력값 유지.</td></tr>
+  <tr><td>생년월일 미래 날짜</td><td>선택 불가 (피커에서 오늘 이후 날짜 비활성화)</td></tr>
+</table>
+
+
+<!-- 체크리스트 -->
+<h2 id="ob-checklist">개발 체크리스트 <span class="badge both">FE + BE</span></h2>
+
+<h3>프론트엔드</h3>
+<ul class="checklist">
+  <li class="done">6단계 UI 구현 (기존)</li>
+  <li class="done">프로그레스 바</li>
+  <li class="done">뒤로 가기 + 건너뛰기</li>
+  <li class="done">연령 검사 (만 20~35세)</li>
+  <li class="done">닉네임 유효성 (2~12자, 한글/영문/숫자)</li>
+  <li class="done">환영 화면 배터리 애니메이션</li>
+  <li>Step 5 바라는 것 UI 추가</li>
+  <li>Step 6 나는요 뱃지 UI 추가 (최대 2개 제한)</li>
+  <li>Step 7 프로필 캐릭터(이모지) 선택 UI 추가</li>
+  <li>닉네임 중복 체크 API 연동</li>
+  <li>OS 알림 권한 요청 (expo-notifications)</li>
+  <li>Supabase에 서베이 결과 저장</li>
+  <li>같은 상태 유저 수 실시간 조회</li>
+</ul>
+
+<h3>백엔드</h3>
+<ul class="checklist">
+  <li>닉네임 중복 체크 RPC 또는 API</li>
+  <li>금칙어 필터 (욕설/개인정보 패턴)</li>
+  <li>waitlist 테이블 INSERT (연령 초과 시)</li>
+  <li>서베이 완료 시 users 테이블 UPDATE (desired_path, badges, profile_emoji 컬럼 추가 필요)</li>
+  <li>배터리 첫 충전 +5% (battery_logs INSERT)</li>
+</ul>
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  홈 피드                                               ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="home-feed">
+
+<div class="feature-title">
+  홈 피드
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>HomeScreen</dd></dl>
+  <dl><dt>탭</dt><dd>하단 탭 첫 번째 (홈)</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="home-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>앱을 열면 가장 먼저 보이는 화면이에요. 내 배터리 상태, 인기 글, 카테고리 바로가기, 최근 글이 한눈에 보여요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>주요 구성</h4>
+      <p>① 배터리 요약 카드 → ② 오늘의 공간글 롤링 → ③ 카테고리 3×2 그리드 → ④ 최근 글 피드</p>
+    </div>
+    <div class="glance-item">
+      <h4>하단 네비게이션</h4>
+      <p>홈 / 게시판 / 검색 / MY — 4탭 구성. 알림은 하단 탭에서 제거되고, 알림 확인은 MY 탭 또는 헤더 아이콘을 통해 접근.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 화면 구성 -->
+<h2 id="home-layout">화면 구성 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>영역</th><th>설명</th><th>비고</th></tr>
+  <tr><td>배터리 요약 카드</td><td>현재 배터리 %, 레벨, 한줄 메시지</td><td>탭하면 MY 탭으로 이동</td></tr>
+  <tr><td>오늘의 공간글</td><td>인기글 자동 롤링 (3~5개)</td><td>3초 간격 수평 스크롤</td></tr>
+  <tr><td>카테고리 바로가기</td><td>3×2 그리드 6개 카테고리</td><td>각 탭하면 해당 섹션으로 이동</td></tr>
+  <tr><td>최근 글 피드</td><td>전체 카테고리 최신 글 목록</td><td>무한 스크롤</td></tr>
+</table>
+
+<!-- 배터리 카드 -->
+<h2 id="home-battery-card">배터리 요약 카드 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>배터리 퍼센트</td><td>0~100%, 프로그레스 바</td></tr>
+  <tr><td>레벨 표시</td><td>Lv.1~5 (아이콘 + 레벨명)</td></tr>
+  <tr><td>한줄 메시지</td><td>레벨별 응원 문구</td></tr>
+  <tr><td>탭 액션</td><td>MY 탭 배터리 상세 화면으로 이동</td></tr>
+</table>
+
+<!-- 카테고리 바로가기 -->
+<h2 id="home-categories">카테고리 바로가기 <span class="badge fe">프론트엔드</span></h2>
+
+<p>6개 카테고리, 각자 고유 아이콘 컬러. 3×2 그리드 배치.</p>
+
+<table>
+  <tr><th>카테고리</th><th>아이콘 컬러</th><th>설명</th><th>이동 대상</th></tr>
+  <tr><td>참견해줘</td><td>주황 (Orange)</td><td>고민 올리고 댓글로 참견받기</td><td>참견해줘 화면</td></tr>
+  <tr><td>면접창고</td><td>네이비 (Navy)</td><td>면접 리얼 후기 아카이브</td><td>면접창고 화면</td></tr>
+  <tr><td>같이하자</td><td>보라 (Violet)</td><td>챌린지 생성/참여</td><td>같이하자 화면</td></tr>
+  <tr><td>자유게시판</td><td>그레이 (Gray)</td><td>자유 주제 글 올리기</td><td>자유게시판 화면</td></tr>
+  <tr><td>공구하자</td><td>초록 (Green)</td><td>공동구매 (Phase 2 티저)</td><td>Phase 2 준비중 화면</td></tr>
+  <tr><td>만들어줘</td><td>레드 (Red)</td><td>운영팀에 의견 보내기</td><td>만들어줘 화면</td></tr>
+</table>
+
+<!-- 최근 글 피드 -->
+<h2 id="home-feed-list">최근 글 피드 <span class="badge both">FE + BE</span></h2>
+
+<p>전체 카테고리 합산 최신 글을 시간 역순으로 표시. 카테고리 뱃지 + 닉네임 + 제목 + 같아요/댓글 수 + 시간 표시.</p>
+
+<div class="card">
+  <strong>쿼리:</strong> <code>SELECT * FROM posts WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 20</code><br>
+  <strong>무한 스크롤:</strong> cursor 기반 페이지네이션 (created_at + id)
+</div>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  자유게시판                                             ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="board">
+
+<div class="feature-title">
+  자유게시판
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>BoardScreen, BoardWriteScreen, BoardDetailScreen</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="board-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>공백기 관련 무엇이든 자유롭게 글을 올리고, 댓글로 소통하는 게시판이에요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>주요 기능</h4>
+      <p>글 목록 → 글쓰기 (이미지 3장, 태그) → 글 상세 + 댓글 + 답글</p>
+    </div>
+  </div>
+</div>
+
+<!-- 글 목록 -->
+<h2 id="board-list">글 목록 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>글 카드</td><td>닉네임 → 제목 → 같아요/댓글 수 + 업로드 시간</td></tr>
+  <tr><td>정렬</td><td>최신순 / 인기순 탭 전환</td></tr>
+  <tr><td>플로팅 버튼</td><td>글쓰기 (+) 버튼 — 오른쪽 하단</td></tr>
+</table>
+
+<!-- 글쓰기 -->
+<h2 id="board-write">글쓰기 <span class="badge both">FE + BE</span></h2>
+
+<p>모든 카테고리 통일 글쓰기 폼: <strong>제목 → 카테고리 선택 → 내용 → 이미지 첨부(최대 3장) → 태그</strong></p>
+
+<table>
+  <tr><th>입력 항목</th><th>설명</th><th>제한</th></tr>
+  <tr><td>제목</td><td>필수, 1~50자</td><td>50자 초과 차단</td></tr>
+  <tr><td>카테고리 선택</td><td>참견해줘 / 면접창고 / 같이하자 / 자유게시판 / 공구하자 / 만들어줘 중 선택</td><td>단일 선택</td></tr>
+  <tr><td>내용</td><td>필수, 최소 10자</td><td>2000자 제한</td></tr>
+  <tr><td>이미지 첨부</td><td>최대 3장 (갤러리 or 카메라)</td><td>장당 5MB 이하, JPG/PNG</td></tr>
+  <tr><td>태그</td><td>선택, # 입력 → 칩 추가</td><td>최대 5개</td></tr>
+</table>
+
+<div class="card">
+  <strong>이미지 저장:</strong> Supabase Storage <code>posts</code> 버킷 → 공개 URL로 <code>posts.image_urls TEXT[]</code>에 저장
+</div>
+
+<!-- 글 상세 -->
+<h2 id="board-detail">글 상세 + 댓글 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>글 본문</td><td>제목 + 내용 + 이미지 + 태그 + 같아요 버튼</td></tr>
+  <tr><td>구분선</td><td>본문과 댓글 사이 hr 구분선</td></tr>
+  <tr><td>댓글 목록</td><td>개별 박스 없이 <strong>구분선</strong>으로 댓글 구분 — 닉네임 + 내용 + 시간 + 같아요 + 답글 버튼</td></tr>
+  <tr><td>답글</td><td>댓글에 대한 1단계 답글 — <strong>들여쓰기 + 좌측 보더</strong> 표시</td></tr>
+  <tr><td>댓글 입력</td><td>하단 고정 입력창 + 전송 버튼</td></tr>
+  <tr><td>신고/삭제</td><td>본인 글/댓글 삭제, 타인 글/댓글 신고</td></tr>
+</table>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  참견해줘                                               ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="cheer">
+
+<div class="feature-title">
+  참견해줘
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>CheerScreen, CheerDetailScreen</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-17</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="cheer-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>고민이나 상황을 올리면 다른 사람들이 댓글로 "참견"해주는 소통 공간이에요. 혼자 고민하지 않아도 돼요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>BEST 참견</h4>
+      <p>같아요가 많은 댓글이 자동으로 상위에 노출돼요. 공감받은 참견이 먼저 보여요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 목록 -->
+<h2 id="cheer-list">목록 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>정렬</td><td>인기순 / 최신순 탭 전환</td></tr>
+  <tr><td>글 카드</td><td>닉네임 → 고민 내용 (최대 3줄) → 참견 수 + 시간</td></tr>
+  <tr><td>글쓰기</td><td>플로팅 (+) 버튼 → 고민 입력 화면</td></tr>
+</table>
+
+<!-- BEST 참견 -->
+<h2 id="cheer-best">BEST 참견 <span class="badge both">FE + BE</span></h2>
+
+<p>글 상세 화면에서 댓글 중 같아요 수가 가장 많은 댓글을 "BEST 참견" 뱃지와 함께 상단에 고정 표시.</p>
+
+<div class="card">
+  <strong>조건:</strong> 같아요 5개 이상 + 다른 댓글보다 높은 같아요 수 → BEST 뱃지 자동 부여<br>
+  <strong>답글:</strong> 댓글에 1단계 답글 지원 (들여쓰기 표시)
+</div>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  면접창고                                               ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="interview">
+
+<div class="feature-title">
+  면접창고 (면접 리얼 후기)
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>InterviewScreen, InterviewCompanyScreen, InterviewDetailScreen</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="interview-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>면접을 보고 나서 솔직한 후기를 남기는 공간이에요. 어떤 질문을 받았는지, 분위기는 어땠는지 공유할 수 있어요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>BLACKLIST란?</h4>
+      <p>후기 작성 시 블랙리스트로 등록할 수 있어요. 50표 이상이면 검색 상단에 고정 노출돼요. 면접 블랙리스트 주의 기업이에요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 3단계 플로우 -->
+<h2 id="interview-flow">3단계 플로우 <span class="badge fe">프론트엔드</span></h2>
+
+<div class="flow">
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-content"><strong>메인</strong> — 검색창 + 인기 후기 + 최신 후기<small>회사명 검색 지원</small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-content"><strong>회사별 리스트</strong> — 평균 별점 + 후기 수 + 요약<small>회사 탭 → 전체 후기 리스트</small></div></div>
+  <div class="flow-line"></div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-content"><strong>상세</strong> — 회사이름 / 면접관 수 / 총점 / 주요 질문 / 전할 말 + 댓글 + 같아요<small>로그인 유저만 열람 가능</small></div></div>
+</div>
+
+<h3>후기 작성 항목</h3>
+<table>
+  <tr><th>항목</th><th>설명</th><th>필수</th></tr>
+  <tr><td>회사명</td><td>텍스트 입력 + 자동완성</td><td>필수</td></tr>
+  <tr><td>직무</td><td>텍스트 입력</td><td>선택</td></tr>
+  <tr><td>면접관 수</td><td>1~10명 선택</td><td>선택</td></tr>
+  <tr><td>별점</td><td>1~5점 (0.5점 단위)</td><td>필수</td></tr>
+  <tr><td>주요 질문</td><td>최대 5개 태그 형식</td><td>선택</td></tr>
+  <tr><td>전할 말 (제목)</td><td>후기 제목 — 예: "진짜 최악. 아직도 이런걸 물어봐?"</td><td>선택</td></tr>
+  <tr><td>상세 내용</td><td>자유 서술 (최대 500자)</td><td>선택</td></tr>
+  <tr><td>블랙리스트 등록</td><td>토글 스위치 — "이 회사를 블랙리스트에 올려요"</td><td>선택</td></tr>
+</table>
+
+<h3>후기 상세 화면 (InterviewDetailScreen)</h3>
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>회사명</td><td>제목 위에 그레이 텍스트로 표시</td></tr>
+  <tr><td>제목</td><td>후기 작성자가 입력한 제목 (굵게, 크게)</td></tr>
+  <tr><td>별점/직무/면접관 수</td><td>메타 정보 행</td></tr>
+  <tr><td>주요 질문</td><td>태그 형식</td></tr>
+  <tr><td>상세 내용</td><td>자유 서술 영역</td></tr>
+  <tr><td>댓글</td><td>구분선 구분 + 답글 지원</td></tr>
+</table>
+
+<!-- BLACKLIST 뱃지 -->
+<h2 id="interview-blacklist">BLACKLIST 뱃지 <span class="badge both">FE + BE</span></h2>
+
+<div class="card danger">
+  <strong>BLACKLIST 기준:</strong>
+  <ul>
+    <li>후기 작성 시 블랙리스트 토글 ON → 해당 회사의 블랙리스트 카운트 +1</li>
+    <li>누적 50표 이상 → 검색 결과 + 회사 카드에 "BLACKLIST" 뱃지 고정 표시</li>
+    <li>뱃지 스타일: 검정 배경 + 흰 텍스트, 프리미엄 스타일 (약간의 긴장감 의도)</li>
+    <li>표시 위치: 회사별 리스트 카드 <strong>좌상단 코너에 걸침</strong> + 상세 화면 상단 배너</li>
+    <li>블랙리스트 안내 문구: "이 후기 작성자가 블랙리스트로 표시했어요"</li>
+  </ul>
+</div>
+
+<div class="card highlight">
+  <strong>DB 설계:</strong> <code>interview_reviews</code> 테이블에 <code>is_blacklist BOOLEAN</code> 컬럼.<br>
+  회사별 집계는 <code>SELECT company, COUNT(*) FILTER (WHERE is_blacklist=true) AS bl_count FROM interview_reviews GROUP BY company</code>
+</div>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  같이하자                                               ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="together">
+
+<div class="feature-title">
+  같이하자 (챌린지)
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>TogetherScreen, TogetherDetailScreen</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-17</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="together-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>혼자 하기 어려운 것을 함께하는 챌린지 공간이에요. 누군가 챌린지를 만들면 다른 사람이 참여하고, 사진으로 인증해요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>어떻게 진행해요?</h4>
+      <p>챌린지 생성 → 참여 신청 → 사진 인증 → 댓글로 응원. 참여자 목록과 진행 현황도 볼 수 있어요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 챌린지 생성/참여 -->
+<h2 id="together-challenge">챌린지 생성 / 참여 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>챌린지 제목</td><td>예: "매일 30분 산책하기"</td></tr>
+  <tr><td>기간</td><td>1주 / 2주 / 1개월 선택</td></tr>
+  <tr><td>최대 참여 인원</td><td>선택 (무제한 or 2~20명)</td></tr>
+  <tr><td>참여 방식</td><td>누구나 참여 / 승인 후 참여</td></tr>
+  <tr><td>참여자 목록</td><td>프로필 이모지 + 닉네임 그리드</td></tr>
+  <tr><td>진행 현황</td><td>전체 인증 횟수 / 내 인증 횟수</td></tr>
+</table>
+
+<!-- 사진 인증 -->
+<h2 id="together-cert">사진 인증 + 댓글 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>인증 사진</td><td>갤러리/카메라에서 1장 첨부 필수</td></tr>
+  <tr><td>인증 메시지</td><td>선택 (최대 100자)</td></tr>
+  <tr><td>1일 1회 제한</td><td>같은 챌린지 하루 1번만 인증 가능</td></tr>
+  <tr><td>인증 피드</td><td>챌린지 상세에서 전체 인증 사진 타임라인 표시</td></tr>
+  <tr><td>댓글</td><td>인증 사진에 댓글 달기 (응원, 공감)</td></tr>
+</table>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  만들어줘                                               ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="suggest">
+
+<div class="feature-title">
+  만들어줘 (의견함)
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>SuggestScreen</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="suggest-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>운영팀에게 비공개로 의견을 보내는 창구예요. 서비스 제안, 버그 제보, 자유 의견 무엇이든 괜찮아요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>전체 투표란?</h4>
+      <p>운영팀이 제안한 기능이나 방향에 대해 유저들이 찬반 투표를 해요. 투표가 끝나면 "종료" 텍스트로 표시돼요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 비공개 의견 -->
+<h2 id="suggest-write">비공개 의견 보내기 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>카테고리</td><td>서비스 제안 / 버그 제보 / 자유 의견 선택</td></tr>
+  <tr><td>내용</td><td>필수, 최대 500자</td></tr>
+  <tr><td>비공개 처리</td><td>운영팀만 열람 가능 (다른 유저에게 노출 안 됨)</td></tr>
+  <tr><td>답변 수신</td><td>운영팀 답변은 DM으로 수신</td></tr>
+</table>
+
+<!-- 전체 투표 -->
+<h2 id="suggest-vote">전체 투표 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>투표 항목</td><td>운영팀이 생성 (관리자 전용)</td></tr>
+  <tr><td>선택지</td><td>"너무 좋아" vs "별로 관심없어"</td></tr>
+  <tr><td>상태</td><td>진행중 / 종료 텍스트로 구분 표시 (뱃지 아닌 텍스트)</td></tr>
+  <tr><td>결과 표시</td><td>투표 후 각 선택지 %와 막대 그래프 표시</td></tr>
+</table>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  다이렉트 메시지 (DM)                                   ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="dm">
+
+<div class="feature-title">
+  다이렉트 메시지 (DM)
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>DMListScreen, DMChatScreen</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="dm-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>유저 간 1:1 비공개 메시지를 주고받는 공간이에요. 운영팀 공식 답변도 여기서 받아볼 수 있어요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>안전 정책</h4>
+      <p>금전거래 유도, 광고, 악성 메시지는 강제 탈퇴 사유예요. 불쾌한 메시지는 운영팀에 신고할 수 있어요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 대화 목록 -->
+<h2 id="dm-list">대화 목록 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>배경</td><td>화이트 배경 (다크 배경 아님)</td></tr>
+  <tr><td>구분선</td><td>대화 카드 사이 구분선으로 통일 (카드형 박스 없음)</td></tr>
+  <tr><td>대화 카드</td><td>프로필 이모지 + 닉네임 + 마지막 메시지 미리보기 + 시간</td></tr>
+  <tr><td>읽지 않은 수</td><td>오른쪽 빨간 배지 (숫자)</td></tr>
+  <tr><td>OFFICIAL 뱃지</td><td>운영팀 대화에만 표시 — "UNOFF 운영팀" 고정 표시</td></tr>
+  <tr><td>새 대화 시작 버튼</td><td>우측 상단 + 버튼 <strong>삭제</strong> — 게시글 닉네임 탭으로만 DM 시작 가능</td></tr>
+</table>
+
+<!-- 운영팀 답변 -->
+<h2 id="dm-official">운영팀 답변 (OFFICIAL) <span class="badge both">FE + BE</span></h2>
+
+<div class="card highlight">
+  <strong>OFFICIAL 뱃지 규칙:</strong>
+  <ul>
+    <li>운영팀 계정(<code>is_admin = true</code>)에서 보낸 메시지에 자동으로 파란 "OFFICIAL" 뱃지 표시</li>
+    <li>만들어줘 의견에 답변 시 자동으로 DM 발송</li>
+    <li>공지 알림 또는 배터리 관련 안내도 운영팀 DM으로 발송 가능</li>
+  </ul>
+</div>
+
+<!-- 안전 경고 -->
+<h2 id="dm-safety">안전 경고 <span class="badge fe">프론트엔드</span></h2>
+
+<div class="card danger">
+  <strong>DM 입력창 하단 고정 문구:</strong><br>
+  "금전거래유도/광고/악성 메시지 적발 시 강제 탈퇴 처리됩니다. 불쾌한 메시지가 있었다면 운영팀에 신고해주세요."
+</div>
+
+<p>신고 버튼: 각 메시지 롱프레스 → "이 메시지 신고하기" → 신고 사유 선택 → 운영팀에 자동 전송.</p>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  공지사항                                               ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="notice">
+
+<div class="feature-title">
+  공지사항
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>NoticeScreen, NoticeDetailScreen</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="notice-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>운영팀이 공식적으로 전달하는 공지 모음이에요. UNOFF가 어떤 서비스인지, 이용 규칙은 뭔지 담겨 있어요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>필독 공지란?</h4>
+      <p>신규 가입자에게 반드시 안내되는 3가지 핵심 공지예요. 일반 공지 목록 최상단에 고정 노출돼요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 필독 공지 -->
+<h2 id="notice-pinned">필독 공지 <span class="badge both">FE + BE</span></h2>
+
+<div class="card highlight">
+  <strong>필독 공지 3종 (상단 고정):</strong>
+  <ol>
+    <li>
+      <strong>NT-01: UNOFF란?</strong><br>
+      UNOFF는 <strong>Underdog's Offbeat + Unofficial</strong>의 합성어.<br>
+      공백기 청년을 위한 비공식 쉼터.<br>
+      지향 가치 (넘버링):
+      <ol>
+        <li>비교 없는 공간</li>
+        <li>각자의 속도</li>
+        <li>공백도 경력</li>
+        <li>엇박자도 리듬</li>
+      </ol>
+      마무리 문구: "서로에게 긍정적인 영향을 주고받는 언더독이 되어주세요."
+    </li>
+    <li><strong>NT-02: UNOFF의 운영 방침</strong> — 안전하고 따뜻한 커뮤니티를 위한 약속</li>
+    <li><strong>NT-03: 강제탈퇴 가이드</strong> — 안전한 커뮤니티를 위한 운영 정책</li>
+  </ol>
+</div>
+
+<!-- 강제탈퇴 가이드 -->
+<h2 id="notice-ban">강제탈퇴 가이드 <span class="badge both">FE + BE</span></h2>
+
+<div class="card danger">
+  <strong>강제탈퇴 사유 (아래 중 하나라도 해당 시):</strong>
+  <ul>
+    <li>금전거래 유도 / 사기 행위</li>
+    <li>광고 / 스팸 / 도배</li>
+    <li>혐오 발언 / 차별 / 성희롱</li>
+    <li>개인정보 유출 / 신상공개</li>
+    <li>반복 신고 3회 누적</li>
+  </ul>
+  <p style="margin-top:8px; color:var(--text-dim); font-size:12px;">강제탈퇴 시 재가입 불가 (기기 + 계정 모두 차단)</p>
+</div>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  알림                                                   ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="notification">
+
+<div class="feature-title">
+  알림
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>NotificationScreen</dd></dl>
+  <dl><dt>접근 방식</dt><dd>하단 탭에서 제거 → 헤더 아이콘 또는 MY 탭 내 메뉴로 접근</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<div class="card warn">
+  <strong>하단 탭 변경 (2026-03-18):</strong> 기존 5탭(홈/게시판/같이해요/알림/MY)에서 4탭(홈/게시판/검색/MY)으로 변경. 알림 탭은 제거되고 검색이 세 번째 탭으로 들어옴. 알림은 헤더 영역 아이콘으로 접근.
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="noti-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>내 글에 달린 댓글, 같아요, 챌린지 소식, 운영팀 공지 등 모든 알림이 여기에 모여요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>그룹 구분</h4>
+      <p>"오늘" / "이번주" 두 그룹으로 구분하여 시간대별로 정리돼요. 읽지 않은 알림은 파란 점으로 표시해요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 알림 목록 -->
+<h2 id="noti-list">알림 목록 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>그룹 헤더</td><td>"오늘" / "이번주" 섹션 헤더</td></tr>
+  <tr><td>알림 아이템</td><td>아이콘 + 내용 요약 + 시간 + 읽지 않음 dot</td></tr>
+  <tr><td>읽지 않음 dot</td><td>알림 아이템 좌측 파란 점 (읽으면 사라짐)</td></tr>
+  <tr><td>탭 액션</td><td>알림 탭 → 관련 화면으로 이동</td></tr>
+  <tr><td>전체 읽음</td><td>우상단 "모두 읽음" 버튼</td></tr>
+</table>
+
+<!-- 알림 종류 -->
+<h2 id="noti-types">알림 종류 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>알림 종류</th><th>내용</th><th>이동 대상</th></tr>
+  <tr><td>댓글</td><td>"[닉네임]이 내 글에 댓글을 달았어"</td><td>해당 글 상세</td></tr>
+  <tr><td>답글</td><td>"[닉네임]이 내 댓글에 답글을 달았어"</td><td>해당 댓글</td></tr>
+  <tr><td>같아요</td><td>"[닉네임]이 내 글에 같아요를 눌렀어"</td><td>해당 글 상세</td></tr>
+  <tr><td>챌린지 참여</td><td>"[닉네임]이 내 챌린지에 참여했어"</td><td>챌린지 상세</td></tr>
+  <tr><td>시스템 알림</td><td>"배터리가 50%가 됐어. 잘 쉬고 있어!"</td><td>배터리 화면</td></tr>
+  <tr><td>공지</td><td>운영팀 새 공지 알림</td><td>공지사항</td></tr>
+  <tr><td>DM</td><td>"[닉네임]에게 새 메시지가 왔어"</td><td>DM 채팅</td></tr>
+</table>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  검색                                                   ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="search">
+
+<div class="feature-title">
+  검색
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>SearchScreen</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-17</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="search-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>글, 사람, 태그를 검색할 수 있어요. 최근 검색어와 인기 태그도 제안해줘요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>검색 유형</h4>
+      <p>글 검색 / 사람(닉네임) 검색 / 태그 검색 — 탭으로 구분</p>
+    </div>
+  </div>
+</div>
+
+<!-- 검색 유형 -->
+<h2 id="search-types">검색 유형 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>유형</th><th>검색 대상</th><th>결과 표시</th></tr>
+  <tr><td>글</td><td>제목 + 내용 full-text 검색</td><td>글 카드 목록</td></tr>
+  <tr><td>사람</td><td>닉네임 부분 일치</td><td>프로필 카드 (이모지 + 닉네임 + 나는요 뱃지)</td></tr>
+  <tr><td>태그</td><td><code>#태그</code> 정확 일치</td><td>해당 태그 글 목록</td></tr>
+</table>
+
+<div class="card">
+  <strong>Supabase Full-Text Search:</strong> <code>posts.search_vector tsvector</code> 컬럼으로 PostgreSQL FTS 활용<br>
+  <code>WHERE search_vector @@ plainto_tsquery('korean', :query)</code>
+</div>
+
+<!-- 최근 검색 + 인기 태그 -->
+<h2 id="search-recent">최근 검색 + 인기 태그 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>최근 검색</td><td>로컬 AsyncStorage에 최대 10개 저장, X 버튼으로 개별 삭제</td></tr>
+  <tr><td>인기 태그</td><td>지난 7일 기준 태그 사용 횟수 상위 10개 → 칩 형식 표시</td></tr>
+  <tr><td>인기 태그 업데이트</td><td>Supabase Edge Function 또는 pg_cron으로 일 1회 집계</td></tr>
+</table>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  프로필 / 설정                                          ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="profile">
+
+<div class="feature-title">
+  프로필 / 설정
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>MyScreen, ProfileEditScreen, SettingsScreen</dd></dl>
+  <dl><dt>탭</dt><dd>하단 탭 네 번째 (MY) — 탭 구조 변경 반영</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="profile-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>내 정보가 한눈에 보이는 개인 페이지예요. 배터리 현황, 내가 쓴 글, 설정까지 여기서 관리해요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>주요 구성</h4>
+      <p>프로필 카드 + 배터리 상세 + 활동 요약 → 프로필 편집 / 설정 메뉴</p>
+    </div>
+  </div>
+</div>
+
+<!-- MY 페이지 -->
+<h2 id="profile-my">MY 페이지 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>영역</th><th>설명</th></tr>
+  <tr><td>프로필 카드</td><td>달 충전 게이지 + 닉네임 + 상태메시지</td></tr>
+  <tr><td>배터리 현황</td><td>배터리 % + 레벨 + 진행 막대 + 레벨업 조건 안내</td></tr>
+  <tr><td>활동 요약</td><td>내가 쓴 글 수 / 받은 같아요 수 / 챌린지 참여 수</td></tr>
+  <tr><td>내 글 목록</td><td>탭 → 내가 작성한 글 전체 목록</td></tr>
+</table>
+
+<!-- 달 충전 게이지 프로필 -->
+<h2 id="profile-moon">달 충전 게이지 프로필 <span class="badge both">FE + BE</span></h2>
+
+<div class="glance" style="margin-bottom:20px;">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>기존 이모지 프로필을 대체하는 새로운 프로필 이미지예요. 달이 차오르는 모습으로 표현돼요. 배터리가 쌓일수록 달이 점점 차올라요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>10단계 구성</h4>
+      <p>신월(0%) ~ 보름달(100%). 배터리 퍼센트에 따라 자동으로 달 단계가 결정돼요. 직접 선택하거나 프로필 편집에서 변경할 수 있어요.</p>
+    </div>
+  </div>
+</div>
+
+<table>
+  <tr><th>단계</th><th>명칭</th><th>배터리 범위</th><th>표현</th></tr>
+  <tr><td>0</td><td>신월</td><td>0~9%</td><td>검게 비어있는 달</td></tr>
+  <tr><td>1</td><td>초승달 1</td><td>10~19%</td><td>아주 얇은 초승달</td></tr>
+  <tr><td>2</td><td>초승달 2</td><td>20~29%</td><td>얇은 초승달</td></tr>
+  <tr><td>3</td><td>반달 직전</td><td>30~39%</td><td>3/8 달</td></tr>
+  <tr><td>4</td><td>반달</td><td>40~49%</td><td>정확한 반달</td></tr>
+  <tr><td>5</td><td>반달 넘김</td><td>50~59%</td><td>5/8 달</td></tr>
+  <tr><td>6</td><td>볼록달 1</td><td>60~69%</td><td>6/8 달</td></tr>
+  <tr><td>7</td><td>볼록달 2</td><td>70~79%</td><td>7/8 달</td></tr>
+  <tr><td>8</td><td>거의 보름</td><td>80~89%</td><td>아주 약간 덜 찬 달</td></tr>
+  <tr><td>9</td><td>보름달</td><td>90~100%</td><td>완전히 찬 보름달</td></tr>
+</table>
+
+<div class="card highlight">
+  <strong>DB 컬럼:</strong> <code>public.users.moon_phase INTEGER DEFAULT 0</code> (0~9)<br>
+  <strong>자동 계산:</strong> <code>moon_phase = FLOOR(battery_percent / 10)</code> — 배터리 업데이트 시 자동 갱신<br>
+  <strong>수동 선택:</strong> 온보딩 Step 5 및 프로필 편집에서 유저가 원하는 단계로 선택 가능 (배터리와 독립적으로 표시 단계 선택)
+</div>
+
+<!-- 프로필 편집 -->
+<h2 id="profile-edit">프로필 편집 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>수정 가능</th><th>비고</th></tr>
+  <tr><td>달 충전 게이지 단계</td><td>가능</td><td>0~9 단계 중 선택 (배터리 연동 또는 수동)</td></tr>
+  <tr><td>닉네임</td><td>불가</td><td>운영팀 요청 시에만 변경 가능</td></tr>
+  <tr><td>상태메시지</td><td>가능</td><td>최대 50자</td></tr>
+  <tr><td>관심사</td><td>가능</td><td>온보딩 Step 4 재선택 (최대 3개)</td></tr>
+  <tr><td>공백 상태</td><td>가능</td><td>온보딩 Step 2 재선택</td></tr>
+</table>
+
+<div class="card warn">
+  <strong>닉네임 변경 불가 정책:</strong> 가입 시 설정한 닉네임은 변경 불가. 운영팀 이메일로 사유 포함 요청 시에만 예외 처리.
+</div>
+
+<!-- 설정 -->
+<h2 id="profile-settings">설정 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>섹션</th><th>항목</th></tr>
+  <tr><td>계정</td><td>연결된 소셜 계정 확인 / 로그아웃 / 회원탈퇴</td></tr>
+  <tr><td>알림</td><td>댓글/같아요/챌린지/DM/공지 알림 개별 ON/OFF / 방해금지 시간 설정</td></tr>
+  <tr><td>정보</td><td>이용약관 / 개인정보처리방침 / 오픈소스 라이선스 / 버전 정보</td></tr>
+  <tr><td>기타</td><td>캐시 삭제 / 문의하기 (운영팀 DM으로 연결)</td></tr>
+</table>
+
+
+<!-- ╔═══════════════════════════════════════════════════════╗ -->
+<!-- ║  탈퇴 / 탑독 전환                                      ║ -->
+<!-- ╚═══════════════════════════════════════════════════════╝ -->
+<hr class="feature-divider" id="topdog">
+
+<div class="feature-title">
+  탈퇴 / 탑독 전환
+  <span class="ft-badge">MVP</span>
+</div>
+
+<div class="meta">
+  <dl><dt>관련 화면</dt><dd>TopDogScreen (P-04), MentorVerifyScreen (P-05)</dd></dl>
+  <dl><dt>진입 조건</dt><dd>배터리 Lv.5 달성 → 탑독 전환 알림 또는 MY 탭 → 설정 → 회원탈퇴</dd></dl>
+  <dl><dt>최종 수정</dt><dd>2026-03-18</dd></dl>
+</div>
+
+<!-- 한눈에 보기 -->
+<div class="glance" id="topdog-glance">
+  <div class="glance-title">한눈에 보기</div>
+  <div class="glance-grid">
+    <div class="glance-item">
+      <h4>이게 뭔가요?</h4>
+      <p>배터리 Lv.5에 도달하거나 탈퇴를 요청했을 때, UNOFF를 떠나는 것이 아니라 "탑독(Topdog)"으로 전환하는 특별한 이탈 경험이에요. 공백기를 이겨낸 사람이 아직 쉬고 있는 사람들의 멘토가 되는 구조예요.</p>
+    </div>
+    <div class="glance-item">
+      <h4>선택지</h4>
+      <p>① 탈퇴하고 오피셜 커뮤니티로 이동하거나, ② 언더독들의 멘토로 남거나. 멘토로 남는 경우 회사 메일 또는 명함 인증을 거쳐 멘토 뱃지를 받아요.</p>
+    </div>
+  </div>
+  <div class="glance-full">
+    <h4>사용자가 겪는 흐름</h4>
+    <div class="glance-steps">
+      <div class="glance-step"><span class="step-num">1</span> 탈퇴 요청 또는 Lv.5 달성</div>
+      <div class="glance-step"><span class="step-num">2</span> P-04: 탑독 전환 화면</div>
+      <div class="glance-step"><span class="step-num">3</span> 선택 A: 탈퇴 → 앱 종료</div>
+      <div class="glance-step"><span class="step-num">4</span> 선택 B: 멘토 머물기 → P-05 멘토 인증</div>
+      <div class="glance-step"><span class="step-num">5</span> 멘토 뱃지 부여 → 홈으로</div>
+    </div>
+  </div>
+</div>
+
+<!-- P-04 탑독 전환 화면 -->
+<h2 id="topdog-p04">P-04: 탑독 전환 화면 <span class="badge fe">프론트엔드</span></h2>
+
+<table>
+  <tr><th>요소</th><th>설명</th></tr>
+  <tr><td>헤드라인</td><td>"Underdog → Topdog, 새로운 시작을 축하합니다"</td></tr>
+  <tr><td>서브텍스트</td><td>공백기를 마친 것에 대한 따뜻한 메시지</td></tr>
+  <tr><td>선택지 A</td><td>"이제 오피셜 커뮤니티에서 놀래요" → 탈퇴 처리</td></tr>
+  <tr><td>선택지 B</td><td>"아직 쉬고있는 언더독들의 멘토가 되어줄래요" → 멘토 인증 진행</td></tr>
+</table>
+
+<div class="card highlight">
+  <strong>UX 원칙:</strong> 탈퇴가 아닌 "졸업"의 경험. 축하하는 톤. UNOFF는 공백기를 이겨낸 사람도 가치있게 연결하는 생태계.
+</div>
+
+<!-- P-05 멘토 인증 -->
+<h2 id="topdog-p05">P-05: 멘토 인증 <span class="badge both">FE + BE</span></h2>
+
+<p>탑독 전환 화면에서 "멘토 머물기"를 선택한 유저가 멘토 자격을 인증하는 화면.</p>
+
+<table>
+  <tr><th>인증 방법</th><th>설명</th><th>처리</th></tr>
+  <tr><td>1안: 회사 메일 인증</td><td>재직 중인 회사 이메일 입력 → 인증 메일 발송 → 링크 클릭</td><td>자동 처리 (Supabase Email Auth)</td></tr>
+  <tr><td>2안: 명함 사진 인증</td><td>명함 사진 업로드 → 운영팀 수동 검토</td><td>수동 처리 (운영팀 확인 후 승인)</td></tr>
+</table>
+
+<div class="card warn">
+  <strong>인증 처리 기간:</strong>
+  <ul>
+    <li>회사 메일: 실시간 자동 처리</li>
+    <li>명함 사진: 영업일 기준 1~3일 (운영팀 검토)</li>
+    <li>인증 완료 시 DM으로 알림 전송</li>
+    <li>인증 거절 시 사유와 함께 DM 안내</li>
+  </ul>
+</div>
+
+<h3>멘토 인증 DB</h3>
+<div class="card">
+  <code>public.mentor_verifications</code> 테이블:
+  <ul>
+    <li><code>user_id</code> UUID</li>
+    <li><code>method</code> TEXT — 'email' | 'business_card'</li>
+    <li><code>status</code> TEXT — 'pending' | 'approved' | 'rejected'</li>
+    <li><code>submitted_at</code> TIMESTAMPTZ</li>
+    <li><code>reviewed_at</code> TIMESTAMPTZ</li>
+    <li><code>card_image_url</code> TEXT (명함 사진 경로)</li>
+  </ul>
+</div>
+
+<!-- 멘토 뱃지 -->
+<h2 id="topdog-badge">멘토 뱃지 <span class="badge both">FE + BE</span></h2>
+
+<table>
+  <tr><th>항목</th><th>설명</th></tr>
+  <tr><td>뱃지 노출 위치</td><td>프로필 카드 — <strong>상시 노출</strong> (프로필 어디서 보든 항상 표시)</td></tr>
+  <tr><td>뱃지 스타일</td><td>"MENTOR" 텍스트 + 특별 아이콘 (탑독 상징)</td></tr>
+  <tr><td>DB 컬럼</td><td><code>public.users.is_mentor BOOLEAN DEFAULT false</code></td></tr>
+  <tr><td>멘토 역할</td><td>일반 유저와 동일하게 커뮤니티 활동. 멘토 전용 채널 미지원 (MVP)</td></tr>
+</table>
+
+<div class="card highlight">
+  <strong>멘토 운영 원칙:</strong>
+  <ul>
+    <li>멘토도 언더독을 지지하는 입장 — 우월감이 아닌 경험 공유</li>
+    <li>멘토가 다시 공백기에 들어갔다면 멘토 상태 유지 (자진 해제 가능)</li>
+    <li>멘토 뱃지는 강제탈퇴 시 즉시 박탈</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════ -->
+<!-- 변경 이력 -->
+<!-- ═══════════════════════════════════ -->
+<hr class="feature-divider" id="changelog">
+<h2 style="border:none; margin-top:0;">변경 이력</h2>
+
+<div class="update-log">
+  <strong>2026-03-18</strong> — 디자인 확정 반영 및 기획 재정비 업데이트.<br>
+  <strong>프로필:</strong> 이모지 프로필 삭제 → 달 충전 게이지 프로필 (신월~보름달 10단계)로 확정. 온보딩 Step 5에 달 단계 선택 추가.<br>
+  <strong>온보딩:</strong> 8단계 → 7단계 재구성 (Step 5 바라는 것·Step 6 나는요 뱃지 제거 → Step 5 닉네임+달 게이지, Step 6 알림 허용, Step 7 환영). 알림 서브텍스트 "언제든 끌 수 있어!"만 유지. 환영 화면 배터리 게이지 UI 삭제.<br>
+  <strong>홈 피드:</strong> 카테고리 6개 컬러 확정 (주황/네이비/보라/그레이/초록/레드). 하단 네비게이션 4탭으로 변경 (알림 탭 → 검색 탭 교체).<br>
+  <strong>면접창고:</strong> 후기 상세에 제목 필드 추가. BLACKLIST 뱃지 위치 좌상단 코너로 변경. 블랙리스트 안내 문구 추가.<br>
+  <strong>글쓰기 폼 통일:</strong> 제목 → 카테고리 선택 → 내용 → 이미지(최대 3장) → 태그 순서 확정.<br>
+  <strong>피드 카드 통일:</strong> 닉네임 → 제목 → 같아요/댓글 수 + 업로드 시간.<br>
+  <strong>댓글 통일:</strong> 개별 박스 제거 → 구분선 구분. 답글 들여쓰기 + 좌측 보더.<br>
+  <strong>DM:</strong> 우측 상단 + 버튼 삭제. 배경 화이트, 구분선 통일.<br>
+  <strong>만들어줘:</strong> 전체 투표 "반영완료" 뱃지 삭제 → "종료" 텍스트로 변경.<br>
+  <strong>공지사항:</strong> NT-01에 UNOFF 뜻(Underdog's Offbeat + Unofficial) 명시, 지향 가치 넘버링(1~4), 마무리 문구 추가.<br>
+  <strong>신규 섹션:</strong> 탈퇴/탑독 전환 (P-04 탑독 전환 화면, P-05 멘토 인증, 멘토 뱃지). 사이드바 nav-group 추가.
+</div>
+<div class="update-log">
+  <strong>2026-03-17</strong> — 인앱 디자인 37화면 확장에 따른 대규모 기획서 업데이트.<br>
+  <strong>변경:</strong> 온보딩 7단계 → 8단계 (Step 5 바라는 것, Step 6 나는요 뱃지 추가), 닉네임 캐릭터 선택 추가, 닉네임 변경 불가 정책 명시.<br>
+  <strong>추가:</strong> 온보딩 슬라이드 카피(Splash/Slide 1~3), 가입 완료 화면(01-D, N번째 언더독 메시지).<br>
+  <strong>신규 섹션 8개:</strong> 홈 피드 / 자유게시판 / 참견해줘 / 면접창고(BLACKLIST 뱃지 포함) / 같이하자 / 만들어줘 / DM(OFFICIAL 뱃지, 안전 경고) / 공지사항(UNOFF 뜻, 강제탈퇴 가이드) / 알림 / 검색 / 프로필·설정.<br>
+  <strong>사이드바:</strong> 9개 nav-group → 13개 nav-group으로 확장.
+</div>
+<div class="update-log">
+  <strong>2026-03-16 (3)</strong> — 불일치 수정: 소셜 로그인 프로바이더 테이블(카카오 OAuth 방식, 네이버 미구현, 탭 구조 차이). 온보딩 섹션 전체 추가(7단계 상세 + 한눈에 보기 + 엣지케이스 + 체크리스트).
+</div>
+<div class="update-log">
+  <strong>2026-03-16 (2)</strong> — 비개발자용 "한눈에 보기" 블록 추가. 앞으로 모든 기능 섹션에 쉬운 요약 포함.
+</div>
+<div class="update-log">
+  <strong>2026-03-16 (1)</strong> — 문서 생성. 회원가입/로그인 섹션 완성 (FE + BE + 데이터 통합). 나머지 8개 섹션은 준비중 플레이스홀더.
+</div>
+
+</main>
+</div>
+
+<!-- ═══════════════════════════════════ -->
+<!-- 스크립트 -->
+<!-- ═══════════════════════════════════ -->
+<script>
+// 사이드바 그룹 토글
+function toggleGroup(el) {
+  el.parentElement.classList.toggle('open');
+}
+
+// 스크롤 시 사이드바 활성 링크 업데이트
+const allLinks = document.querySelectorAll('.nav-items a');
+const allSections = [];
+allLinks.forEach(a => {
+  const id = a.getAttribute('href')?.replace('#','');
+  if (id) {
+    const el = document.getElementById(id);
+    if (el) allSections.push({ link: a, el, group: a.closest('.nav-group') });
+  }
+});
+
+window.addEventListener('scroll', () => {
+  let current = allSections[0];
+  for (const s of allSections) {
+    if (s.el.getBoundingClientRect().top <= 100) current = s;
+  }
+  allLinks.forEach(l => l.classList.remove('active'));
+  if (current) {
+    current.link.classList.add('active');
+    // 해당 그룹 자동 열기
+    if (!current.group.classList.contains('open')) {
+      current.group.classList.add('open');
+    }
+  }
+});
+
+// 클릭 시 스무스 스크롤
+allLinks.forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const id = a.getAttribute('href')?.replace('#','');
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNOFF — Design Hub</title>
+<link rel="icon" href="favicon.svg">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, 'Pretendard', sans-serif;
+    background: #0F0F1A; color: #E8E8F0;
+    min-height: 100vh; padding: 48px 24px 80px;
+    max-width: 720px; margin: 0 auto;
+  }
+
+  /* 헤더 */
+  .header { margin-bottom: 56px; }
+  .logo { font-size: 36px; font-weight: 800; letter-spacing: 2px; color: #fff; }
+  .tagline { color: #8888AA; font-size: 15px; margin-top: 8px; }
+
+  /* 카테고리 섹션 */
+  .category {
+    margin-bottom: 48px;
+  }
+  .category-title {
+    font-size: 24px; font-weight: 700; color: #fff;
+    margin-bottom: 6px;
+  }
+  .category-desc {
+    font-size: 14px; color: #8888AA;
+    margin-bottom: 20px;
+  }
+
+  /* 링크 카드 */
+  .links { display: flex; flex-direction: column; gap: 10px; }
+  a.card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 18px;
+    background: #1A1A2E;
+    border: 1px solid #2A2A4A;
+    border-radius: 12px;
+    color: #E8E8F0; text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  a.card:hover { background: #222240; border-color: #7B68EE; }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .card-text { flex: 1; }
+  .card-text .name { font-size: 16px; font-weight: 600; }
+  .card-text .desc { font-size: 13px; color: #8888AA; margin-top: 3px; }
+  .arrow { color: #555; font-size: 18px; }
+
+  /* 카테고리별 아이콘 배경색 */
+  .icon-plan { background: rgba(123,104,238,0.15); }
+  .icon-design { background: rgba(0,180,197,0.15); }
+  .icon-onboard { background: rgba(255,217,61,0.15); }
+  .icon-system { background: rgba(78,205,196,0.15); }
+  .icon-brand { background: rgba(255,107,107,0.15); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">unoff</div>
+  <div class="tagline">Design Hub</div>
+</div>
+
+<!-- 서비스 기획 -->
+<div class="category">
+  <div class="category-title">서비스 기획</div>
+  <div class="category-desc">앱 기능 스펙, 플로우, 데이터 설계</div>
+  <div class="links">
+    <a class="card" href="planning/service-plan.html">
+      <div class="card-icon icon-plan">📋</div>
+      <div class="card-text">
+        <div class="name">앱서비스 상세기획</div>
+        <div class="desc">전체 기능 스펙 + 화면별 상세 설계</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="planning/auth-plan.html">
+      <div class="card-icon icon-plan">🔐</div>
+      <div class="card-text">
+        <div class="name">회원가입 / 로그인</div>
+        <div class="desc">인증 플로우 상세 (소셜 + OTP)</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="planning/full-plan.html">
+      <div class="card-icon icon-plan">📑</div>
+      <div class="card-text">
+        <div class="name">통합 기획서</div>
+        <div class="desc">사업계획 + 서비스 전략</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="planning/app-design-plan.html">
+      <div class="card-icon icon-plan">⚙️</div>
+      <div class="card-text">
+        <div class="name">앱 설계 기획서</div>
+        <div class="desc">기술 아키텍처 + 데이터 모델</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+  </div>
+</div>
+
+<!-- 인앱 디자인 -->
+<div class="category">
+  <div class="category-title">인앱 디자인</div>
+  <div class="category-desc">전체 화면 시안, UI/UX 상세</div>
+  <div class="links">
+    <a class="card" href="design/screens/inapp-v2.html">
+      <div class="card-icon icon-design">🎨</div>
+      <div class="card-text">
+        <div class="name">인앱 화면 v2</div>
+        <div class="desc">전체 화면 시안 (최신)</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="design/screens/final.html">
+      <div class="card-icon icon-design">✨</div>
+      <div class="card-text">
+        <div class="name">최종 디자인</div>
+        <div class="desc">확정 디자인 시안</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="design/screens/core-uiux.html">
+      <div class="card-icon icon-design">📱</div>
+      <div class="card-text">
+        <div class="name">핵심 화면 UI/UX</div>
+        <div class="desc">주요 화면 상세 설계</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="design/screens/full-flow.html">
+      <div class="card-icon icon-design">🔄</div>
+      <div class="card-text">
+        <div class="name">전체 플로우</div>
+        <div class="desc">화면 간 흐름 정리</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="design/screens/3types.html">
+      <div class="card-icon icon-design">🎭</div>
+      <div class="card-text">
+        <div class="name">디자인 3타입 비교</div>
+        <div class="desc">미니멀 / 그라데이션 / 카드</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+  </div>
+</div>
+
+<!-- 온보딩 -->
+<div class="category">
+  <div class="category-title">온보딩</div>
+  <div class="category-desc">첫 실행 경험, 달 모션, 배터리 시스템</div>
+  <div class="links">
+    <a class="card" href="design/onboarding/moon-battery.html">
+      <div class="card-icon icon-onboard">🌙</div>
+      <div class="card-text">
+        <div class="name">달 + 배터리 온보딩</div>
+        <div class="desc">달 모션 애니메이션 + 배터리 시스템</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="design/onboarding/prototype.html">
+      <div class="card-icon icon-onboard">🎬</div>
+      <div class="card-text">
+        <div class="name">인터랙션 프로토타입</div>
+        <div class="desc">실제 동작하는 프로토타입</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="design/onboarding/flow.html">
+      <div class="card-icon icon-onboard">📐</div>
+      <div class="card-text">
+        <div class="name">온보딩 플로우</div>
+        <div class="desc">정적 화면 흐름</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+  </div>
+</div>
+
+<!-- 디자인 시스템 -->
+<div class="category">
+  <div class="category-title">디자인 시스템</div>
+  <div class="category-desc">컴포넌트, 토큰, 스타일 가이드</div>
+  <div class="links">
+    <a class="card" href="design/system/components.html">
+      <div class="card-icon icon-system">🧩</div>
+      <div class="card-text">
+        <div class="name">컴포넌트 시스템</div>
+        <div class="desc">버튼, 카드, 입력 등</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+    <a class="card" href="design/system/v3.html">
+      <div class="card-icon icon-system">🎯</div>
+      <div class="card-text">
+        <div class="name">디자인 v3</div>
+        <div class="desc">최신 디자인 시스템</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+  </div>
+</div>
+
+<!-- 브랜드 -->
+<div class="category">
+  <div class="category-title">브랜드</div>
+  <div class="category-desc">브랜드 가이드, 컬러, 타이포그래피</div>
+  <div class="links">
+    <a class="card" href="brand/guide.html">
+      <div class="card-icon icon-brand">💜</div>
+      <div class="card-text">
+        <div class="name">브랜드 가이드</div>
+        <div class="desc">컬러 / 타이포 / 로고 사용 규칙</div>
+      </div>
+      <span class="arrow">›</span>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

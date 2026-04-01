@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>unoff — Final In-App Design</title>
+  <!-- Pretendard 공식 CDN (브랜드 가이드 §4-1 기준) -->
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+    /* ─────────────────────────────────────────────
+       디자인 토큰 (브랜드 가이드 §3, §4, §5 기준)
+       ───────────────────────────────────────────── */
+    :root {
+      /* Ultra Violet 계열 */
+      --violet-900: #2E1F4E;
+      --violet-700: #47366A;
+      --violet-500: #5F4B8B;
+      --violet-400: #7E6BA6;
+      --violet-300: #A899C4;
+      --violet-200: #D0C7E0;
+      --violet-100: #EDE9F5;
+
+      /* Scuba Blue 계열 */
+      --scuba-600: #009BAA;
+      --scuba-500: #00B4C5;
+      --scuba-400: #33C5D3;
+      --scuba-300: #7DDAE3;
+      --scuba-200: #B3E9EF;
+      --scuba-100: #E0F5F8;
+
+      /* Cloud Dancer 계열 */
+      --cloud-500: #F0EDE5;
+      --cloud-400: #E8E4DA;
+      --cloud-300: #DDD8CC;
+      --cloud-200: #C9C3B5;
+      --cloud-100: #F7F5F0;
+
+      /* 기본 */
+      --white: #FFFFFF;
+      --black: #1A1A1A;
+
+      /* 오로라 그라데이션 (시그니처: Scuba→Violet) */
+      --aurora-gradient: linear-gradient(90deg, var(--scuba-500) 0%, var(--violet-500) 100%);
+      --aurora-gradient-v: linear-gradient(180deg, var(--scuba-500) 0%, var(--violet-500) 100%);
+    }
+
+    /* ─────────────────────────────────────────────
+       리셋 & 기본 설정
+       ───────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      /* 페이지 배경: 요청사항대로 #120E1C (깊은 밤하늘) */
+      background: #120E1C;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 64px;
+      gap: 0;
+    }
+
+    /* ─────────────────────────────────────────────
+       페이지 레이블
+       ───────────────────────────────────────────── */
+    .page-label-top {
+      color: var(--violet-300);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    .page-label-bottom {
+      color: var(--violet-300);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      margin-top: 20px;
+      text-align: center;
+      opacity: 0.6;
+    }
+
+    /* ─────────────────────────────────────────────
+       iPhone 프레임
+       ───────────────────────────────────────────── */
+    .iphone-frame {
+      /* iPhone 14 Pro 기준: 390 × 844px */
+      width: 390px;
+      height: 844px;
+      background: var(--white);
+      border-radius: 48px;
+      overflow: hidden;
+      position: relative;
+
+      /* 프레임 외곽 테두리 (디바이스 베젤) */
+      box-shadow:
+        0 0 0 2px #2A2A2A,
+        0 0 0 4px #1A1A1A,
+        0 32px 80px rgba(0, 0, 0, 0.6),
+        0 8px 24px rgba(0, 180, 197, 0.12);
+    }
+
+    /* ─────────────────────────────────────────────
+       iOS 상태바 영역
+       ───────────────────────────────────────────── */
+    .status-bar {
+      /* 상태바 높이: 54px (다이나믹 아일랜드 포함 안전 영역) */
+      height: 54px;
+      background: var(--white);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 28px 8px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* 다이나믹 아일랜드: 118×34px, 정중앙 */
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 34px;
+      background: #1A1A1A;
+      border-radius: 20px;
+      z-index: 20;
+    }
+
+    .status-time {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1A1A1A;
+      letter-spacing: -0.3px;
+    }
+
+    /* 배터리/신호 아이콘 영역 (오른쪽) */
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 신호 강도 아이콘 (SVG inline) */
+    .status-icons svg {
+      display: block;
+    }
+
+    /* ─────────────────────────────────────────────
+       스크롤 영역 (상태바 아래 ~ 네비게이션 위)
+       ───────────────────────────────────────────── */
+    .scroll-area {
+      /* 844 - 54(상태바) - 83(하단 네비) = 707px */
+      height: 707px;
+      overflow-y: auto;
+      background: var(--white);
+
+      /* 스크롤바 숨김 */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .scroll-area::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ─────────────────────────────────────────────
+       헤더 (로고 + 검색 아이콘)
+       ───────────────────────────────────────────── */
+    .header {
+      /* 좌우 패딩 20px, 넉넉한 상하 패딩 */
+      padding: 16px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+    }
+
+    /* 로고: 반드시 #1A1A1A Black. 컬러 변형 절대 금지. */
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.5px;
+    }
+
+    /* 검색 아이콘 버튼 */
+    .header-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* ─────────────────────────────────────────────
+       "지금 핫한 이야기" 배너
+       ───────────────────────────────────────────── */
+    .hot-banner {
+      margin: 4px 20px 16px;
+      background: var(--violet-900);   /* Violet 900 다크 배경 */
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .hot-banner-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      /* 오버라인 스타일 */
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .hot-banner-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.47;
+      margin-bottom: 10px;
+    }
+
+    .hot-banner-meta {
+      font-size: 12px;
+      color: var(--violet-300);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: flex-end;
+    }
+
+    /* ─────────────────────────────────────────────
+       카테고리 필터 탭 (가로 스크롤)
+       ───────────────────────────────────────────── */
+    .tab-container {
+      padding: 0 20px 12px;
+      /* 탭 영역에 약한 경계선 */
+      border-bottom: 1px solid #F5F5F5;
+      margin-bottom: 4px;
+    }
+
+    .tab-list {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .tab-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-item {
+      /* 탭 기본: 패딩 넉넉하게 */
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      position: relative;
+      color: var(--violet-300);      /* 비활성: Violet 300 */
+      flex-shrink: 0;
+    }
+
+    /* 활성 탭: Scuba 500 텍스트 + 하단 2px 라인 */
+    .tab-item.active {
+      color: var(--scuba-500);
+      font-weight: 600;
+    }
+
+    .tab-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 16px;
+      right: 16px;
+      height: 2px;
+      background: var(--scuba-500);
+      border-radius: 9999px;
+    }
+
+    /* ─────────────────────────────────────────────
+       피드 카드 영역
+       ───────────────────────────────────────────── */
+    .feed {
+      padding: 12px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;     /* 카드 간격 12px */
+    }
+
+    /* ─────────────────────────────────────────────
+       게시글 카드
+       Type B: White + Cloud300 보더 1px + radius 12px
+       상단 오로라 라인 2px (Type C 포인트 병합)
+       ───────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--cloud-300);   /* #DDD8CC 보더 1px */
+      border-radius: 12px;
+      overflow: hidden;
+      /* 그림자 완전 제거 — 보더로만 구분 */
+    }
+
+    /* 카드 상단 오로라 그라데이션 라인 2px (오로라 포인트) */
+    .card-aurora-line {
+      height: 2px;
+      background: linear-gradient(90deg, var(--scuba-500) 0%, var(--violet-500) 100%);
+      /* 브랜드 시그니처 그라데이션: Scuba→Violet */
+    }
+
+    /* 카드 내부 콘텐츠: 패딩 16px */
+    .card-body {
+      padding: 14px 16px 12px;
+    }
+
+    /* 카드 상단 행: 닉네임 + 뱃지 + 시간 */
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .card-nickname {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--violet-900);
+      letter-spacing: -0.2px;
+    }
+
+    /* 상태 뱃지: 알약형 */
+    .badge {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    /* OFF 뱃지: Violet 100 배경 + Violet 300 텍스트 */
+    .badge-off {
+      background: var(--violet-100);
+      color: var(--violet-300);
+    }
+
+    /* 충전 중 뱃지: Scuba 100 배경 + Scuba 500 텍스트 */
+    .badge-charging {
+      background: var(--scuba-100);
+      color: var(--scuba-500);
+    }
+
+    /* 번아웃 회복 뱃지: Cloud 400 배경 + Cloud 200 텍스트 */
+    .badge-burnout {
+      background: var(--cloud-400);
+      color: var(--cloud-200);
+    }
+
+    /* 시간 텍스트 */
+    .card-time {
+      font-size: 11px;
+      color: var(--violet-300);
+      margin-left: auto;   /* 우측 끝으로 */
+      font-weight: 400;
+    }
+
+    /* 카드 본문 텍스트 */
+    .card-content {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--violet-900);
+      line-height: 1.6;    /* 브랜드 가이드: 본문 line-height 1.6~1.8 */
+      margin-bottom: 14px;
+
+      /* 최대 3줄 제한 */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* 카드 하단: 반응 버튼 */
+    .card-reactions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-top: 10px;
+      border-top: 1px solid #F5F3FA;   /* 아주 연한 구분선 */
+    }
+
+    .reaction-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--violet-400);
+      cursor: pointer;
+    }
+
+    .reaction-btn span {
+      font-weight: 500;
+      color: var(--violet-400);
+    }
+
+    /* 반응 아이콘 */
+    .reaction-icon {
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    /* ─────────────────────────────────────────────
+       글쓰기 FAB (Floating Action Button)
+       우하단 고정: Scuba→Violet 오로라 그라데이션
+       ───────────────────────────────────────────── */
+    .fab {
+      position: absolute;
+      /* 하단 네비 높이(83px) + 여유 16px */
+      bottom: 99px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, var(--scuba-500) 0%, var(--violet-500) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* 그림자: 0 4px 16px rgba(0,180,197,0.3) */
+      box-shadow: 0 4px 16px rgba(0, 180, 197, 0.3);
+      cursor: pointer;
+      z-index: 50;
+    }
+
+    /* ─────────────────────────────────────────────
+       하단 네비게이션 (4탭)
+       높이 83px, Safe Area 포함
+       ───────────────────────────────────────────── */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 83px;
+      background: var(--white);
+      /* 상단 구분선: 오로라 그라데이션 1px */
+      border-top: 1px solid transparent;
+      background-clip: padding-box;
+      z-index: 40;
+    }
+
+    /* 오로라 그라데이션 상단 구분선 구현 */
+    .bottom-nav::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--scuba-500) 0%, var(--violet-300) 50%, var(--violet-500) 100%);
+      opacity: 0.4;
+    }
+
+    /* 네비 탭 목록 */
+    .nav-list {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-around;
+      padding-top: 10px;
+      height: 56px;   /* Safe Area(27px) 위 탭 영역 */
+    }
+
+    /* 개별 탭 */
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      position: relative;
+      min-width: 56px;
+    }
+
+    /* 네비 아이콘 */
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* 활성 탭 도트 제거됨 — 사용자 요청 */
+    .nav-icon .active-dot {
+      display: none;
+    }
+
+    /* 네비 텍스트 라벨 */
+    .nav-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+
+    /* 활성: Violet 900 */
+    .nav-item.active .nav-label {
+      color: var(--violet-900);
+      font-weight: 600;
+    }
+
+    /* 비활성: Violet 300 */
+    .nav-item .nav-label {
+      color: var(--violet-300);
+    }
+
+    /* 홈 인디케이터 */
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: var(--violet-900);
+      opacity: 0.2;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 레이블 -->
+  <p class="page-label-top">unoff — Final In-App Design</p>
+
+  <!-- ─────────────────────────────────────────
+       iPhone 프레임
+       ───────────────────────────────────────── -->
+  <div class="iphone-frame">
+
+    <!-- iOS 상태바 -->
+    <div class="status-bar">
+      <!-- 다이나믹 아일랜드: 118×34px, 중앙 고정 -->
+      <div class="dynamic-island"></div>
+
+      <!-- 좌측: 시간 -->
+      <span class="status-time">9:41</span>
+
+      <!-- 우측: 신호·와이파이·배터리 아이콘 -->
+      <div class="status-icons">
+        <!-- 셀룰러 신호 (4칸 막대) -->
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+          <rect x="0" y="8" width="3" height="4" rx="0.5" fill="#1A1A1A"/>
+          <rect x="4.5" y="5.5" width="3" height="6.5" rx="0.5" fill="#1A1A1A"/>
+          <rect x="9" y="3" width="3" height="9" rx="0.5" fill="#1A1A1A"/>
+          <rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="#1A1A1A"/>
+        </svg>
+        <!-- 와이파이 -->
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+          <path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#1A1A1A"/>
+          <path d="M3.5 6.5C4.9 5.1 6.4 4.4 8 4.4s3.1.7 4.5 2.1" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M0.5 3.5C2.6 1.4 5.2 0.2 8 0.2s5.4 1.2 7.5 3.3" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
+        <!-- 배터리 -->
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+          <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1A1A1A" stroke-opacity="0.35"/>
+          <path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1A1A1A" fill-opacity="0.4"/>
+          <rect x="2" y="2" width="16" height="8" rx="2" fill="#1A1A1A"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 스크롤 가능 본문 영역 -->
+    <div class="scroll-area">
+
+      <!-- ──────────────────────────────────────
+           헤더: 로고 + 검색 아이콘
+           ────────────────────────────────────── -->
+      <div class="header">
+        <!-- 로고: 소문자 unoff, 반드시 #1A1A1A Black -->
+        <span class="logo">unoff</span>
+
+        <!-- 검색 아이콘 (Violet 500, outlined) -->
+        <div class="header-btn">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="10" cy="10" r="7" stroke="#5F4B8B" stroke-width="1.8"/>
+            <path d="M15.5 15.5L20 20" stroke="#5F4B8B" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────
+           "지금 핫한 이야기" 배너
+           Violet 900 다크 배경, radius 12px
+           ────────────────────────────────────── -->
+      <div class="hot-banner">
+        <!-- 라벨: Overline 11px SemiBold -->
+        <div class="hot-banner-label">🔥 지금 핫한 이야기</div>
+        <!-- 본문: Body M 15px -->
+        <div class="hot-banner-title">면접에서 공백기 어떻게 말해요?</div>
+        <!-- 반응 수: 우측 하단 Caption 12px, Violet 300 -->
+        <div class="hot-banner-meta">
+          <span>🤝 같아요 34</span>
+          <span style="opacity:0.5;">·</span>
+          <span>💬 댓글 21</span>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────
+           카테고리 필터 탭 (가로 스크롤)
+           ────────────────────────────────────── -->
+      <div class="tab-container">
+        <div class="tab-list">
+          <!-- 활성 탭: Scuba 500 텍스트 + 하단 2px 라인 -->
+          <div class="tab-item active">전체</div>
+          <!-- 비활성 탭: Violet 300 텍스트 -->
+          <div class="tab-item">오늘의 OFF</div>
+          <div class="tab-item">면접후기</div>
+          <div class="tab-item">고민창고</div>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────
+           게시글 피드
+           ────────────────────────────────────── -->
+      <div class="feed">
+
+        <!-- ── 카드 1 ──────────────────────────
+             닉네임: OFF중인누군가
+             상태: OFF (Violet 100 + Violet 300)
+             시간: 2시간 전
+             본문: "오늘 자소서 한 줄 썼다..."
+             ────────────────────────────────── -->
+        <div class="card">
+
+          <div class="card-body">
+            <!-- 닉네임 + 뱃지 + 시간 -->
+            <div class="card-meta">
+              <span class="card-nickname">OFF중인누군가</span>
+              <span class="badge badge-off">OFF</span>
+              <span class="card-time">2시간 전</span>
+            </div>
+
+            <!-- 본문: 최대 2~3줄 -->
+            <div class="card-content">
+              오늘 자소서 한 줄 썼다. 그것만으로 오늘은 충분해.
+            </div>
+
+            <!-- 반응 버튼 -->
+            <div class="card-reactions">
+              <div class="reaction-btn">
+                <span class="reaction-icon">🤝</span>
+                <span>같아요 42</span>
+              </div>
+              <div class="reaction-btn">
+                <span class="reaction-icon">💬</span>
+                <span>댓글 12</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 카드 2 ──────────────────────────
+             닉네임: 충전중인고양이
+             상태: 충전 중 (Scuba 100 + Scuba 500)
+             시간: 5시간 전
+             본문: "면접에서 공백기 어떻게 말해요?..."
+             ────────────────────────────────── -->
+        <div class="card">
+
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="card-nickname">충전중인고양이</span>
+              <span class="badge badge-charging">충전 중</span>
+              <span class="card-time">5시간 전</span>
+            </div>
+
+            <div class="card-content">
+              면접에서 공백기 어떻게 말해요? 다들 어떻게 설명하세요...
+            </div>
+
+            <div class="card-reactions">
+              <div class="reaction-btn">
+                <span class="reaction-icon">🤝</span>
+                <span>같아요 34</span>
+              </div>
+              <div class="reaction-btn">
+                <span class="reaction-icon">💬</span>
+                <span>댓글 21</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 카드 3 ──────────────────────────
+             닉네임: 밤하늘산책자
+             상태: 번아웃 회복 (Cloud 400 + Cloud 200)
+             시간: 어제
+             본문: "요즘 아침에 눈 뜨면 또 뭘 해야 하나..."
+             ────────────────────────────────── -->
+        <div class="card">
+
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="card-nickname">밤하늘산책자</span>
+              <span class="badge badge-burnout">번아웃 회복</span>
+              <span class="card-time">어제</span>
+            </div>
+
+            <div class="card-content">
+              요즘 아침에 눈 뜨면 또 뭘 해야 하나 싶은데, 여기 오면 좀 나아져.
+            </div>
+
+            <div class="card-reactions">
+              <div class="reaction-btn">
+                <span class="reaction-icon">🤝</span>
+                <span>같아요 28</span>
+              </div>
+              <div class="reaction-btn">
+                <span class="reaction-icon">💬</span>
+                <span>댓글 8</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단 여백 (숨 쉬는 공간) -->
+        <div style="height: 24px;"></div>
+
+      </div>
+    </div><!-- .scroll-area 끝 -->
+
+    <!-- ──────────────────────────────────────
+         글쓰기 FAB
+         Scuba→Violet 오로라 그라데이션 배경
+         크기 56×56, radius 9999, 우하단 고정
+         ────────────────────────────────────── -->
+    <div class="fab">
+      <!-- 연필 아이콘 (SVG inline, White) -->
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M15.5 2.5L19.5 6.5L7 19H3V15L15.5 2.5Z"
+          stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+        <path d="M13 5L17 9" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- ──────────────────────────────────────
+         하단 네비게이션 (4탭)
+         높이 83px, Safe Area 포함
+         상단: 오로라 그라데이션 구분선 1px
+         ────────────────────────────────────── -->
+    <div class="bottom-nav">
+      <div class="nav-list">
+
+        <!-- 홈 (활성: Violet 900 + Scuba 500 도트) -->
+        <div class="nav-item active">
+          <div class="nav-icon">
+            <!-- 홈 아이콘 (outlined) -->
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M2 9.5L11 2L20 9.5V20H14V14H8V20H2V9.5Z"
+                stroke="#2E1F4E" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <!-- 활성 도트: Scuba 500, 3px -->
+            <span class="active-dot"></span>
+          </div>
+          <span class="nav-label">홈</span>
+        </div>
+
+        <!-- 게시판 (비활성: Violet 300) -->
+        <div class="nav-item">
+          <div class="nav-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="3" y="3" width="16" height="16" rx="3"
+                stroke="#A899C4" stroke-width="1.8" fill="none"/>
+              <path d="M7 8H15M7 12H13" stroke="#A899C4" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="nav-label">게시판</span>
+        </div>
+
+        <!-- 알림 (비활성: Violet 300) -->
+        <div class="nav-item">
+          <div class="nav-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 3C7.686 3 5 5.686 5 9V14L3 16H19L17 14V9C17 5.686 14.314 3 11 3Z"
+                stroke="#A899C4" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+              <path d="M9 16C9 17.105 9.895 18 11 18C12.105 18 13 17.105 13 16"
+                stroke="#A899C4" stroke-width="1.8" fill="none"/>
+            </svg>
+          </div>
+          <span class="nav-label">알림</span>
+        </div>
+
+        <!-- MY (비활성: Violet 300) -->
+        <div class="nav-item">
+          <div class="nav-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="8" r="4"
+                stroke="#A899C4" stroke-width="1.8" fill="none"/>
+              <path d="M3 20C3 16.134 6.134 13 10 13H12C15.866 13 19 16.134 19 20"
+                stroke="#A899C4" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <span class="nav-label">MY</span>
+        </div>
+
+      </div><!-- .nav-list 끝 -->
+
+      <!-- 홈 인디케이터: 134×5px, Violet 900 opacity 0.2 -->
+      <div class="home-indicator"></div>
+
+    </div><!-- .bottom-nav 끝 -->
+
+  </div><!-- .iphone-frame 끝 -->
+
+  <!-- 하단 레이블 -->
+  <p class="page-label-bottom">Type C 컬러 + Type B 카드 + Black 로고</p>
+
+</body>
+</html>
